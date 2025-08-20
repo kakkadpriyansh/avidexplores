@@ -1,0 +1,188 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* AvidExplores Adventure Design System */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+@layer base {
+  :root {
+    /* Adventure Color Palette */
+    --background: 0 0% 100%;
+    --foreground: 210 12% 16%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 12% 16%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 12% 16%;
+
+    /* Adventure Primary - Deep Forest Green */
+    --primary: 155 40% 25%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 155 40% 35%;
+
+    /* Adventure Secondary - Mountain Orange */
+    --secondary: 25 85% 55%;
+    --secondary-foreground: 0 0% 98%;
+
+    /* Sky Blue Accent */
+    --accent: 200 70% 50%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Earth Brown Muted */
+    --muted: 30 8% 92%;
+    --muted-foreground: 30 8% 45%;
+
+    /* Adventure Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(155 40% 25%) 0%, hsl(155 50% 35%) 50%, hsl(25 85% 55%) 100%);
+    --gradient-mountain: linear-gradient(180deg, hsl(200 70% 50%) 0%, hsl(155 40% 25%) 100%);
+    --gradient-sunset: linear-gradient(90deg, hsl(25 85% 55%) 0%, hsl(15 90% 60%) 100%);
+    --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+
+    /* Adventure Shadows & Effects */
+    --shadow-adventure: 0 10px 40px -10px hsl(155 40% 25% / 0.3);
+    --shadow-glow: 0 0 30px hsl(25 85% 55% / 0.4);
+    --shadow-card: 0 4px 20px -4px hsl(210 12% 16% / 0.1);
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 155 40% 25%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark Adventure Theme */
+    --background: 210 20% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 210 20% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 210 20% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 155 50% 45%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 155 50% 55%;
+
+    --secondary: 25 80% 60%;
+    --secondary-foreground: 210 20% 8%;
+
+    --accent: 200 60% 55%;
+    --accent-foreground: 210 20% 8%;
+
+    --muted: 210 20% 16%;
+    --muted-foreground: 210 10% 65%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 210 20% 20%;
+    --input: 210 20% 16%;
+    --ring: 155 50% 45%;
+
+    /* Dark Adventure Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(210 20% 8%) 0%, hsl(155 50% 25%) 50%, hsl(25 80% 45%) 100%);
+    --gradient-mountain: linear-gradient(180deg, hsl(210 20% 12%) 0%, hsl(155 40% 20%) 100%);
+    --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-montserrat font-bold;
+  }
+}
+
+@layer components {
+  /* Adventure Button Variants */
+  .btn-hero {
+    @apply bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-8 py-4 rounded-2xl font-montserrat font-semibold text-lg shadow-adventure hover:shadow-glow transition-all duration-300 hover:scale-105;
+  }
+
+  .btn-adventure {
+    @apply bg-secondary text-secondary-foreground px-6 py-3 rounded-xl font-montserrat font-semibold hover:bg-secondary/90 transition-all duration-300 hover:scale-105;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary bg-transparent px-6 py-3 rounded-xl font-montserrat font-semibold hover:bg-primary hover:text-primary-foreground transition-all duration-300;
+  }
+
+  /* Adventure Cards */
+  .card-glass {
+    @apply bg-card backdrop-blur-md border border-white/20 rounded-2xl shadow-card hover:shadow-adventure transition-all duration-300;
+  }
+
+  .card-adventure {
+    @apply bg-card rounded-2xl shadow-card hover:shadow-adventure transition-all duration-300 hover:-translate-y-2 overflow-hidden;
+  }
+
+  /* Hero Effects */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+
+  .mountain-gradient {
+    background: var(--gradient-mountain);
+  }
+
+  .glass-card {
+    background: var(--gradient-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* Animations */
+  .fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  .stagger-children > * {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
