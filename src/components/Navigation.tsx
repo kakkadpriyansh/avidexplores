@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Mountain, Sun, Moon } from 'lucide-react';
+import { Menu, Mountain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -10,13 +9,7 @@ import {
 } from '@/components/ui/sheet';
 
 const Navigation = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const location = useLocation();
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-  };
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -57,18 +50,6 @@ const Navigation = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="rounded-full"
-            >
-              {isDarkMode ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </Button>
             <Link to="/login">
               <Button variant="outline" size="sm" className="btn-outline">
                 Login
@@ -83,19 +64,6 @@ const Navigation = () => {
 
           {/* Mobile Menu */}
           <div className="md:hidden flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="rounded-full"
-            >
-              {isDarkMode ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </Button>
-            
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm">

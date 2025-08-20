@@ -49,6 +49,13 @@ export interface Story {
   tags: string[];
 }
 
+export interface Destination {
+  name: string;
+  image: string;
+  subtitle?: string;
+  slug?: string;
+}
+
 export const mockEvents: Event[] = [
   {
     id: '1',
@@ -177,8 +184,8 @@ export const mockStories: Story[] = [
     id: '1',
     slug: 'conquering-the-peaks',
     title: 'Conquering the Peaks: A Journey of Self-Discovery',
-    excerpt: 'How a challenging trek to the Himalayas changed my perspective on life and adventure.',
-    cover: 'https://images.unsplash.com/photo-1464822759506-4b2e6ea6a3de?w=600&h=400&fit=crop',
+    excerpt: 'How a challenging trek to the Himalayas changed my perspective on life and adventure, teaching me lessons that go far beyond the mountains.',
+    cover: 'https://miro.medium.com/v2/resize:fit:1400/format:webp/0*m4F4LxOfM7_l8Mu6',
     content: 'The mountains have always called to me, but this trek was different...',
     author: 'Vikram Singh',
     authorAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
@@ -188,9 +195,61 @@ export const mockStories: Story[] = [
   },
   {
     id: '2',
+    slug: 'underwater-paradise-maldives',
+    title: 'Diving into Paradise: Maldives Underwater Adventure',
+    excerpt: 'Exploring the vibrant coral reefs and marine life of the Maldives - a scuba diving experience that will leave you breathless.',
+    cover: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&h=400&fit=crop',
+    content: 'The crystal-clear waters of the Maldives hide an underwater world...',
+    author: 'Priya Nair',
+    authorAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b-3f?w=100&h=100&fit=crop&crop=face',
+    publishedAt: '2024-01-20',
+    readTime: 7,
+    tags: ['Scuba Diving', 'Marine Life', 'Maldives']
+  },
+  {
+    id: '3',
+    slug: 'desert-safari-rajasthan',
+    title: 'Golden Sands and Starlit Nights: Rajasthan Desert Safari',
+    excerpt: 'Experience the magic of the Thar Desert with camel rides, traditional music, and camping under a blanket of stars.',
+    cover: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600&h=400&fit=crop',
+    content: 'The vast expanse of golden sand dunes stretched endlessly...',
+    author: 'Rajesh Sharma',
+    authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+    publishedAt: '2024-01-18',
+    readTime: 6,
+    tags: ['Desert', 'Camping', 'Culture']
+  },
+  {
+    id: '4',
+    slug: 'white-water-rapids-rishikesh',
+    title: 'Conquering the Rapids: White Water Rafting in Rishikesh',
+    excerpt: 'Navigate through Grade IV rapids on the holy Ganges river, where spirituality meets adrenaline in the adventure capital of India.',
+    cover: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&h=400&fit=crop',
+    content: 'The roar of the rapids echoed through the valley as our raft...',
+    author: 'Anita Gupta',
+    authorAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+    publishedAt: '2024-01-12',
+    readTime: 5,
+    tags: ['Water Sports', 'Rishikesh', 'Adrenaline']
+  },
+  {
+    id: '5',
+    slug: 'backpacking-southeast-asia',
+    title: 'Solo Backpacking Through Southeast Asia: 30 Days of Discovery',
+    excerpt: 'From bustling Bangkok markets to serene Bali beaches, follow my month-long solo journey across Southeast Asia.',
+    cover: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=400&fit=crop',
+    content: 'With nothing but a backpack and an open mind, I embarked on...',
+    author: 'Karan Mehta',
+    authorAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+    publishedAt: '2024-01-08',
+    readTime: 12,
+    tags: ['Solo Travel', 'Backpacking', 'Southeast Asia']
+  },
+  {
+    id: '6',
     slug: 'family-adventure-guide',
     title: 'The Ultimate Family Adventure Guide',
-    excerpt: 'Tips and tricks for planning the perfect outdoor adventure with kids.',
+    excerpt: 'Tips and tricks for planning the perfect outdoor adventure with kids, ensuring fun and safety for the whole family.',
     cover: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop',
     content: 'Planning outdoor adventures with family requires careful consideration...',
     author: 'Meera Reddy',
@@ -198,19 +257,6 @@ export const mockStories: Story[] = [
     publishedAt: '2024-01-10',
     readTime: 6,
     tags: ['Family', 'Tips', 'Planning']
-  },
-  {
-    id: '3',
-    slug: 'monsoon-trekking-safety',
-    title: 'Monsoon Trekking: Safety First',  
-    excerpt: 'Essential safety tips for trekking during the monsoon season.',
-    cover: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=400&fit=crop',
-    content: 'Monsoon trekking can be magical, but it requires extra precautions...',
-    author: 'Arjun Kapoor',
-    authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-    publishedAt: '2024-01-05',
-    readTime: 5,
-    tags: ['Safety', 'Monsoon', 'Trekking']
   }
 ];
 
@@ -220,3 +266,22 @@ export const adventureStats = {
   events: '200+',
   years: '8+'
 };
+
+export const destinations = {
+  india: [
+    { name: 'Ladakh', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=600&fit=crop', subtitle: 'Road Trip', slug: 'ladakh' },
+    { name: 'Kerala', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400&h=600&fit=crop', slug: 'kerala' },
+    { name: 'Himachal', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=600&fit=crop', slug: 'himachal' },
+    { name: 'Goa', image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400&h=600&fit=crop', slug: 'goa' },
+    { name: 'Andaman Nicobar', image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=600&fit=crop', slug: 'andaman-nicobar' },
+  ],
+  international: [
+    { name: 'Dubai', image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&h=600&fit=crop' },
+    { name: 'Maldives', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=600&fit=crop' },
+    { name: 'Malaysia', image: 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400&h=600&fit=crop' },
+    { name: 'Singapore', image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400&h=600&fit=crop' },
+    { name: 'Bali', image: 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?w=400&h=600&fit=crop' },
+  ],
+};
+
+export const mockDestinations: Destination[] = destinations.india;

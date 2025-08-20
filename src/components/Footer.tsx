@@ -119,7 +119,17 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/20 mt-12 pt-8 text-center text-primary-foreground/60">
-          <p>&copy; 2024 AvidExplores. All rights reserved. | Privacy Policy | Terms of Service</p>
+          <p>
+            Developed and designed by{' '}
+            <a
+              href="https://kakkadpriyanshportfolio.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-secondary"
+            >
+              Priyansh
+            </a>
+          </p>
         </div>
       </div>
     </footer>

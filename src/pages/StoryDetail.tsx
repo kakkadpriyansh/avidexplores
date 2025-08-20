@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import StoryCard from '@/components/StoryCard';
@@ -14,6 +15,11 @@ const StoryDetail = () => {
   
   const story = mockStories.find(s => s.slug === slug);
   const relatedStories = mockStories.filter(s => s.slug !== slug).slice(0, 3);
+
+  // Scroll to top when component mounts or slug changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
 
   if (!story) {
     return (
@@ -163,12 +169,12 @@ const StoryDetail = () => {
             alt={story.title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
           
           {/* Back Button */}
           <div className="absolute top-8 left-4">
             <Link to="/stories">
-              <Button variant="ghost" className="text-white hover:bg-white/20">
+              <Button variant="ghost" className="text-white hover:bg-muted/20">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Stories
               </Button>
