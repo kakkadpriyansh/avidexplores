@@ -50,37 +50,37 @@ const Hero = () => {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto stagger-children">
-            <div className="glass-card p-6 rounded-2xl text-center">
-              <Users className="h-8 w-8 text-secondary mx-auto mb-2" />
-              <div className="text-2xl md:text-3xl font-montserrat font-bold text-white">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-4xl mx-auto stagger-children">
+            <div className="glass-card p-4 md:p-6 rounded-2xl text-center bg-black/30 backdrop-blur-sm border border-white/20">
+              <Users className="h-6 w-6 md:h-8 md:w-8 text-secondary mx-auto mb-2" />
+              <div className="text-xl md:text-2xl lg:text-3xl font-montserrat font-bold text-white">
                 {adventureStats.participants}
               </div>
-              <div className="text-white/80 text-sm">Happy Adventurers</div>
+              <div className="text-white/90 text-xs md:text-sm">Happy Adventurers</div>
             </div>
             
-            <div className="glass-card p-6 rounded-2xl text-center">
-              <Award className="h-8 w-8 text-secondary mx-auto mb-2" />
-              <div className="text-2xl md:text-3xl font-montserrat font-bold text-white">
+            <div className="glass-card p-4 md:p-6 rounded-2xl text-center bg-black/30 backdrop-blur-sm border border-white/20">
+              <Award className="h-6 w-6 md:h-8 md:w-8 text-secondary mx-auto mb-2" />
+              <div className="text-xl md:text-2xl lg:text-3xl font-montserrat font-bold text-white">
                 {adventureStats.guides}
               </div>
-              <div className="text-white/80 text-sm">Expert Guides</div>
+              <div className="text-white/90 text-xs md:text-sm">Expert Guides</div>
             </div>
             
-            <div className="glass-card p-6 rounded-2xl text-center">
-              <MapPin className="h-8 w-8 text-secondary mx-auto mb-2" />
-              <div className="text-2xl md:text-3xl font-montserrat font-bold text-white">
+            <div className="glass-card p-4 md:p-6 rounded-2xl text-center bg-black/30 backdrop-blur-sm border border-white/20">
+              <MapPin className="h-6 w-6 md:h-8 md:w-8 text-secondary mx-auto mb-2" />
+              <div className="text-xl md:text-2xl lg:text-3xl font-montserrat font-bold text-white">
                 {adventureStats.events}
               </div>
-              <div className="text-white/80 text-sm">Adventures</div>
+              <div className="text-white/90 text-xs md:text-sm">Adventures</div>
             </div>
             
-            <div className="glass-card p-6 rounded-2xl text-center">
-              <Calendar className="h-8 w-8 text-secondary mx-auto mb-2" />
-              <div className="text-2xl md:text-3xl font-montserrat font-bold text-white">
+            <div className="glass-card p-4 md:p-6 rounded-2xl text-center bg-black/30 backdrop-blur-sm border border-white/20">
+              <Calendar className="h-6 w-6 md:h-8 md:w-8 text-secondary mx-auto mb-2" />
+              <div className="text-xl md:text-2xl lg:text-3xl font-montserrat font-bold text-white">
                 {adventureStats.years}
               </div>
-              <div className="text-white/80 text-sm">Years Experience</div>
+              <div className="text-white/90 text-xs md:text-sm">Years Experience</div>
             </div>
           </div>
         </div>
