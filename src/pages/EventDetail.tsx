@@ -17,7 +17,10 @@ import {
   XCircle,
   Backpack,
   Shield,
-  Heart
+  Heart,
+  Mountain,
+  Flag,
+  Sunrise
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
@@ -236,9 +239,11 @@ const EventDetail = () => {
                                 onClick={() => setSelectedDay(day)}
                               >
                               <div className="flex items-center space-x-4 mb-4">
-                                {/* Day number circle */}
-                                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg shadow-lg group-hover:scale-110 transition-transform duration-200">
-                                  {day.day}
+                                {/* Day icon */}
+                                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200">
+                                  {index === 0 ? <Flag className="h-6 w-6" /> : 
+                                   index === event.itinerary.length - 1 ? <Mountain className="h-6 w-6" /> : 
+                                   <Sunrise className="h-6 w-6" />}
                                 </div>
                                 
                                 {/* Badge */}
