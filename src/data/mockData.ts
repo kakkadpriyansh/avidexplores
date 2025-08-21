@@ -146,6 +146,88 @@ export const mockEvents: Event[] = [
     ageLimit: '8-65 years',
     season: 'Year Round',
     tags: ['Camping', 'Family Friendly', 'Weekend']
+  },
+  {
+    id: '4',
+    slug: 'maharashtra-escape-3-days',
+    title: 'Maharashtra Escape – 3 Days / 2 Nights',
+    category: 'Multi-Adventure',
+    price: 7000,
+    location: 'Maharashtra (Bhandardara)',
+    difficulty: 'Moderate',
+    duration: '3 Days',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+    shortDescription: 'Experience waterfalls, trekking, heritage, boating, and BBQ nights in Maharashtra\'s natural paradise.',
+    description: 'This journey blends thrill & tranquility — roaring waterfalls, ancient trekking trails, heritage temples, scenic road trips, and stargazing BBQ nights. Every moment is designed to spark unforgettable memories in Maharashtra\'s natural paradise with stays at Bhandardara Resort.',
+    highlights: [
+      '5 Waterfall Adventure (25 km journey)',
+      'Harishchandragad Trek with hidden waterfall',
+      'Boating on Maharashtra\'s biggest dam (28 km stretch)',
+      'BBQ Night with music & dancing',
+      'Amruteshwar Temple visit',
+      'Natural bath experience',
+      'Professional trek guides'
+    ],
+    inclusions: [
+      '2 Breakfasts, 2 Lunches, 2 Dinners',
+      'BBQ night with entertainment',
+      'AC vehicle transport as per itinerary',
+      'Guided 5-waterfall exploration',
+      'Professional trek guide',
+      'Boating experience',
+      'Taxes & service charges',
+      '2 nights accommodation at Bhandardara Resort'
+    ],
+    exclusions: [
+      'Personal expenses (laundry, beverages, etc.)',
+      'Insurance',
+      'Camera fees at monuments (if applicable)',
+      'Activities not mentioned in itinerary',
+      'Extra costs due to natural/political disturbances'
+    ],
+    itinerary: [
+      {
+        day: 0,
+        title: 'Departure',
+        description: 'From Ahmedabad – AC Sleeper Bus (6:00 PM), From Surat – AC Tempo Traveller (11:00 PM), From Vadodara – Self-arranged travel to Surat, From Nashik – Pickup at 7:00 AM (Day 1)'
+      },
+      {
+        day: 1,
+        title: 'Waterfall Wonderland',
+        description: '10:30 AM – Arrival at Bhandardara Resort, 12:00 PM – Energizing Lunch, 1:30 PM – Begin 5 Waterfall Adventure: Vasundhara Falls, Koikhubhe Falls, Nahani Falls, Necklace Falls, Vanrai Falls, 7:00 PM – Return & relax, 8:00 PM – Dinner, Overnight stay at resort'
+      },
+      {
+        day: 2,
+        title: 'Thrilling Trek Adventure',
+        description: '6:00 AM – Early breakfast, 7:00 AM – Departure for Harishchandragad, 8:00 AM – Start trek from base point, Mid-day – Packed lunch amidst nature, Special Highlight: Hidden waterfall + natural bath, 6:00 PM – Return to resort, 8:00 PM – Dinner, 9:30 PM – Special BBQ Night with music & dancing'
+      },
+      {
+        day: 3,
+        title: 'Heritage & Water Adventure',
+        description: '8:00 AM – Breakfast, 9:00 AM – Visit Amruteshwar Temple, 11:00 AM – Boating on Maharashtra\'s biggest dam (28 km stretch), 2:00 PM – Begin return journey, 5:00 PM – Drop at Nashik, 7:00 PM – AC bus to Ahmedabad, 12:00 AM – Arrival at Surat'
+      }
+    ],
+    thingsToCarry: [
+      'Original ID proof (mandatory)',
+      'Trekking shoes with good grip',
+      'Quick-dry clothes (3-4 sets)',
+      'Light jacket/windcheater',
+      'Swimwear for waterfalls',
+      'Personal water bottle (1L+)',
+      'Small daypack',
+      'Hat, sunglasses, sunscreen (SPF 50+)',
+      'Insect repellent',
+      'First aid kit & medicines',
+      'Quick-dry towel',
+      'Power bank & charger',
+      'Waterproof cover for gadgets',
+      'Torch/headlamp + batteries',
+      'Toiletries & hygiene items'
+    ],
+    maxParticipants: 25,
+    ageLimit: '12-60 years',
+    season: 'Oct-Mar',
+    tags: ['Adventure', 'Waterfalls', 'Trekking', 'Heritage', 'Multi-Day']
   }
 ];
 
