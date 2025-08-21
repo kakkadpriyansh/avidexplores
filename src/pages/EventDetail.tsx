@@ -40,6 +40,9 @@ const EventDetail = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  // Compute itinerary helpers
+  const hasDeparture = event?.itinerary?.some((d) => d.day === 0) ?? false;
+  const totalDays = event ? Math.max(...event.itinerary.map((d) => d.day)) : 0;
   if (!event) {
     return (
       <div className="min-h-screen bg-background">
@@ -248,7 +251,7 @@ const EventDetail = () => {
                                 
                                 {/* Badge */}
                                 <Badge variant="outline" className="text-xs">
-                                  Day {day.day}
+                                  {day.day === 0 ? 'Departure' : `Day ${day.day}`}
                                 </Badge>
                               </div>
                               
@@ -273,7 +276,9 @@ const EventDetail = () => {
                       <div className="mt-8 p-4 bg-muted/50 rounded-lg border border-dashed border-border">
                         <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
                           <Calendar className="h-4 w-4" />
-                          <span>Total Duration: {event.itinerary.length} Days</span>
+                          <span>
+                            Total Duration: {totalDays} Days{hasDeparture ? ' + Departure' : ''}
+                          </span>
                         </div>
                       </div>
                       
@@ -285,12 +290,12 @@ const EventDetail = () => {
                             <div className="flex items-center justify-between p-6 border-b border-border">
                               <div className="flex items-center space-x-4">
                                 <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
-                                  {selectedDay.day}
+                                  {selectedDay.day === 0 ? 'D0' : selectedDay.day}
                                 </div>
                                 <div>
                                   <h3 className="text-2xl font-bold text-foreground">{selectedDay.title}</h3>
                                   <Badge variant="outline" className="mt-1">
-                                    Day {selectedDay.day}
+                                    {selectedDay.day === 0 ? 'Departure' : `Day ${selectedDay.day}`}
                                   </Badge>
                                 </div>
                               </div>
@@ -305,9 +310,15 @@ const EventDetail = () => {
                             {/* Modal content */}
                             <div className="p-6">
                               <div className="prose prose-sm max-w-none">
-                                <p className="text-muted-foreground leading-relaxed text-base">
-                                  {selectedDay.description}
-                                </p>
+                                <ul className="list-disc pl-5 space-y-2 text-base">
+                                  {selectedDay.description
+                                    .split(/(?:\r?\n|•| - | – |,)/g)
+                                    .map((s: string) => s.trim())
+                                    .filter(Boolean)
+                                    .map((point: string, idx: number) => (
+                                      <li key={idx} className="text-muted-foreground">{point}</li>
+                                    ))}
+                                </ul>
                               </div>
                             </div>
                             
