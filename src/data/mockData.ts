@@ -156,7 +156,7 @@ export const mockEvents: Event[] = [
     location: 'Maharashtra (Bhandardara)',
     difficulty: 'Moderate',
     duration: '3 Days',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+    image: 'https://ik.imagekit.io/yd29mwkn4/images/uploads/packages/large/27192.jpg',
     shortDescription: 'Experience waterfalls, trekking, heritage, boating, and BBQ nights in Maharashtra\'s natural paradise.',
     description: '🌍 Hello Traveller! ✨\nGet ready for a breathtaking Maharashtra Escape 🌄\n\n📅 Duration: 3 Days / 2 Nights\n🚌 Departure From: Rajkot | Ahmedabad | Surat | Nashik\n\n🌟 Journey Highlights:\n\n1️⃣ 5 Stunning Waterfalls 💦\n2️⃣ Harishchandra Trek 🥾\n3️⃣ Heritage Amruteshwar Temple 🛕\n4️⃣ Boat Adventure on Maharashtra\'s Biggest Dam (28 km) 🚤\n5️⃣ Scenic Road Trip 🚗\n6️⃣ Special BBQ Night under Billions of Stars 🔥✨\n\n📌 Stay: Comfortable 2 nights at Bhandardara Resort 🏡\n\n💫 What\'s the Special Magic?\n\nThis journey blends thrill & tranquility – the roar of waterfalls, the adventure of trekking, the serenity of temple visits, and the calm of a boat ride. Every moment is designed to create unforgettable memories amidst Maharashtra\'s natural beauty.\n\n',
     highlights: [
