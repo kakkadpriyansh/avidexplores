@@ -62,7 +62,7 @@ const StoryCard = ({ story }: StoryCardProps) => {
         
         {/* Category Badge */}
         <div className="absolute top-4 left-4">
-          <Badge className="bg-primary/90 text-white border-0 hover:bg-primary">
+          <Badge className="bg-primary/90 text-primary-foreground border-0 hover:bg-primary">
             {story.tags[0]}
           </Badge>
         </div>
@@ -142,7 +142,7 @@ const StoryCard = ({ story }: StoryCardProps) => {
 
         {/* Read More Button */}
         <Link to={`/stories/${story.slug}`} className="block">
-          <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white font-semibold py-2.5 rounded-lg transition-all duration-300 group-hover:shadow-lg">
+          <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-primary-foreground font-semibold py-2.5 rounded-lg transition-all duration-300 group-hover:shadow-lg">
             <span className="flex items-center justify-center">
               Read Full Story
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />

@@ -95,10 +95,8 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 [data-chart=${id}] {
 ${lightVars}
 }
-@media (prefers-color-scheme: dark) {
-  [data-chart=${id}] {
+.dark [data-chart=${id}] {
 ${darkVars}
-  }
 }
 `
 

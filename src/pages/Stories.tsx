@@ -59,7 +59,7 @@ const Stories = () => {
                 
                 {/* Featured Badge */}
                 <div className="absolute top-6 left-6">
-                  <Badge className="bg-yellow-500 text-black font-semibold px-4 py-2 text-sm">
+                  <Badge className="bg-yellow-500 text-yellow-950 dark:text-yellow-50 font-semibold px-4 py-2 text-sm">
                     <TrendingUp className="w-4 h-4 mr-2" />
                     Featured Story
                   </Badge>
@@ -119,7 +119,7 @@ const Stories = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-foreground">Trending Now</h2>
-            <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-white">
+            <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
               View All
             </Button>
           </div>
@@ -136,7 +136,7 @@ const Stories = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute top-4 left-4">
-                      <Badge className="bg-red-500 text-white font-semibold">
+                      <Badge className="bg-red-500 text-red-50 font-semibold">
                         #{index + 2}
                       </Badge>
                     </div>

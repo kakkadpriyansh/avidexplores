@@ -174,7 +174,7 @@ const StoryDetail = () => {
           {/* Back Button */}
           <div className="absolute top-8 left-4">
             <Link to="/stories">
-              <Button variant="ghost" className="text-white hover:bg-muted/20">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/20">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Stories
               </Button>

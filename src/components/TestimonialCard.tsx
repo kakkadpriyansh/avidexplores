@@ -23,7 +23,7 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
             className={`h-4 w-4 ${
               i < testimonial.rating
                 ? 'text-secondary fill-current'
-                : 'text-gray-300'
+                : 'text-muted-foreground/40'
             }`}
           />
         ))}

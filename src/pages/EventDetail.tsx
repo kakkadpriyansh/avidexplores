@@ -66,7 +66,7 @@ const EventDetail = () => {
       case 'Expert':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -111,7 +111,7 @@ const EventDetail = () => {
           {/* Back Button */}
           <div className="absolute top-8 left-4">
             <Link to="/events">
-              <Button variant="ghost" className="text-white hover:bg-white/20">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/20">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Adventures
               </Button>
@@ -122,7 +122,7 @@ const EventDetail = () => {
           <div className="absolute top-8 right-4">
             <Button 
               variant="ghost" 
-              className="text-white hover:bg-white/20"
+              className="text-primary-foreground hover:bg-primary-foreground/20"
               onClick={handleShare}
             >
               <Share2 className="h-4 w-4 mr-2" />
@@ -136,11 +136,11 @@ const EventDetail = () => {
               <Badge className={getDifficultyColor(event.difficulty)}>
                 {event.difficulty}
               </Badge>
-              <Badge variant="secondary" className="bg-white/90 text-gray-800">
+              <Badge variant="secondary" className="bg-background/90 text-foreground">
                 {event.category}
               </Badge>
             </div>
-            <h1 className="text-3xl md:text-4xl font-montserrat font-bold text-white mb-2">
+            <h1 className="text-3xl md:text-4xl font-montserrat font-bold text-primary-foreground mb-2">
               {event.title}
             </h1>
             <div className="flex items-center text-white/90 text-sm">

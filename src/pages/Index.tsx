@@ -222,7 +222,7 @@ const Index = () => {
           <div className="text-center">
             <Link
               to="/stories"
-              className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
+              className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 transition-colors duration-200"
             >
               Read More Stories
               <ArrowRight className="ml-2 h-5 w-5" />
