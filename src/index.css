@@ -17,17 +17,17 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 12% 16%;
 
-    /* Adventure Primary - Deep Forest Green */
-    --primary: 155 40% 25%;
+    /* Adventure Primary - Ocean Blue */
+    --primary: 220 70% 50%;
     --primary-foreground: 0 0% 98%;
-    --primary-glow: 155 40% 35%;
+    --primary-glow: 220 70% 60%;
 
-    /* Adventure Secondary - Mountain Orange */
-    --secondary: 25 85% 55%;
+    /* Adventure Secondary - Sunset Orange */
+    --secondary: 30 90% 60%;
     --secondary-foreground: 0 0% 98%;
 
-    /* Sky Blue Accent */
-    --accent: 200 70% 50%;
+    /* Teal Accent */
+    --accent: 180 65% 45%;
     --accent-foreground: 0 0% 98%;
 
     /* Earth Brown Muted */
@@ -35,14 +35,14 @@
     --muted-foreground: 30 8% 45%;
 
     /* Adventure Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(155 40% 25%) 0%, hsl(155 50% 35%) 50%, hsl(25 85% 55%) 100%);
-    --gradient-mountain: linear-gradient(180deg, hsl(200 70% 50%) 0%, hsl(155 40% 25%) 100%);
-    --gradient-sunset: linear-gradient(90deg, hsl(25 85% 55%) 0%, hsl(15 90% 60%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(220 70% 50%) 0%, hsl(220 80% 60%) 50%, hsl(30 90% 60%) 100%);
+    --gradient-mountain: linear-gradient(180deg, hsl(180 65% 45%) 0%, hsl(220 70% 50%) 100%);
+    --gradient-sunset: linear-gradient(90deg, hsl(30 90% 60%) 0%, hsl(15 90% 65%) 100%);
     --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
 
     /* Adventure Shadows & Effects */
-    --shadow-adventure: 0 10px 40px -10px hsl(155 40% 25% / 0.3);
-    --shadow-glow: 0 0 30px hsl(25 85% 55% / 0.4);
+    --shadow-adventure: 0 10px 40px -10px hsl(220 70% 50% / 0.3);
+    --shadow-glow: 0 0 30px hsl(30 90% 60% / 0.4);
     --shadow-card: 0 4px 20px -4px hsl(210 12% 16% / 0.1);
 
     --destructive: 0 84.2% 60.2%;
@@ -50,7 +50,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 155 40% 25%;
+    --ring: 220 70% 50%;
 
     --radius: 1rem;
 
@@ -83,14 +83,14 @@
       --popover: 210 20% 12%;
       --popover-foreground: 0 0% 95%;
 
-      --primary: 155 50% 45%;
+      --primary: 220 75% 55%;
       --primary-foreground: 0 0% 98%;
-      --primary-glow: 155 50% 55%;
+      --primary-glow: 220 75% 65%;
 
-      --secondary: 25 80% 60%;
+      --secondary: 30 85% 65%;
       --secondary-foreground: 210 20% 8%;
 
-      --accent: 200 60% 55%;
+      --accent: 180 70% 50%;
       --accent-foreground: 210 20% 8%;
 
       --muted: 210 20% 16%;
@@ -101,11 +101,11 @@
 
       --border: 210 20% 20%;
       --input: 210 20% 16%;
-      --ring: 155 50% 45%;
+      --ring: 220 75% 55%;
 
       /* Dark Adventure Gradients */
-      --gradient-hero: linear-gradient(135deg, hsl(210 20% 8%) 0%, hsl(155 50% 25%) 50%, hsl(25 80% 45%) 100%);
-      --gradient-mountain: linear-gradient(180deg, hsl(210 20% 12%) 0%, hsl(155 40% 20%) 100%);
+      --gradient-hero: linear-gradient(135deg, hsl(210 20% 8%) 0%, hsl(220 75% 35%) 50%, hsl(30 85% 50%) 100%);
+      --gradient-mountain: linear-gradient(180deg, hsl(210 20% 12%) 0%, hsl(220 70% 30%) 100%);
       --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
     }
   }

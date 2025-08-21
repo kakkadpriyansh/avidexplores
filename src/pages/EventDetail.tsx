@@ -21,11 +21,13 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 const EventDetail = () => {
   const { slug } = useParams();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedDay, setSelectedDay] = useState<any>(null);
   
   const event = mockEvents.find(e => e.slug === slug);
   const relatedEvents = mockEvents.filter(e => e.slug !== slug).slice(0, 3);
@@ -224,20 +226,98 @@ const EventDetail = () => {
 
                   {activeTab === 'itinerary' && (
                     <div>
-                      <h3 className="text-xl font-semibold mb-4">Day-by-Day Itinerary</h3>
-                      <div className="space-y-6">
-                        {event.itinerary.map((day) => (
-                          <div key={day.day} className="border-l-2 border-primary pl-6 pb-6">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold">
-                                {day.day}
+                      <h3 className="text-2xl font-bold mb-6 text-foreground">Day-by-Day Itinerary</h3>
+                      <div className="flex flex-col gap-4">
+                        {event.itinerary.map((day, index) => (
+                          <div key={day.day} className="relative">
+                              {/* Day card */}
+                              <div 
+                                className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group w-full"
+                                onClick={() => setSelectedDay(day)}
+                              >
+                              <div className="flex items-center space-x-4 mb-4">
+                                {/* Day number circle */}
+                                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg shadow-lg group-hover:scale-110 transition-transform duration-200">
+                                  {day.day}
+                                </div>
+                                
+                                {/* Badge */}
+                                <Badge variant="outline" className="text-xs">
+                                  Day {day.day}
+                                </Badge>
                               </div>
-                              <h4 className="text-lg font-semibold">{day.title}</h4>
+                              
+                              {/* Title */}
+                              <h4 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-200">{day.title}</h4>
+                              
+                              {/* Preview text */}
+                              <p className="text-sm text-muted-foreground line-clamp-3">
+                                {day.description.substring(0, 100)}...
+                              </p>
+                              
+                              {/* Click indicator */}
+                              <div className="mt-4 text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                Click to view details →
+                              </div>
                             </div>
-                            <p className="text-muted-foreground">{day.description}</p>
                           </div>
                         ))}
                       </div>
+                      
+                      {/* Summary footer */}
+                      <div className="mt-8 p-4 bg-muted/50 rounded-lg border border-dashed border-border">
+                        <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+                          <Calendar className="h-4 w-4" />
+                          <span>Total Duration: {event.itinerary.length} Days</span>
+                        </div>
+                      </div>
+                      
+                      {/* Modal */}
+                      {selectedDay && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                          <div className="bg-card border border-border rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-2xl">
+                            {/* Modal header */}
+                            <div className="flex items-center justify-between p-6 border-b border-border">
+                              <div className="flex items-center space-x-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
+                                  {selectedDay.day}
+                                </div>
+                                <div>
+                                  <h3 className="text-2xl font-bold text-foreground">{selectedDay.title}</h3>
+                                  <Badge variant="outline" className="mt-1">
+                                    Day {selectedDay.day}
+                                  </Badge>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => setSelectedDay(null)}
+                                className="p-2 hover:bg-muted rounded-full transition-colors duration-200"
+                              >
+                                <X className="h-5 w-5 text-muted-foreground" />
+                              </button>
+                            </div>
+                            
+                            {/* Modal content */}
+                            <div className="p-6">
+                              <div className="prose prose-sm max-w-none">
+                                <p className="text-muted-foreground leading-relaxed text-base">
+                                  {selectedDay.description}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {/* Modal footer */}
+                            <div className="p-6 border-t border-border bg-muted/20">
+                              <button
+                                onClick={() => setSelectedDay(null)}
+                                className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200"
+                              >
+                                Close Details
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
