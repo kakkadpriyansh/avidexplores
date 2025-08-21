@@ -66,7 +66,7 @@ export const mockEvents: Event[] = [
     location: 'Himachal Pradesh',
     difficulty: 'Challenging',
     duration: '7 Days',
-    image: '/src/assets/trek-bridge.jpg',
+    image: 'https://himalayanwindows.com/wp-content/uploads/2016/05/Gokyo-Ri-View-.jpg',
     shortDescription: 'Experience the majestic Himalayas on this challenging 7-day trek to base camp.',
     description: 'Embark on an unforgettable journey through pristine mountain trails, ancient villages, and breathtaking landscapes. This challenging trek offers spectacular views of snow-capped peaks and an authentic mountain experience.',
     highlights: [
@@ -97,7 +97,7 @@ export const mockEvents: Event[] = [
     location: 'Rishikesh',
     difficulty: 'Moderate',
     duration: '1 Day',
-    image: '/src/assets/rafting-action.jpg',
+    image: 'https://www.cagayandeoro.gov.ph/media/k2/items/cache/8b072d4f47fa16702f8c7356d2c88ee8_L.jpg',
     shortDescription: 'Thrilling white water rafting experience on the sacred Ganges.',
     description: 'Navigate through exhilarating rapids and enjoy the stunning river landscapes of Rishikesh. Perfect for adventure seekers looking for an adrenaline rush.',
     highlights: [
@@ -126,7 +126,7 @@ export const mockEvents: Event[] = [
     location: 'Lonavala',
     difficulty: 'Easy',
     duration: '2 Days',
-    image: '/src/assets/camping-stars.jpg',
+    image: 'https://cdn.vox-cdn.com/thumbor/7j8-07M3E7i_H39qXbyex3DdMKY=/0x0:4741x3161/1820x1213/filters:focal(1992x1202:2750x1960):format(webp)/cdn.vox-cdn.com/uploads/chorus_image/image/59535149/shutterstock_625918454.0.jpg',
     shortDescription: 'Perfect weekend getaway with camping under the stars.',
     description: 'Escape the city chaos with a peaceful weekend camping experience. Enjoy bonfires, stargazing, and nature walks in a serene mountain setting.',
     highlights: [
@@ -158,7 +158,7 @@ export const mockEvents: Event[] = [
     duration: '3 Days',
     image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
     shortDescription: 'Experience waterfalls, trekking, heritage, boating, and BBQ nights in Maharashtra\'s natural paradise.',
-    description: '🌍 Hello Traveller! ✨\nGet ready for a breathtaking Maharashtra Escape 🌄\n\n📅 Duration: 3 Days / 2 Nights\n🚌 Departure From: Rajkot | Ahmedabad | Surat | Nashik\n\n🌟 Journey Highlights:\n\n1️⃣ 5 Stunning Waterfalls 💦\n2️⃣ Harishchandra Trek 🥾\n3️⃣ Heritage Amruteshwar Temple 🛕\n4️⃣ Boat Adventure on Maharashtra\'s Biggest Dam (28 km) 🚤\n5️⃣ Scenic Road Trip 🚗\n6️⃣ Special BBQ Night under Billions of Stars 🔥✨\n\n📌 Stay: Comfortable 2 nights at Bhandardara Resort 🏡\n\n💫 What\'s the Special Magic?\n\nThis journey blends thrill & tranquility – the roar of waterfalls, the adventure of trekking, the serenity of temple visits, and the calm of a boat ride. Every moment is designed to create unforgettable memories amidst Maharashtra\'s natural beauty.\n\n📩 For detailed itinerary, just ping me!',
+    description: '🌍 Hello Traveller! ✨\nGet ready for a breathtaking Maharashtra Escape 🌄\n\n📅 Duration: 3 Days / 2 Nights\n🚌 Departure From: Rajkot | Ahmedabad | Surat | Nashik\n\n🌟 Journey Highlights:\n\n1️⃣ 5 Stunning Waterfalls 💦\n2️⃣ Harishchandra Trek 🥾\n3️⃣ Heritage Amruteshwar Temple 🛕\n4️⃣ Boat Adventure on Maharashtra\'s Biggest Dam (28 km) 🚤\n5️⃣ Scenic Road Trip 🚗\n6️⃣ Special BBQ Night under Billions of Stars 🔥✨\n\n📌 Stay: Comfortable 2 nights at Bhandardara Resort 🏡\n\n💫 What\'s the Special Magic?\n\nThis journey blends thrill & tranquility – the roar of waterfalls, the adventure of trekking, the serenity of temple visits, and the calm of a boat ride. Every moment is designed to create unforgettable memories amidst Maharashtra\'s natural beauty.\n\n',
     highlights: [
       '5 Waterfall Adventure (25 km journey)',
       'Harishchandragad Trek with hidden waterfall',
