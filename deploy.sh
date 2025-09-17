@@ -69,9 +69,42 @@ install_dependencies() {
     success "Dependencies installed successfully"
 }
 
+# Check environment configuration
+check_environment() {
+    log "Checking environment configuration..."
+    
+    if [ ! -f ".env.production" ]; then
+        warning ".env.production file not found. Creating from template..."
+        if [ -f ".env.production.example" ]; then
+            cp .env.production.example .env.production
+            warning "Please update .env.production with your production values"
+        else
+            error ".env.production.example not found. Cannot create production environment file."
+        fi
+    fi
+    
+    # Check if MONGODB_URI is set
+    if ! grep -q "MONGODB_URI=" .env.production; then
+        error "MONGODB_URI not found in .env.production. Please configure your database connection."
+    fi
+    
+    success "Environment configuration check completed"
+}
+
 # Run tests and build
 build_application() {
     log "Building application..."
+    
+    # Set NODE_ENV for production build
+    export NODE_ENV=production
+    
+    # Load production environment variables for build
+    if [ -f ".env.production" ]; then
+        log "Loading production environment variables..."
+        set -a  # automatically export all variables
+        source .env.production
+        set +a  # stop automatically exporting
+    fi
     
     # Run linting
     log "Running ESLint..."
@@ -219,6 +252,9 @@ deploy() {
     
     # Check dependencies
     check_dependencies
+    
+    # Check environment configuration
+    check_environment
     
     # Install dependencies
     install_dependencies

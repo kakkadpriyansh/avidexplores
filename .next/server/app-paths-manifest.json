@@ -1,10 +1,4 @@
 {
   "/api/health/route": "app/api/health/route.js",
-  "/page": "app/page.js",
-  "/api/destination-cards/route": "app/api/destination-cards/route.js",
-  "/api/testimonials/route": "app/api/testimonials/route.js",
-  "/api/stories/route": "app/api/stories/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/events/route": "app/api/events/route.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js"
+  "/page": "app/page.js"
 }
