@@ -68,7 +68,7 @@ export default function RegisterPage() {
       if (response.ok) {
         toast({
           title: "Account Created!",
-          description: "Welcome to AvidExplores! Please sign in to continue.",
+          description: "Welcome to Avid Explorers! Please sign in to continue.",
         });
         router.push('/login');
       } else {
@@ -113,7 +113,7 @@ export default function RegisterPage() {
               <div className="flex items-center justify-center space-x-2 mb-4">
                 <Mountain className="h-8 w-8 text-primary" />
                 <span className="font-montserrat font-bold text-2xl text-foreground">
-                  AvidExplores
+                  Avid Explorers
                 </span>
               </div>
               <h1 className="text-3xl font-montserrat font-bold text-foreground mb-2">

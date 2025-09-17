@@ -77,8 +77,8 @@
 4. [ ] Deploy and test
 
 #### Docker Deployment
-1. [ ] Build Docker image: `docker build -t avid-explores .`
-2. [ ] Test container locally: `docker run -p 3000:3000 avid-explores`
+1. [ ] Build Docker image: `docker build -t avid-explorers .`
+2. [ ] Test container locally: `docker run -p 3000:3000 avid-explorers`
 3. [ ] Push to container registry
 4. [ ] Deploy to production server
 
@@ -88,7 +88,7 @@
 3. [ ] Install dependencies: `npm install`
 4. [ ] Create production `.env` file
 5. [ ] Build application: `npm run build`
-6. [ ] Set up process manager (PM2): `pm2 start npm --name "avid-explores" -- start`
+6. [ ] Set up process manager (PM2): `pm2 start npm --name "avid-explorers" -- start`
 7. [ ] Configure reverse proxy (Nginx)
 8. [ ] Set up SSL certificate
 

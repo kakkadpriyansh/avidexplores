@@ -700,14 +700,14 @@ SiteSettingsSchema.statics.createDefaultSettings = function(userId: string) {
     siteName: 'Avid Explores',
     siteDescription: 'Discover amazing travel experiences and adventures with Avid Explores',
     siteKeywords: ['travel', 'adventure', 'tours', 'experiences', 'booking'],
-    siteUrl: 'https://avidexplores.com',
+    siteUrl: 'https://avidexplorers.com',
     logo: {
       light: '/images/logo-light.png',
       dark: '/images/logo-dark.png',
       favicon: '/images/favicon.ico'
     },
     contact: {
-      email: 'info@avidexplores.com',
+      email: 'info@avidexplorers.com',
       phone: '+91 9876543210',
       address: {
         street: '123 Travel Street',
@@ -731,9 +731,9 @@ SiteSettingsSchema.statics.createDefaultSettings = function(userId: string) {
     },
     email: {
       fromName: 'Avid Explores',
-      fromEmail: 'noreply@avidexplores.com',
-      replyToEmail: 'info@avidexplores.com',
-      supportEmail: 'support@avidexplores.com'
+      fromEmail: 'noreply@avidexplorers.com',
+      replyToEmail: 'info@avidexplorers.com',
+      supportEmail: 'support@avidexplorers.com'
     },
     booking: {
       cancellationPolicy: 'Free cancellation up to 24 hours before the experience starts.',

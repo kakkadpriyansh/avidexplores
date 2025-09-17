@@ -77,33 +77,33 @@ docker-compose -f docker-compose.prod.yml up -d
 2. **Or build and run manually:**
 ```bash
 # Build the image
-docker build -t avid-explores .
+docker build -t avid-explorers .
 
 # Run the container
 docker run -d \
-  --name avid-explores-app \
+  --name avid-explorers-app \
   -p 3000:3000 \
   --env-file .env \
   --restart unless-stopped \
-  avid-explores
+  avid-explorers
 ```
 
 #### Docker Management Commands
 ```bash
 # View logs
-docker logs avid-explores-app -f
+docker logs avid-explorers-app -f
 
 # Stop the application
-docker stop avid-explores-app
+docker stop avid-explorers-app
 
 # Start the application
-docker start avid-explores-app
+docker start avid-explorers-app
 
 # Update the application
-docker pull avid-explores:latest
-docker stop avid-explores-app
-docker rm avid-explores-app
-docker run -d --name avid-explores-app -p 3000:3000 --env-file .env avid-explores:latest
+docker pull avid-explorers:latest
+docker stop avid-explorers-app
+docker rm avid-explorers-app
+docker run -d --name avid-explorers-app -p 3000:3000 --env-file .env avid-explorers:latest
 ```
 
 ### Option 2: PM2 Deployment
@@ -126,7 +126,7 @@ npm run build
 
 3. **Start with PM2:**
 ```bash
-pm2 start npm --name "avid-explores" -- start
+pm2 start npm --name "avid-explorers" -- start
 pm2 save
 pm2 startup
 ```
@@ -137,13 +137,13 @@ pm2 startup
 pm2 status
 
 # View logs
-pm2 logs avid-explores
+pm2 logs avid-explorers
 
 # Restart application
-pm2 restart avid-explores
+pm2 restart avid-explorers
 
 # Stop application
-pm2 stop avid-explores
+pm2 stop avid-explorers
 
 # Monitor resources
 pm2 monit
@@ -179,7 +179,7 @@ vercel --prod
 1. **Clone repository:**
 ```bash
 git clone <your-repo-url>
-cd avid-explores-frontend-main
+cd avid-explorers-frontend-main
 ```
 
 2. **Install dependencies:**
@@ -194,7 +194,7 @@ npm run build
 
 4. **Start with PM2:**
 ```bash
-pm2 start npm --name "avid-explores" -- start
+pm2 start npm --name "avid-explorers" -- start
 ```
 
 5. **Configure Nginx:**
@@ -255,7 +255,7 @@ pm2 set pm2-logrotate:max_size 10M
 pm2 set pm2-logrotate:retain 30
 
 # Docker monitoring
-docker stats avid-explores-app
+docker stats avid-explorers-app
 ```
 
 ### 2. Health Checks

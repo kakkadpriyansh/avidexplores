@@ -43,7 +43,7 @@ const Navigation = () => {
           <Link href="/" className="flex items-center space-x-2 group">
             <Mountain className="h-8 w-8 text-primary group-hover:text-primary-glow transition-colors" />
             <span className="font-montserrat font-bold text-xl text-foreground">
-              AvidExplores
+              Avid Explorers
             </span>
           </Link>
 

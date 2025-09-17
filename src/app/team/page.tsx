@@ -101,7 +101,7 @@ export default async function TeamPage() {
               Our Team
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Meet the passionate adventurers behind AvidExplores. We are guides, coordinators, and storytellers dedicated to making your journeys unforgettable.
+              Meet the passionate adventurers behind Avid Explorers. We are guides, coordinators, and storytellers dedicated to making your journeys unforgettable.
             </p>
           </div>
         </div>

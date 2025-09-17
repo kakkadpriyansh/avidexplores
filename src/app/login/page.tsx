@@ -95,7 +95,7 @@ function LoginContent() {
               <div className="flex items-center justify-center space-x-2 mb-4">
                 <Mountain className="h-8 w-8 text-primary" />
                 <span className="font-montserrat font-bold text-2xl text-foreground">
-                  AvidExplores
+                  Avid Explorers
                 </span>
               </div>
               <h1 className="text-3xl font-montserrat font-bold text-foreground mb-2">

@@ -28,7 +28,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <nav className="flex flex-col h-full">
       <div className="flex items-center gap-2 px-4 h-16 border-b">
         <Mountain className="h-6 w-6 text-primary" />
-        <span className="font-montserrat font-bold text-lg">AvidExplores Admin</span>
+        <span className="font-montserrat font-bold text-lg">Avid Explorers Admin</span>
       </div>
       <div className="flex-1 p-2">
         {navItems.map((item) => {

@@ -13,7 +13,7 @@ const Footer = () => {
             <div className="flex items-center space-x-2">
               <Mountain className="h-8 w-8 text-secondary" />
               <span className="font-montserrat font-bold text-xl">
-                AvidExplores
+                Avid Explorers
               </span>
             </div>
             <p className="text-primary-foreground/80">
@@ -90,7 +90,7 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-primary-foreground/80">
                 <Mail className="h-4 w-4 text-secondary" />
-                <span>hello@avidexplores.com</span>
+                <span>hello@avidexplorers.com</span>
               </div>
               <div className="flex items-center space-x-3 text-primary-foreground/80">
                 <Phone className="h-4 w-4 text-secondary" />

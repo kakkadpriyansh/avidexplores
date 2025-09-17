@@ -42,7 +42,7 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: 'Email',
-      details: ['hello@avidexplores.com', 'bookings@avidexplores.com']
+      details: ['hello@avidexplorers.com', 'bookings@avidexplorers.com']
     },
     {
       icon: Clock,

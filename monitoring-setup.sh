@@ -13,9 +13,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_NAME="avid-explores"
-LOG_DIR="/var/log/avid-explores"
-BACKUP_DIR="/var/backups/avid-explores"
+PROJECT_NAME="avid-explorers"
+LOG_DIR="/var/log/avid-explorers"
+BACKUP_DIR="/var/backups/avid-explorers"
 
 # Functions
 log() {
@@ -67,7 +67,7 @@ setup_logrotate() {
     if [ "$SYSTEM_LEVEL" = true ]; then
         log "Setting up log rotation..."
         
-        cat > /etc/logrotate.d/avid-explores << EOF
+        cat > /etc/logrotate.d/avid-explorers << EOF
 $LOG_DIR/*.log {
     daily
     missingok
@@ -276,14 +276,14 @@ echo ""
 # PM2 Status (if available)
 if command -v pm2 &> /dev/null; then
     echo "🔧 PM2 Process Status:"
-    pm2 list | grep -E "(App name|avid-explores)" || echo "   No PM2 processes found"
+    pm2 list | grep -E "(App name|avid-explorers)" || echo "   No PM2 processes found"
     echo ""
 fi
 
 # Docker Status (if available)
 if command -v docker &> /dev/null; then
     echo "🐳 Docker Container Status:"
-    docker ps | grep avid-explores || echo "   No Docker containers found"
+    docker ps | grep avid-explorers || echo "   No Docker containers found"
     echo ""
 fi
 

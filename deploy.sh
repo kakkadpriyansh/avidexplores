@@ -13,9 +13,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_NAME="avid-explores"
-DOCKER_IMAGE_NAME="avid-explores"
-CONTAINER_NAME="avid-explores-app"
+PROJECT_NAME="avid-explorers"
+DOCKER_IMAGE_NAME="avid-explorers"
+CONTAINER_NAME="avid-explorers-app"
 BACKUP_DIR="./backups"
 LOG_FILE="./deployment.log"
 

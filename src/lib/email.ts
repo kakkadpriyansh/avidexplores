@@ -46,7 +46,7 @@ const getBookingConfirmationTemplate = (booking: IBooking, event: IEvent, user: 
           </ul>
         </div>
         
-        <p>If you have any questions, please contact us at support@avidexplores.com</p>
+        <p>If you have any questions, please contact us at support@avidexplorers.com</p>
         
         <p>Best regards,<br>The Avid Explores Team</p>
       </div>
@@ -84,7 +84,7 @@ const getPaymentFailedTemplate = (booking: IBooking, event: IEvent, user: IUser)
           <p><small>This booking will be automatically cancelled if payment is not completed within 24 hours.</small></p>
         </div>
         
-        <p>If you continue to face issues, please contact us at support@avidexplores.com</p>
+        <p>If you continue to face issues, please contact us at support@avidexplorers.com</p>
         
         <p>Best regards,<br>The Avid Explores Team</p>
       </div>
@@ -120,7 +120,7 @@ const getCancellationTemplate = (booking: IBooking, event: IEvent, user: IUser) 
           </div>
         ` : ''}
         
-        <p>We're sorry to see you go. If you have any feedback or questions, please contact us at support@avidexplores.com</p>
+        <p>We're sorry to see you go. If you have any feedback or questions, please contact us at support@avidexplorers.com</p>
         
         <p>Best regards,<br>The Avid Explores Team</p>
       </div>
@@ -210,7 +210,7 @@ export const sendNewsletterEmail = async (subscribers: string[], subject: string
 // Admin notification emails
 export const sendAdminNotification = async (subject: string, content: string) => {
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@avidexplores.com';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@avidexplorers.com';
     
     await transporter.sendMail({
       from: `"Avid Explores System" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,

@@ -82,7 +82,7 @@ async function createAdmin() {
     console.log('Connected to MongoDB');
 
     // Admin credentials
-    const adminEmail = 'admin@avidexplores.com';
+    const adminEmail = 'admin@avidexplorers.com';
     const adminPassword = 'admin123';
     const adminName = 'Admin User';
 
