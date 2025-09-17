@@ -1,12 +1,46 @@
 {
   "name": "avid-explores-nextjs",
-  "private": true,
   "version": "0.1.0",
+  "private": true,
+  "description": "A comprehensive travel and adventure platform built with Next.js, featuring booking management, story sharing, and admin dashboard.",
+  "keywords": [
+    "nextjs",
+    "travel",
+    "booking",
+    "adventure",
+    "tourism",
+    "react",
+    "typescript",
+    "mongodb",
+    "tailwindcss"
+  ],
+  "author": "Avid Explores Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/avid-explores-frontend.git"
+  },
+  "homepage": "https://avidexplores.com",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "clean": "rm -rf .next out",
+    "analyze": "cross-env ANALYZE=true next build",
+    "export": "next export",
+    "postinstall": "prisma generate || echo 'Prisma not configured'",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "create-admin": "node scripts/create-admin.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -38,19 +72,25 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-query": "^5.83.0",
+    "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.462.0",
+    "mongoose": "^8.18.0",
+    "next": "^14.2.32",
+    "next-auth": "^4.24.11",
+    "nodemailer": "^6.10.1",
+    "razorpay": "^2.9.6",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.61.1",
     "react-resizable-panels": "^2.1.9",
-    "next": "^14.0.0",
     "recharts": "^2.15.4",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
@@ -61,17 +101,34 @@
   "devDependencies": {
     "@eslint/js": "^9.32.0",
     "@tailwindcss/typography": "^0.5.16",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.16.5",
+    "@types/nodemailer": "^6.4.19",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^14.0.0",
+    "eslint-config-next": "^14.2.32",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.12",
+    "globals": "^15.12.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
-    "@types/node": "^22.16.5",
-    "@types/react": "^18.3.23",
-    "@types/react-dom": "^18.3.7"
+    "typescript-eslint": "^8.18.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
