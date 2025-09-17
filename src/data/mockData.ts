@@ -16,13 +16,31 @@ export interface Event {
   itinerary: Array<{
     day: number;
     title: string;
+    location?: string;
     description: string;
+    activities?: string[];
+    meals?: string[];
+    accommodation?: string;
   }>;
   thingsToCarry: string[];
   maxParticipants: number;
   ageLimit: string;
   season: string;
   tags: string[];
+  preparation?: {
+    physicalRequirements?: string;
+    medicalRequirements?: string;
+    experienceLevel?: string;
+    safetyGuidelines?: string[];
+    additionalNotes?: string;
+  };
+  availableMonths?: string[];
+  availableDates?: {
+    month: string;
+    year: number;
+    dates: number[];
+    location?: string;
+  }[];
 }
 
 export interface Testimonial {
@@ -78,15 +96,85 @@ export const mockEvents: Event[] = [
     inclusions: ['Transportation', 'Accommodation', 'Meals', 'Professional Guide', 'Safety Equipment'],
     exclusions: ['Personal expenses', 'Travel insurance', 'Additional meals'],
     itinerary: [
-      { day: 1, title: 'Arrival & Base Setup', description: 'Meet at base camp, gear check, and acclimatization.' },
-      { day: 2, title: 'Forest Trail', description: 'Trek through dense pine forests and meadows.' },
-      { day: 3, title: 'High Altitude Camp', description: 'Reach high altitude camp with panoramic views.' }
+      { 
+        day: 1, 
+        title: 'Arrival & Base Setup', 
+        location: 'Base Camp',
+        description: 'Meet at base camp, gear check, and acclimatization.',
+        activities: ['Gear check', 'Team briefing', 'Acclimatization walk'],
+        meals: ['Dinner'],
+        accommodation: 'Base camp tents'
+      },
+      { 
+        day: 2, 
+        title: 'Forest Trail', 
+        location: 'Pine Forest',
+        description: 'Trek through dense pine forests and meadows.',
+        activities: ['Forest trekking', 'Wildlife spotting', 'Photography'],
+        meals: ['Breakfast', 'Packed lunch', 'Dinner'],
+        accommodation: 'Mountain huts'
+      },
+      { 
+        day: 3, 
+        title: 'High Altitude Camp', 
+        location: 'High Altitude Camp',
+        description: 'Reach high altitude camp with panoramic views.',
+        activities: ['Summit attempt', 'Panoramic photography', 'Celebration'],
+        meals: ['Breakfast', 'Packed lunch', 'Dinner'],
+        accommodation: 'High altitude tents'
+      }
     ],
     thingsToCarry: ['Trekking boots', 'Warm clothing', 'Rain gear', 'Personal medications'],
     maxParticipants: 15,
     ageLimit: '16-60 years',
     season: 'Mar-Jun, Sep-Nov',
-    tags: ['Adventure', 'Mountains', 'Camping']
+    tags: ['Adventure', 'Mountains', 'Camping'],
+    preparation: {
+      physicalRequirements: 'Good physical fitness required. Ability to walk 6-8 hours daily on rough terrain.',
+      medicalRequirements: 'No serious heart conditions or respiratory issues. Consult doctor if you have any medical conditions.',
+      experienceLevel: 'Previous trekking experience recommended but not mandatory.',
+      safetyGuidelines: [
+        'Always stay with the group',
+        'Follow guide instructions at all times',
+        'Inform guide of any health issues immediately',
+        'Carry sufficient water and energy snacks',
+        'Wear appropriate trekking gear'
+      ],
+      additionalNotes: 'Weather conditions can change rapidly. Be prepared for cold temperatures and possible rain.'
+    },
+    availableMonths: ['March', 'April', 'May', 'June', 'September', 'October', 'November'],
+    availableDates: [
+      {
+        month: 'March',
+        year: 2024,
+        dates: [15, 22, 29],
+        location: 'Manali Base Camp'
+      },
+      {
+        month: 'April',
+        year: 2024,
+        dates: [5, 12, 19, 26],
+        location: 'Manali Base Camp'
+      },
+      {
+        month: 'May',
+        year: 2024,
+        dates: [3, 10, 17, 24, 31],
+        location: 'Manali Base Camp'
+      },
+      {
+        month: 'September',
+        year: 2024,
+        dates: [7, 14, 21, 28],
+        location: 'Manali Base Camp'
+      },
+      {
+        month: 'October',
+        year: 2024,
+        dates: [5, 12, 19, 26],
+        location: 'Manali Base Camp'
+      }
+    ]
   },
   {
     id: '2',
@@ -109,13 +197,35 @@ export const mockEvents: Event[] = [
     inclusions: ['Safety gear', 'Professional guide', 'Lunch', 'Transportation'],
     exclusions: ['Personal expenses', 'Additional meals'],
     itinerary: [
-      { day: 1, title: 'Rafting Day', description: 'Full day rafting with lunch break on the riverbank.' }
+      { 
+        day: 1, 
+        title: 'Rafting Day', 
+        location: 'Ganges River',
+        description: 'Full day rafting with lunch break on the riverbank.',
+        activities: ['Safety briefing', 'White water rafting', 'Riverside lunch', 'Swimming'],
+        meals: ['Lunch'],
+        accommodation: 'Day trip - no accommodation'
+      }
     ],
     thingsToCarry: ['Quick-dry clothes', 'Extra clothes', 'Waterproof bag'],
     maxParticipants: 24,
     ageLimit: '12-55 years',
     season: 'Sep-Jun',
-    tags: ['Water Sports', 'Adventure', 'Day Trip']
+    tags: ['Water Sports', 'Adventure', 'Day Trip'],
+    preparation: {
+      physicalRequirements: 'Basic swimming ability required. Good physical fitness for paddling.',
+      medicalRequirements: 'No heart conditions or back problems. Pregnant women not allowed.',
+      experienceLevel: 'No prior rafting experience required. Suitable for beginners.',
+      safetyGuidelines: [
+        'Always wear provided safety gear',
+        'Listen to guide instructions carefully',
+        'Stay seated in the raft unless instructed',
+        'Hold paddle firmly',
+        'Do not stand in the raft'
+      ],
+      additionalNotes: 'Water levels vary by season. Best experience during monsoon aftermath.'
+    },
+    availableMonths: ['September', 'October', 'November', 'December', 'January', 'February', 'March', 'April', 'May', 'June']
   },
   {
     id: '3',
@@ -138,14 +248,44 @@ export const mockEvents: Event[] = [
     inclusions: ['Camping gear', 'Meals', 'Activities', 'Transportation'],
     exclusions: ['Personal expenses', 'Beverages'],
     itinerary: [
-      { day: 1, title: 'Setup & Activities', description: 'Camp setup, nature walk, and bonfire night.' },
-      { day: 2, title: 'Adventure & Departure', description: 'Morning activities and departure.' }
+      { 
+        day: 1, 
+        title: 'Setup & Activities', 
+        location: 'Lonavala Campsite',
+        description: 'Camp setup, nature walk, and bonfire night.',
+        activities: ['Camp setup', 'Nature walk', 'Team games', 'Bonfire', 'Stargazing'],
+        meals: ['Evening snacks', 'Dinner'],
+        accommodation: 'Camping tents'
+      },
+      { 
+        day: 2, 
+        title: 'Adventure & Departure', 
+        location: 'Lonavala Campsite',
+        description: 'Morning activities and departure.',
+        activities: ['Morning yoga', 'Breakfast', 'Camp cleanup', 'Group photos'],
+        meals: ['Breakfast'],
+        accommodation: 'Check-out'
+      }
     ],
     thingsToCarry: ['Comfortable clothes', 'Torch', 'Personal medicines'],
     maxParticipants: 30,
     ageLimit: '8-65 years',
     season: 'Year Round',
-    tags: ['Camping', 'Family Friendly', 'Weekend']
+    tags: ['Camping', 'Family Friendly', 'Weekend'],
+    preparation: {
+      physicalRequirements: 'Basic fitness level. Suitable for all ages including children and seniors.',
+      medicalRequirements: 'No specific medical requirements. Inform about allergies or special needs.',
+      experienceLevel: 'No prior camping experience required. Perfect for beginners and families.',
+      safetyGuidelines: [
+        'Stay within designated camping area',
+        'Follow fire safety rules during bonfire',
+        'Keep the campsite clean',
+        'Supervise children at all times',
+        'Use torch/flashlight after dark'
+      ],
+      additionalNotes: 'Family-friendly environment. Great for first-time campers and team building.'
+    },
+    availableMonths: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
   },
   {
     id: '4',

@@ -1,5 +1,9 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, Mountain } from 'lucide-react';
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import { Menu, Mountain, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -7,26 +11,36 @@ import {
   SheetTrigger,
   SheetClose,
 } from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Navigation = () => {
-  const location = useLocation();
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
 
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/events', label: 'Events' },
     { href: '/stories', label: 'Stories' },
+    { href: '/team', label: 'Team' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
+          <Link href="/" className="flex items-center space-x-2 group">
             <Mountain className="h-8 w-8 text-primary group-hover:text-primary-glow transition-colors" />
             <span className="font-montserrat font-bold text-xl text-foreground">
               AvidExplores
@@ -38,7 +52,7 @@ const Navigation = () => {
             {navLinks.map((link) => (
               <Link
                 key={link.href}
-                to={link.href}
+                href={link.href}
                 className={`font-inter font-medium transition-colors hover:text-primary ${
                   isActive(link.href) ? 'text-primary' : 'text-foreground/80'
                 }`}
@@ -50,16 +64,60 @@ const Navigation = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/login">
-              <Button variant="outline" size="sm" className="btn-outline">
-                Login
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button className="btn-adventure">
-                Sign Up
-              </Button>
-            </Link>
+            {status === 'loading' ? (
+              <div className="h-8 w-8 animate-pulse bg-muted rounded-full" />
+            ) : session ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={session.user.image || ''} alt={session.user.name || ''} />
+                      <AvatarFallback>
+                        {session.user.name?.charAt(0).toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{session.user.name}</p>
+                      <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        {session.user.email}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="flex items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer flex items-center"
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="outline" size="sm" className="btn-outline">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="btn-adventure">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu */}
@@ -75,7 +133,7 @@ const Navigation = () => {
                   {navLinks.map((link) => (
                     <SheetClose asChild key={link.href}>
                       <Link
-                        to={link.href}
+                        href={link.href}
                         className={`text-lg font-inter font-medium transition-colors hover:text-primary ${
                           isActive(link.href) ? 'text-primary' : 'text-foreground/80'
                         }`}
@@ -86,20 +144,59 @@ const Navigation = () => {
                   ))}
                   
                   <div className="flex flex-col space-y-4 pt-6 border-t border-border/50">
-                    <SheetClose asChild>
-                      <Link to="/login">
-                        <Button variant="outline" className="w-full btn-outline">
-                          Login
-                        </Button>
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link to="/register">
-                        <Button className="w-full btn-adventure">
-                          Sign Up
-                        </Button>
-                      </Link>
-                    </SheetClose>
+                    {session ? (
+                      <>
+                        <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={session.user.image || ''} alt={session.user.name || ''} />
+                            <AvatarFallback>
+                              {session.user.name?.charAt(0).toUpperCase() || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col">
+                            <p className="font-medium text-sm">{session.user.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {session.user.email}
+                            </p>
+                          </div>
+                        </div>
+                        <SheetClose asChild>
+                          <Link href="/dashboard">
+                            <Button variant="outline" className="w-full justify-start">
+                              <User className="mr-2 h-4 w-4" />
+                              Dashboard
+                            </Button>
+                          </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start"
+                            onClick={() => signOut({ callbackUrl: '/' })}
+                          >
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Sign out
+                          </Button>
+                        </SheetClose>
+                      </>
+                    ) : (
+                      <>
+                        <SheetClose asChild>
+                          <Link href="/login">
+                            <Button variant="outline" className="w-full btn-outline">
+                              Login
+                            </Button>
+                          </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Link href="/register">
+                            <Button className="w-full btn-adventure">
+                              Sign Up
+                            </Button>
+                          </Link>
+                        </SheetClose>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>

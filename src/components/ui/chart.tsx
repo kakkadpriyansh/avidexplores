@@ -314,12 +314,12 @@ const ChartStyleGradient = ({
   offset?: [number, number]
 }) => {
   return (
-    <RechartsPrimitive.Defs>
-      <RechartsPrimitive.LinearGradient id={id} x1="0%" y1="0%" x2="0%" y2="100%">
-        <RechartsPrimitive.Stop offset={`${offset[0]}%`} stopColor={`var(--color-${color})`} stopOpacity={0.8} />
-        <RechartsPrimitive.Stop offset={`${offset[1]}%`} stopColor={`var(--color-${color})`} stopOpacity={0} />
-      </RechartsPrimitive.LinearGradient>
-    </RechartsPrimitive.Defs>
+    <defs>
+      <linearGradient id={id} x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset={`${offset[0]}%`} stopColor={`var(--color-${color})`} stopOpacity={0.8} />
+        <stop offset={`${offset[1]}%`} stopColor={`var(--color-${color})`} stopOpacity={0} />
+      </linearGradient>
+    </defs>
   )
 }
 

@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ArrowRight, Users, MapPin, Calendar, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { adventureStats } from '@/data/mockData';
-import heroImage from '@/assets/hero-adventure.jpg';
+// Using direct path to image in assets folder
 
 const Hero = () => {
   return (
@@ -10,7 +10,7 @@ const Hero = () => {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src={heroImage}
+          src="/hero-adventure.jpg"
           alt="Adventure landscape"
           className="w-full h-full object-cover"
         />
@@ -36,13 +36,13 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 fade-in-up">
-            <Link to="/events">
+            <Link href="/events">
               <Button className="btn-hero group">
                 Explore Adventures
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link to="/stories">
+            <Link href="/stories">
               <Button variant="outline" className="btn-outline">
                 Read Stories
               </Button>

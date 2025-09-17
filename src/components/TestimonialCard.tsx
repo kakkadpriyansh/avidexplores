@@ -1,8 +1,20 @@
 import { Star } from 'lucide-react';
-import { Testimonial } from '@/data/mockData';
 
 interface TestimonialCardProps {
-  testimonial: Testimonial;
+  testimonial: {
+    _id: string;
+    userId: {
+      name: string;
+      avatar?: string;
+    };
+    eventId: {
+      title: string;
+      location?: string;
+    };
+    rating: number;
+    review: string;
+    title?: string;
+  };
 }
 
 const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
@@ -10,8 +22,8 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
     <div className="card-glass p-6 text-center max-w-md mx-auto">
       {/* Avatar */}
       <img
-        src={testimonial.avatar}
-        alt={testimonial.name}
+        src={testimonial.userId?.avatar || '/placeholder.svg'}
+        alt={testimonial.userId?.name || 'User'}
         className="w-16 h-16 rounded-full mx-auto mb-4 object-cover border-4 border-white/20"
       />
 
@@ -31,16 +43,16 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
 
       {/* Review Text */}
       <p className="text-card-foreground mb-4 italic">
-        "{testimonial.text}"
+        "{testimonial.review}"
       </p>
 
       {/* Name and Event */}
       <div>
         <h4 className="font-montserrat font-semibold text-card-foreground">
-          {testimonial.name}
+          {testimonial.userId?.name || 'Anonymous'}
         </h4>
         <p className="text-sm text-muted-foreground">
-          {testimonial.event} • {testimonial.location}
+          {testimonial.eventId?.title || 'Adventure'} • {testimonial.eventId?.location || 'Location'}
         </p>
       </div>
     </div>

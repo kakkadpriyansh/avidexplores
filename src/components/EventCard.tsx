@@ -1,27 +1,57 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { MapPin, Clock, Users, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Event } from '@/data/mockData';
+
+// Database Event interface
+interface DatabaseEvent {
+  _id: string;
+  slug: string;
+  title: string;
+  category: string;
+  price: number;
+  location: {
+    name: string;
+    state: string;
+    country: string;
+  };
+  difficulty: string;
+  duration: number;
+  images: string[];
+  description: string;
+  shortDescription: string;
+  highlights: string[];
+  inclusions: string[];
+  exclusions: string[];
+  maxParticipants: number;
+  tags: string[];
+}
 
 interface EventCardProps {
-  event: Event;
+  event: DatabaseEvent;
 }
 
 const EventCard = ({ event }: EventCardProps) => {
   const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Easy':
+    const normalizedDifficulty = difficulty.toLowerCase();
+    switch (normalizedDifficulty) {
+      case 'easy':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'Moderate':
+      case 'moderate':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'Challenging':
+      case 'difficult':
+      case 'challenging':
         return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-      case 'Expert':
+      case 'extreme':
+      case 'expert':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       default:
         return 'bg-muted text-muted-foreground';
     }
+  };
+
+  const formatDifficulty = (difficulty: string) => {
+    return difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase();
   };
 
   return (
@@ -29,13 +59,13 @@ const EventCard = ({ event }: EventCardProps) => {
       {/* Image */}
       <div className="relative overflow-hidden h-48">
         <img
-          src={event.image}
+          src={event.images?.[0] || '/placeholder-event.jpg'}
           alt={event.title}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute top-4 left-4">
           <Badge className={getDifficultyColor(event.difficulty)}>
-            {event.difficulty}
+            {formatDifficulty(event.difficulty)}
           </Badge>
         </div>
         <div className="absolute top-4 right-4">
@@ -59,11 +89,11 @@ const EventCard = ({ event }: EventCardProps) => {
         <div className="flex flex-col space-y-2 mb-4 text-sm text-muted-foreground">
           <div className="flex items-center space-x-2">
             <MapPin className="h-4 w-4 text-primary" />
-            <span>{event.location}</span>
+            <span>{event.location?.name || 'Location TBD'}, {event.location?.state || ''}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Clock className="h-4 w-4 text-primary" />
-            <span>{event.duration}</span>
+            <span>{event.duration} {event.duration === 1 ? 'day' : 'days'}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Users className="h-4 w-4 text-primary" />
@@ -73,11 +103,11 @@ const EventCard = ({ event }: EventCardProps) => {
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {event.tags.slice(0, 3).map((tag) => (
+          {event.tags?.slice(0, 3).map((tag) => (
             <Badge key={tag} variant="outline" className="text-xs">
               {tag}
             </Badge>
-          ))}
+          )) || null}
         </div>
 
         {/* Price and CTA */}
@@ -88,7 +118,7 @@ const EventCard = ({ event }: EventCardProps) => {
             </span>
             <span className="text-muted-foreground text-sm">/ person</span>
           </div>
-          <Link to={`/events/${event.slug}`}>
+          <Link href={`/events/${event.slug}`}>
             <Button className="btn-adventure">
               View Details
             </Button>

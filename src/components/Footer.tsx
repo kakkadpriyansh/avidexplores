@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Mountain, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,7 +49,7 @@ const Footer = () => {
               ].map((link) => (
                 <li key={link.href}>
                   <Link
-                    to={link.href}
+                    href={link.href}
                     className="text-primary-foreground/80 hover:text-secondary transition-colors"
                   >
                     {link.label}
@@ -73,7 +73,7 @@ const Footer = () => {
               ].map((category) => (
                 <li key={category}>
                   <Link
-                    to={`/events?category=${category.toLowerCase()}`}
+                    href={`/events?category=${category.toLowerCase()}`}
                     className="text-primary-foreground/80 hover:text-secondary transition-colors"
                   >
                     {category}
