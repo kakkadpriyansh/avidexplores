@@ -6,9 +6,9 @@ import { Shield, Users, Award, Heart, ArrowRight } from 'lucide-react';
 
 async function getTeamMembers() {
   try {
-    // Prefer relative URL to work across dev ports and environments
-    const base = process.env.NEXT_PUBLIC_BASE_URL || '';
-    const url = base ? `${base}/api/teams` : '/api/teams';
+    // Use INTERNAL_API_URL for server-side calls to avoid DNS issues
+    const base = process.env.INTERNAL_API_URL || 'http://localhost:3000';
+    const url = `${base}/api/teams`;
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();

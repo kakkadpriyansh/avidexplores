@@ -12,7 +12,8 @@ import { ArrowRight, Zap, Users, Shield } from 'lucide-react';
 // Fetch events from the database
 async function getEvents() {
   try {
-    const base = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    // Use INTERNAL_API_URL for server-side calls to avoid DNS issues
+    const base = process.env.INTERNAL_API_URL || 'http://localhost:3000';
     const response = await fetch(`${base}/api/events`, {
       cache: 'no-store'
     });
@@ -33,7 +34,8 @@ async function getEvents() {
 // Fetch destination cards from the database
 async function getDestinationCards() {
   try {
-    const base = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    // Use INTERNAL_API_URL for server-side calls to avoid DNS issues
+    const base = process.env.INTERNAL_API_URL || 'http://localhost:3000';
     const response = await fetch(`${base}/api/destination-cards`, {
       cache: 'no-store'
     });
@@ -54,7 +56,8 @@ async function getDestinationCards() {
 // Fetch testimonials from the database
 async function getTestimonials() {
   try {
-    const base = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    // Use INTERNAL_API_URL for server-side calls to avoid DNS issues
+    const base = process.env.INTERNAL_API_URL || 'http://localhost:3000';
     const response = await fetch(`${base}/api/testimonials?featured=true&limit=6`, {
       cache: 'no-store'
     });
@@ -75,7 +78,8 @@ async function getTestimonials() {
 // Fetch stories from the database
 async function getStories() {
   try {
-    const base = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    // Use INTERNAL_API_URL for server-side calls to avoid DNS issues
+    const base = process.env.INTERNAL_API_URL || 'http://localhost:3000';
     const response = await fetch(`${base}/api/stories?limit=10&sortBy=publishedAt&sortOrder=desc`, {
       cache: 'no-store'
     });
