@@ -32,7 +32,6 @@ export async function GET(request: NextRequest) {
     if (!includeSecrets) {
       delete settingsObj.email?.smtpSettings;
       delete settingsObj.payment?.razorpay;
-      delete settingsObj.payment?.stripe;
       delete settingsObj.api;
       delete settingsObj.uploads?.cloudinaryConfig;
       delete settingsObj.uploads?.s3Config;

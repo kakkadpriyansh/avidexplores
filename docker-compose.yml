@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://avidexplorers:kBkBWLYhJnACgZC6@72.60.97.217:27017/?authSource=aviddatabase
+      - NEXTAUTH_SECRET=your-development-secret-here
+      - NEXTAUTH_URL=http://localhost:3000
+      - APP_URL=http://localhost:3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - mongodb
+    networks:
+      - avid-network
+
+  mongodb:
+    image: mongo:7.0
+    container_name: avid-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: avidexplorers
+      MONGO_INITDB_ROOT_PASSWORD: kBkBWLYhJnACgZC6
+      MONGO_INITDB_DATABASE: aviddatabase
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - avid-network
+
+networks:
+  avid-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

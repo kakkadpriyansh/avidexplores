@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
 import connectDB from './mongodb';
 import UserModel, { IUser } from '@/models/User';
 import { Model } from 'mongoose';
@@ -138,15 +137,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
       }
-    }),
-    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-      ? [
-          GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET
-          })
-        ]
-      : [])
+    })
   ],
   session: {
     strategy: 'jwt'

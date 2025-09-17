@@ -25,7 +25,7 @@ export interface IBooking extends Document {
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'REFUNDED';
   paymentInfo: {
     paymentId?: string;
-    paymentMethod: 'RAZORPAY' | 'STRIPE' | 'BANK_TRANSFER' | 'CASH';
+    paymentMethod: 'RAZORPAY' | 'BANK_TRANSFER' | 'CASH';
     paymentStatus: 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED';
     transactionId?: string;
     razorpayOrderId?: string;
@@ -143,7 +143,7 @@ const BookingSchema = new Schema<IBooking>({
     paymentId: String,
     paymentMethod: {
       type: String,
-      enum: ['RAZORPAY', 'STRIPE', 'BANK_TRANSFER', 'CASH'],
+      enum: ['RAZORPAY', 'BANK_TRANSFER', 'CASH'],
       required: [true, 'Payment method is required']
     },
     paymentStatus: {

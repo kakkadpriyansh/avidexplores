@@ -96,11 +96,6 @@ export interface ISiteSettings extends Document {
       keySecret: string;
       webhookSecret: string;
     };
-    stripe?: {
-      publishableKey: string;
-      secretKey: string;
-      webhookSecret: string;
-    };
   };
   
   // Booking settings
@@ -491,11 +486,6 @@ const SiteSettingsSchema = new Schema<ISiteSettings>({
     razorpay: {
       keyId: { type: String, trim: true },
       keySecret: { type: String, trim: true },
-      webhookSecret: { type: String, trim: true }
-    },
-    stripe: {
-      publishableKey: { type: String, trim: true },
-      secretKey: { type: String, trim: true },
       webhookSecret: { type: String, trim: true }
     }
   },

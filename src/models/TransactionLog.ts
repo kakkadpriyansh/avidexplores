@@ -24,7 +24,7 @@ export interface ITransactionLog extends Document {
   exchangeRate?: number; // If different from base currency
   
   // Payment method and gateway
-  paymentMethod: 'razorpay' | 'stripe' | 'paypal' | 'bank_transfer' | 'cash' | 'wallet' | 'upi' | 'card' | 'net_banking';
+  paymentMethod: 'razorpay' | 'paypal' | 'bank_transfer' | 'cash' | 'wallet' | 'upi' | 'card' | 'net_banking';
   paymentGateway: string;
   gatewayTransactionId?: string;
   gatewayResponse?: any;
@@ -152,7 +152,7 @@ const TransactionLogSchema = new Schema<ITransactionLog>({
   
   paymentMethod: {
     type: String,
-    enum: ['razorpay', 'stripe', 'paypal', 'bank_transfer', 'cash', 'wallet', 'upi', 'card', 'net_banking'],
+    enum: ['razorpay', 'paypal', 'bank_transfer', 'cash', 'wallet', 'upi', 'card', 'net_banking'],
     required: [true, 'Payment method is required'],
     index: true
   },

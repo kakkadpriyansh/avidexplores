@@ -53,7 +53,6 @@ export async function GET(
       if (section === 'payment') {
         sectionData = { ...sectionData.toObject() };
         delete sectionData.razorpay;
-        delete sectionData.stripe;
       }
       
       if (section === 'api') {
