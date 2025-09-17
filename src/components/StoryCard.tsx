@@ -6,24 +6,30 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 
-interface StoryCardProps {
-  story: {
-    _id: string;
-    title: string;
-    slug: string;
-    excerpt: string;
-    coverImage: string;
-    tags: string[];
-    readTime: number;
-    userId: {
-      name: string;
-      avatar?: string;
-    };
-    publishedAt?: string;
-    createdAt: string;
-    views?: number;
-    likes?: string[];
+interface FlexibleStory {
+  _id?: string;
+  id?: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  coverImage?: string;
+  image?: string;
+  tags: string[];
+  readTime: number;
+  userId?: {
+    name: string;
+    avatar?: string;
   };
+  author?: string;
+  publishedAt?: string;
+  createdAt?: string;
+  date?: string;
+  views?: number;
+  likes?: string[];
+}
+
+interface StoryCardProps {
+  story: FlexibleStory;
 }
 
 const StoryCard = ({ story }: StoryCardProps) => {
@@ -67,7 +73,7 @@ const StoryCard = ({ story }: StoryCardProps) => {
       {/* Cover Image */}
       <div className="relative overflow-hidden h-56">
         <img
-          src={story.coverImage}
+          src={story.coverImage || story.image || '/placeholder-story.jpg'}
           alt={story.title}
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -113,10 +119,10 @@ const StoryCard = ({ story }: StoryCardProps) => {
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card"></div>
             </div>
             <div>
-              <div className="font-semibold text-foreground text-sm">{story.userId?.name || 'Anonymous'}</div>
+              <div className="font-semibold text-foreground text-sm">{story.userId?.name || story.author || 'Anonymous'}</div>
               <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                 <Calendar className="h-3 w-3" />
-                <span>{new Date(story.publishedAt || story.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                <span>{new Date(story.publishedAt || story.createdAt || story.date || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
               </div>
             </div>
           </div>

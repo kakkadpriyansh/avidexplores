@@ -511,7 +511,7 @@ export default function CreateStoryPage() {
                     disabled={loading}
                   >
                     <Save className="h-4 w-4 mr-2" />
-                    {loading ? 'Creating...' : (formData.published ? 'Create & Publish' : 'Create Story')}
+                    {loading ? 'Creating...' : (formData.isPublished ? 'Create & Publish' : 'Create Story')}
                   </Button>
                 </CardContent>
               </Card>

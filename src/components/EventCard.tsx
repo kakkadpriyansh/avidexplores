@@ -3,21 +3,23 @@ import { MapPin, Clock, Users, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-// Database Event interface
-interface DatabaseEvent {
-  _id: string;
+// Flexible Event interface that handles both mock data and database data
+interface FlexibleEvent {
+  _id?: string;
+  id?: string;
   slug: string;
   title: string;
   category: string;
   price: number;
-  location: {
+  location: string | {
     name: string;
     state: string;
     country: string;
   };
   difficulty: string;
-  duration: number;
-  images: string[];
+  duration: number | string;
+  images?: string[];
+  image?: string;
   description: string;
   shortDescription: string;
   highlights: string[];
@@ -28,7 +30,7 @@ interface DatabaseEvent {
 }
 
 interface EventCardProps {
-  event: DatabaseEvent;
+  event: FlexibleEvent;
 }
 
 const EventCard = ({ event }: EventCardProps) => {
@@ -59,7 +61,7 @@ const EventCard = ({ event }: EventCardProps) => {
       {/* Image */}
       <div className="relative overflow-hidden h-48">
         <img
-          src={event.images?.[0] || '/placeholder-event.jpg'}
+          src={event.images?.[0] || event.image || '/placeholder-event.jpg'}
           alt={event.title}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
@@ -89,11 +91,21 @@ const EventCard = ({ event }: EventCardProps) => {
         <div className="flex flex-col space-y-2 mb-4 text-sm text-muted-foreground">
           <div className="flex items-center space-x-2">
             <MapPin className="h-4 w-4 text-primary" />
-            <span>{event.location?.name || 'Location TBD'}, {event.location?.state || ''}</span>
+            <span>
+              {typeof event.location === 'string' 
+                ? event.location 
+                : `${event.location?.name || 'Location TBD'}, ${event.location?.state || ''}`
+              }
+            </span>
           </div>
           <div className="flex items-center space-x-2">
             <Clock className="h-4 w-4 text-primary" />
-            <span>{event.duration} {event.duration === 1 ? 'day' : 'days'}</span>
+            <span>
+              {typeof event.duration === 'number' 
+                ? `${event.duration} ${event.duration === 1 ? 'day' : 'days'}`
+                : event.duration
+              }
+            </span>
           </div>
           <div className="flex items-center space-x-2">
             <Users className="h-4 w-4 text-primary" />

@@ -326,17 +326,20 @@ const StoriesPage = () => {
                 <StoryCard 
                   key={story._id} 
                   story={{
-                    id: story._id,
+                    _id: story._id,
                     title: story.title,
                     slug: story.slug,
                     excerpt: story.excerpt,
-                    cover: story.coverImage,
-                    author: story.userId.name,
-                    authorAvatar: story.userId.avatar || '/default-avatar.jpg',
-                    date: story.publishedAt || story.createdAt,
+                    coverImage: story.coverImage,
+                    userId: {
+                      name: story.userId.name,
+                      avatar: story.userId.avatar || '/default-avatar.jpg'
+                    },
+                    publishedAt: story.publishedAt,
+                    createdAt: story.createdAt,
                     readTime: story.readTime,
                     tags: story.tags,
-                    likes: story.likes.length,
+                    likes: story.likes,
                     views: story.views
                   }} 
                 />
