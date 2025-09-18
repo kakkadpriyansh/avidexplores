@@ -6,92 +6,45 @@ import { adventureStats } from '@/data/mockData';
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+    <section className="relative min-h-[60vh] sm:h-[50vh] flex flex-col items-center justify-center overflow-hidden pt-16 pb-8">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/hero-adventure.jpg"
-          alt="Adventure landscape"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/50" />
-      </div>
+      <img
+        src="/hero-adventure.jpg"
+        alt="Adventure landscape"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      />
+      <span className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/50 z-0" />
 
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 text-center">
-        <div className="max-w-4xl mx-auto">
-          {/* Main Heading */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-montserrat font-bold text-white mb-6 fade-in-up">
-            Discover Your Next
-            <span className="block text-transparent bg-gradient-sunset bg-clip-text">
-              Adventure
-            </span>
-          </h1>
+      {/* Main Heading */}
+      <h1 className="relative z-10 text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-montserrat font-bold text-white mb-4 sm:mb-6 mt-8 sm:mt-12 md:mt-16 fade-in-up text-center px-4 leading-tight">
+        <span className="block">Discover Your Next</span>
+        <span className="block text-transparent bg-gradient-sunset bg-clip-text">
+          Adventure
+        </span>
+      </h1>
 
-          {/* Subtitle */}
-          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto fade-in-up">
-            From challenging mountain treks to peaceful camping escapes, 
-            embark on unforgettable journeys with expert guides and fellow adventurers.
-          </p>
+      {/* Subtitle */}
+      <p className="relative z-10 text-sm sm:text-lg md:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto fade-in-up text-center px-4 leading-relaxed">
+        From challenging mountain treks to peaceful camping escapes, 
+        embark on unforgettable journeys with expert guides and fellow adventurers.
+      </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 fade-in-up">
-            <Link href="/events">
-              <Button className="btn-hero group">
-                Explore Adventures
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-            <Link href="/stories">
-              <Button variant="outline" className="btn-outline">
-                Read Stories
-              </Button>
-            </Link>
-          </div>
+      {/* CTA Buttons */}
+      <nav className="relative z-10 flex flex-col sm:flex-row gap-4 items-center justify-center mb-16 fade-in-up">
+        <Link href="/events">
+          <Button className="btn-hero group w-full sm:w-auto">
+            Explore Adventures
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </Link>
+        <Link href="/stories">
+          <Button variant="outline" className="btn-outline w-full sm:w-auto">
+            Read Stories
+          </Button>
+        </Link>
+      </nav>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-4xl mx-auto stagger-children">
-            <div className="glass-card p-4 md:p-6 rounded-2xl text-center bg-black/30 backdrop-blur-sm border border-white/20">
-              <Users className="h-6 w-6 md:h-8 md:w-8 text-secondary mx-auto mb-2" />
-              <div className="text-xl md:text-2xl lg:text-3xl font-montserrat font-bold text-white">
-                {adventureStats.participants}
-              </div>
-              <div className="text-white/90 text-xs md:text-sm">Happy Adventurers</div>
-            </div>
-            
-            <div className="glass-card p-4 md:p-6 rounded-2xl text-center bg-black/30 backdrop-blur-sm border border-white/20">
-              <Award className="h-6 w-6 md:h-8 md:w-8 text-secondary mx-auto mb-2" />
-              <div className="text-xl md:text-2xl lg:text-3xl font-montserrat font-bold text-white">
-                {adventureStats.guides}
-              </div>
-              <div className="text-white/90 text-xs md:text-sm">Expert Guides</div>
-            </div>
-            
-            <div className="glass-card p-4 md:p-6 rounded-2xl text-center bg-black/30 backdrop-blur-sm border border-white/20">
-              <MapPin className="h-6 w-6 md:h-8 md:w-8 text-secondary mx-auto mb-2" />
-              <div className="text-xl md:text-2xl lg:text-3xl font-montserrat font-bold text-white">
-                {adventureStats.events}
-              </div>
-              <div className="text-white/90 text-xs md:text-sm">Adventures</div>
-            </div>
-            
-            <div className="glass-card p-4 md:p-6 rounded-2xl text-center bg-black/30 backdrop-blur-sm border border-white/20">
-              <Calendar className="h-6 w-6 md:h-8 md:w-8 text-secondary mx-auto mb-2" />
-              <div className="text-xl md:text-2xl lg:text-3xl font-montserrat font-bold text-white">
-                {adventureStats.years}
-              </div>
-              <div className="text-white/90 text-xs md:text-sm">Years Experience</div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-float">
-        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse" />
-        </div>
-      </div>
     </section>
   );
 };
