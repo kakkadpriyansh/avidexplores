@@ -25,7 +25,7 @@ const DestinationCard = ({ name, image, subtitle, slug, link }: DestinationCardP
 
   if (link) {
     return (
-      <Link href={link} aria-label={`Visit ${name}`} target="_blank" rel="noopener noreferrer">
+      <Link href={link} aria-label={`Visit ${name}`}>
         {content}
       </Link>
     );

@@ -13,6 +13,8 @@ export interface IEvent extends Document {
     year: number;
     dates: number[];
     location?: string;
+    availableSeats?: number;
+    totalSeats?: number;
   }[]; // Specific available dates with month, year and day numbers
   itinerary: {
     day: number;
@@ -22,6 +24,7 @@ export interface IEvent extends Document {
     activities: string[];
     meals: string[];
     accommodation?: string;
+    images?: string[];
   }[];
   inclusions: string[];
   exclusions: string[];
@@ -116,6 +119,16 @@ const EventSchema = new Schema<IEvent>({
     location: {
       type: String,
       required: false
+    },
+    availableSeats: {
+      type: Number,
+      required: false,
+      min: [0, 'Available seats cannot be negative']
+    },
+    totalSeats: {
+      type: Number,
+      required: false,
+      min: [1, 'Total seats must be at least 1']
     }
   }],
   itinerary: [{
@@ -138,7 +151,8 @@ const EventSchema = new Schema<IEvent>({
     },
     activities: [String],
     meals: [String],
-    accommodation: String
+    accommodation: String,
+    images: [String]
   }],
   inclusions: [{
     type: String,

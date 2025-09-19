@@ -5,6 +5,8 @@ export interface IBooking extends Document {
   eventId: mongoose.Types.ObjectId;
   bookingId: string; // Unique booking reference
   date: Date; // Selected event date
+  selectedMonth?: string; // Selected month for seat tracking
+  selectedYear?: number; // Selected year for seat tracking
   participants: {
     name: string;
     age: number;
@@ -73,6 +75,14 @@ const BookingSchema = new Schema<IBooking>({
   date: {
     type: Date,
     required: [true, 'Event date is required']
+  },
+  selectedMonth: {
+    type: String,
+    trim: true
+  },
+  selectedYear: {
+    type: Number,
+    min: [2024, 'Year must be at least 2024']
   },
   participants: [{
     name: {
