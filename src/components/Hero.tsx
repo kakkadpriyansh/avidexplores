@@ -38,7 +38,7 @@ const Hero = () => {
           </Button>
         </Link>
         <Link href="/stories">
-          <Button variant="outline" className="btn-outline w-full sm:w-auto">
+          <Button variant="outline" className="btn-outline hidden w-full sm:w-auto">
             Read Stories
           </Button>
         </Link>
