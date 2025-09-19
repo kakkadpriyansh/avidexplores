@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
-import { MapPin, Clock, Users, Star } from 'lucide-react';
+import { MapPin, Clock, Users, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
 
 // Flexible Event interface that handles both mock data and database data
 interface FlexibleEvent {
@@ -35,6 +38,19 @@ interface EventCardProps {
 }
 
 const EventCard = ({ event }: EventCardProps) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const images = event.images || (event.image ? [event.image] : ['/placeholder-event.jpg']);
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
   const getDifficultyColor = (difficulty: string) => {
     const normalizedDifficulty = difficulty.toLowerCase();
     switch (normalizedDifficulty) {
@@ -60,13 +76,43 @@ const EventCard = ({ event }: EventCardProps) => {
   return (
     <Link href={`/events/${event.slug}`} className="block">
       <div className="card-adventure group cursor-pointer hover:shadow-lg transition-shadow">
-        {/* Image */}
+        {/* Image Gallery */}
         <div className="relative overflow-hidden h-48">
           <img
-            src={event.images?.[0] || event.image || '/placeholder-event.jpg'}
-            alt={event.title}
+            src={images[currentImageIndex]}
+            alt={`${event.title} - Image ${currentImageIndex + 1}`}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full transition-all opacity-0 group-hover:opacity-100"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full transition-all opacity-0 group-hover:opacity-100"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentImageIndex(index);
+                    }}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
           <div className="absolute top-4 left-4">
             <Badge className={getDifficultyColor(event.difficulty)}>
               {formatDifficulty(event.difficulty)}
