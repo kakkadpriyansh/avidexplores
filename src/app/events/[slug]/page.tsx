@@ -105,6 +105,7 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [relatedLoading, setRelatedLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const carouselApiRef = useRef<any>(null);
 
   useEffect(() => {
@@ -362,6 +363,62 @@ export default function EventDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
+              {/* Available Dates Section - Above Tabs */}
+              {(event.availableDates && event.availableDates.length > 0) && (
+                <div className="mb-6 p-4 bg-muted/30 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center">
+                    <Calendar className="h-4 w-4 mr-2 text-primary" />
+                    Available Dates
+                  </h3>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {event.availableDates.map((dateGroup, index) => {
+                      const monthKey = `${dateGroup.month}-${dateGroup.year}`;
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedMonth(selectedMonth === monthKey ? null : monthKey)}
+                          className={`px-3 py-2 rounded-md text-sm border transition-all ${
+                            selectedMonth === monthKey
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background hover:bg-muted border-border'
+                          }`}
+                        >
+                          {dateGroup.month} {dateGroup.year}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  {selectedMonth && (
+                    <div className="mt-3 p-3 bg-background rounded-md border">
+                      {event.availableDates
+                        .filter(dateGroup => `${dateGroup.month}-${dateGroup.year}` === selectedMonth)
+                        .map((dateGroup, index) => (
+                          <div key={index}>
+                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+                              {dateGroup.dates.map((date, dateIndex) => (
+                                <button
+                                  key={dateIndex}
+                                  className="p-2 text-center border rounded hover:bg-primary hover:text-primary-foreground transition-colors text-sm"
+                                >
+                                  {date}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  )}
+                  
+                  {!selectedMonth && (
+                    <p className="text-xs text-muted-foreground text-center py-2">
+                      Click on a month to view available dates
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Tabs */}
               <div className="flex flex-wrap gap-2 mb-8 border-b border-border">
                 {tabs.map((tab) => (
@@ -805,47 +862,6 @@ export default function EventDetailPage() {
                     <span className="text-muted-foreground">Season:</span>
                     <span className="font-medium">{event.season}</span>
                   </div>
-                  {event.availableMonths && event.availableMonths.length > 0 && (
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Available Months:</span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {event.availableMonths.map((month, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {month}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {event.availableDates && event.availableDates.length > 0 && (
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Available Dates:</span>
-                      <div className="space-y-2 mt-2">
-                        {event.availableDates.map((dateEntry, index) => (
-                          <div key={index} className="border rounded-lg p-3 bg-gray-50">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="font-medium text-sm">
-                                {dateEntry.month} {dateEntry.year}
-                              </span>
-                              {dateEntry.location && (
-                                <span className="text-xs text-muted-foreground flex items-center">
-                                  <MapPin className="h-3 w-3 mr-1" />
-                                  {dateEntry.location}
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                              {dateEntry.dates.map((date, dateIndex) => (
-                                <Badge key={dateIndex} variant="outline" className="text-xs px-2 py-1">
-                                  {date}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Age Limit:</span>
                     <span className="font-medium">{event.ageLimit.min}-{event.ageLimit.max} years</span>
