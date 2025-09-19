@@ -176,14 +176,11 @@ const EventCard = ({ event }: EventCardProps) => {
               {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
                 <div className="flex flex-col">
                   <div className="flex items-center space-x-2">
-                    <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      ₹{event.discountedPrice}
-                    </span>
                     <span className="text-lg text-gray-500 dark:text-gray-400 line-through">
                       ₹{event.price}
                     </span>
-                    <span className="text-sm bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded-full font-medium">
-                      DISCOUNTED
+                    <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      ₹{event.discountedPrice}
                     </span>
                   </div>
                   <span className="text-gray-600 dark:text-gray-400 text-sm">

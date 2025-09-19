@@ -21,6 +21,7 @@ interface Event {
   description: string;
   shortDescription: string;
   price: number;
+  discountedPrice?: number;
   dates: string[];
   availableMonths: string[];
   availableDates: {
@@ -105,8 +106,11 @@ export default function EditEventPage() {
         throw new Error('Event not found');
       }
       const data = await response.json();
+      console.log('Fetched event data:', data);
+      console.log('Discounted price from API:', data.discountedPrice);
       setEvent({
         ...data,
+        discountedPrice: data.discountedPrice || undefined,
         availableMonths: data.availableMonths || [],
         availableDates: Array.isArray(data.availableDates) && data.availableDates.length > 0
           ? data.availableDates
@@ -138,7 +142,7 @@ export default function EditEventPage() {
         updatedAt: new Date().toISOString()
       };
 
-      console.log('Sending payload:', { title: payload.title });
+      console.log('Sending payload:', { title: payload.title, price: payload.price, discountedPrice: payload.discountedPrice });
       const response = await fetch(`/api/admin/events/${params.id}`, {
         method: 'PUT',
         headers: {
@@ -152,7 +156,7 @@ export default function EditEventPage() {
       }
 
       const responseData = await response.json();
-      console.log('API Response:', { title: responseData.title });
+      console.log('API Response:', { title: responseData.title, price: responseData.price, discountedPrice: responseData.discountedPrice });
 
       toast({
         title: 'Success',
@@ -409,6 +413,16 @@ export default function EditEventPage() {
                       value={event.price || ''}
                       onChange={(e) => updateEvent('price', parseFloat(e.target.value) || 0)}
                       required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="discountedPrice">Discounted Price (₹)</Label>
+                    <Input
+                      id="discountedPrice"
+                      type="number"
+                      value={event.discountedPrice || ''}
+                      onChange={(e) => updateEvent('discountedPrice', parseFloat(e.target.value) || undefined)}
+                      placeholder="Optional discounted price"
                     />
                   </div>
                 </div>

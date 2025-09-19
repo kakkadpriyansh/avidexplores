@@ -6,6 +6,7 @@ export interface IEvent extends Document {
   description: string;
   shortDescription: string;
   price: number;
+  discountedPrice?: number;
   dates: Date[];
   availableMonths: string[]; // Available months for booking
   availableDates: {
@@ -94,6 +95,11 @@ const EventSchema = new Schema<IEvent>({
     type: Number,
     required: [true, 'Price is required'],
     min: [0, 'Price cannot be negative']
+  },
+  discountedPrice: {
+    type: Number,
+    required: false,
+    min: [0, 'Discounted price cannot be negative']
   },
   dates: [{
     type: Date,
