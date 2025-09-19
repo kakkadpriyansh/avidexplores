@@ -127,7 +127,8 @@ export async function POST(request: NextRequest) {
       tags,
       highlights,
       thingsToCarry,
-      guide
+      guide,
+      discountedPrice
     } = body;
 
     // Generate slug from title
@@ -170,6 +171,8 @@ export async function POST(request: NextRequest) {
       description,
       shortDescription,
       price,
+      // Persist discountedPrice only if provided (>= 0)
+      discountedPrice: typeof discountedPrice === 'number' && discountedPrice >= 0 ? discountedPrice : undefined,
       dates: dates || [],
       availableMonths: availableMonths || [],
       availableDates: availableDates || [],

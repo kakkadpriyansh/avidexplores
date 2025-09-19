@@ -76,30 +76,48 @@ export async function PUT(
 
     const body = await request.json();
     
-    // Remove fields that shouldn't be updated directly
+    // Remove system fields that shouldn't be updated
     const { _id, createdAt, updatedAt, ...updateData } = body;
+    
+    console.log('PUT /api/admin/events/[id] - Simple update approach');
     
     // Set updatedAt to current time
     updateData.updatedAt = new Date();
 
     await connectDB();
 
-    const event = await (Event as any).findByIdAndUpdate(
-      params.id,
-      updateData,
-      { new: true, runValidators: true }
-    )
-      .populate('guide', 'name email')
-      .populate('createdBy', 'name email');
+    console.log('PUT /api/admin/events/[id] - Update data:', JSON.stringify(updateData, null, 2));
 
-    if (!event) {
+    try {
+      const event = await (Event as any).findByIdAndUpdate(
+        params.id,
+        updateData,
+        { new: true, runValidators: true }
+      )
+        .populate('guide', 'name email')
+        .populate('createdBy', 'name email');
+
+      if (!event) {
+        return NextResponse.json(
+          { error: 'Event not found' },
+          { status: 404 }
+        );
+      }
+      
+      console.log('PUT /api/admin/events/[id] - Updated event result:', {
+        title: event.title,
+        price: event.price,
+        updatedAt: event.updatedAt
+      });
+
+      return NextResponse.json(event);
+    } catch (mongoError) {
+      console.error('PUT /api/admin/events/[id] - MongoDB update error:', mongoError);
       return NextResponse.json(
-        { error: 'Event not found' },
-        { status: 404 }
+        { error: 'Database update failed', details: mongoError.message },
+        { status: 500 }
       );
     }
-
-    return NextResponse.json(event);
   } catch (error: any) {
     console.error('Error updating event:', error);
     

@@ -356,19 +356,20 @@ export default function CreateEventPage() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <Label htmlFor="price">Price (₹) *</Label>
+                    <Label htmlFor="price">Price (₹)</Label>
                     <Input
                       id="price"
                       type="number"
                       value={formData.price}
-                      onChange={(e) => handleInputChange('price', Number(e.target.value))}
-                      placeholder="0"
+                      onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
                       required
                     />
                   </div>
-                  
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="maxParticipants">Max Participants *</Label>
                     <Input
