@@ -47,7 +47,7 @@ const ThemeToggle = () => {
     <div className="fixed bottom-6 right-6 z-50">
       <button
         onClick={toggleTheme}
-        className="w-16 h-16 bg-black/20 dark:bg-white/20 backdrop-blur-md border border-white/30 dark:border-black/30 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 group"
+        className="w-16 h-16 hidden bg-black/20 dark:bg-white/20 backdrop-blur-md border border-white/30 dark:border-black/30 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 group"
         aria-label="Toggle theme"
       >
         <div className="relative w-8 h-8">
