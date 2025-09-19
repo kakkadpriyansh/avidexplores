@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navigation from '@/components/Navigation';
@@ -104,6 +104,8 @@ export default function EventDetailPage() {
   const [relatedEvents, setRelatedEvents] = useState<DatabaseEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [relatedLoading, setRelatedLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const carouselApiRef = useRef<any>(null);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -146,6 +148,26 @@ export default function EventDetailPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
+
+  // Sync carousel with currentImageIndex state
+  useEffect(() => {
+    if (carouselApiRef.current) {
+      carouselApiRef.current.scrollTo(currentImageIndex);
+    }
+  }, [currentImageIndex]);
+
+  // Auto-play functionality
+  useEffect(() => {
+    if (!event || !event.images || event.images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        prevIndex === event.images.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [event?.images]);
 
   // Compute itinerary helpers
   const hasDeparture = event?.itinerary?.some((d) => d.day === 0) ?? false;
@@ -236,14 +258,56 @@ export default function EventDetailPage() {
       
       {/* Event Header */}
       <article className="pt-24">
-        {/* Cover Image */}
+        {/* Image Gallery */}
         <div className="relative h-96 overflow-hidden">
-          <img
-            src={event.images?.[0] || '/placeholder-event.jpg'}
-            alt={event.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          {event.images && event.images.length > 0 ? (
+            <Carousel 
+              className="w-full h-full"
+              setApi={(api) => {
+                carouselApiRef.current = api;
+                if (api) {
+                  api.on('select', () => {
+                    setCurrentImageIndex(api.selectedScrollSnap());
+                  });
+                }
+              }}
+            >
+              <CarouselContent>
+                {event.images.map((image, index) => (
+                  <CarouselItem key={index}>
+                    <div className="relative h-96 overflow-hidden">
+                      <img
+                        src={image || '/placeholder-event.jpg'}
+                        alt={`${event.title} - Image ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                      
+                      {/* Image Counter */}
+                      <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                        {currentImageIndex + 1} / {event.images.length}
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {event.images.length > 1 && (
+                <>
+                  <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 border-none" />
+                  <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 border-none" />
+                </>
+              )}
+            </Carousel>
+          ) : (
+            <div className="relative h-96 overflow-hidden">
+              <img
+                src="/placeholder-event.jpg"
+                alt={event.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            </div>
+          )}
           
           {/* Back Button */}
           <div className="absolute top-8 left-4">
@@ -290,6 +354,8 @@ export default function EventDetailPage() {
             </div>
           </div>
         </div>
+
+
 
         {/* Event Details */}
         <div className="container mx-auto px-4 py-12">

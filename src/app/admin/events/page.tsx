@@ -258,7 +258,7 @@ export default function AdminEventsPage() {
                         </div>
                         <div className="flex items-center font-semibold text-primary">
                           <DollarSign className="h-4 w-4 mr-1" />
-                          ₹{event.price.toLocaleString()}
+                          <span>₹{event.price.toLocaleString()}</span>
                         </div>
                       </div>
                       

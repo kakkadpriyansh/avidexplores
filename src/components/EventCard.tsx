@@ -11,6 +11,7 @@ interface FlexibleEvent {
   title: string;
   category: string;
   price: number;
+  discountedPrice?: number;
   location: string | {
     name: string;
     state: string;
@@ -123,21 +124,37 @@ const EventCard = ({ event }: EventCardProps) => {
             )) || null}
           </div>
 
-          {/* Price and CTA Section */}
-          <div className="flex items-center justify-between">
+          {/* Price Section */}
+          <div className="flex items-center">
             <div>
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                ₹{event.price}
-              </span>
-              <span className="text-gray-600 dark:text-gray-400 ml-1">
-                per person
-              </span>
+              {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      ₹{event.discountedPrice}
+                    </span>
+                    <span className="text-lg text-gray-500 dark:text-gray-400 line-through">
+                      ₹{event.price}
+                    </span>
+                    <span className="text-sm bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded-full font-medium">
+                      DISCOUNTED
+                    </span>
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400 text-sm">
+                    per person
+                  </span>
+                </div>
+              ) : (
+                <div>
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                    ₹{event.price}
+                  </span>
+                  <span className="text-gray-600 dark:text-gray-400 ml-1">
+                    per person
+                  </span>
+                </div>
+              )}
             </div>
-            <button
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 z-10 relative"
-            >
-              View Details
-            </button>
           </div>
         </div>
       </div>

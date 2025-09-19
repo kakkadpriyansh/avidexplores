@@ -129,19 +129,30 @@ export default function EditEventPage() {
     e.preventDefault();
     if (!event) return;
 
+    console.log('Form submission - current event state:', { title: event.title });
+
     setSaving(true);
     try {
+      const payload = {
+        ...event,
+        updatedAt: new Date().toISOString()
+      };
+
+      console.log('Sending payload:', { title: payload.title });
       const response = await fetch(`/api/admin/events/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(event),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
         throw new Error('Failed to update event');
       }
+
+      const responseData = await response.json();
+      console.log('API Response:', { title: responseData.title });
 
       toast({
         title: 'Success',
@@ -162,7 +173,10 @@ export default function EditEventPage() {
 
   const updateEvent = (field: string, value: any) => {
     if (!event) return;
-    setEvent({ ...event, [field]: value });
+    console.log('updateEvent called:', { field, value });
+    const newEvent = { ...event, [field]: value };
+    console.log('updateEvent setting new state:', { field, value });
+    setEvent(newEvent);
   };
 
   const updateNestedField = (parent: string, field: string, value: any) => {
@@ -386,18 +400,20 @@ export default function EditEventPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="price">Price (₹)</Label>
                     <Input
                       id="price"
                       type="number"
-                      value={event.price}
-                      onChange={(e) => updateEvent('price', parseInt(e.target.value))}
-                      min="0"
+                      value={event.price || ''}
+                      onChange={(e) => updateEvent('price', parseFloat(e.target.value) || 0)}
                       required
                     />
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="minParticipants">Min Participants</Label>
                     <Input
