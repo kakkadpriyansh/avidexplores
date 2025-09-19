@@ -16,8 +16,7 @@ import {
   Filter,
   MapPin,
   Calendar,
-  Users,
-  DollarSign
+  Users
 } from 'lucide-react';
 
 interface EventItem {
@@ -257,7 +256,6 @@ export default function AdminEventsPage() {
                           {event.currentBookings || 0}/{event.maxParticipants}
                         </div>
                         <div className="flex items-center font-semibold text-primary">
-                          <DollarSign className="h-4 w-4 mr-1" />
                           <span>₹{event.price.toLocaleString()}</span>
                         </div>
                       </div>
