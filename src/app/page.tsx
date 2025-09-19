@@ -2,7 +2,6 @@ import Hero from '@/components/Hero';
 import EventCard from '@/components/EventCard';
 import DestinationCard from '@/components/DestinationCard';
 import TestimonialCard from '@/components/TestimonialCard';
-import StoryCard from '@/components/StoryCard';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -75,33 +74,16 @@ async function getTestimonials() {
   }
 }
 
-// Fetch stories from the database
-async function getStories() {
-  try {
-    // Use INTERNAL_API_URL for server-side calls to avoid DNS issues
-    const base = process.env.INTERNAL_API_URL || 'http://localhost:3000';
-    const response = await fetch(`${base}/api/stories?limit=10&sortBy=publishedAt&sortOrder=desc`, {
-      cache: 'no-store'
-    });
-    
-    if (!response.ok) {
-      console.error('Failed to fetch stories:', response.status);
-      return [];
-    }
-    
-    const data = await response.json();
-    return Array.isArray(data.data) ? data.data : [];
-  } catch (error) {
-    console.error('Error fetching stories:', error);
-    return [];
-  }
-}
+
+
 
 export default async function HomePage() {
-  const events = await getEvents();
-  const destinationCards = await getDestinationCards();
-  const testimonials = await getTestimonials();
-  const stories = await getStories();
+  const [events, destinations, testimonials] = await Promise.all([
+    getEvents(),
+    getDestinationCards(),
+    getTestimonials()
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -116,8 +98,8 @@ export default async function HomePage() {
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">Popular Destinations</h2>
             <div className="flex gap-6 overflow-x-auto pb-4">
-              {destinationCards.length > 0 ? (
-                destinationCards.map((card) => (
+              {destinations.length > 0 ? (
+                destinations.map((card) => (
                   <DestinationCard 
                     key={card._id} 
                     name={card.title}
@@ -133,9 +115,9 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Featured Events */}
+          {/* Events Section */}
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Featured Adventures</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Upcoming Adventures</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {events.length > 0 ? (
                 events.slice(0, 6).map((event) => (
@@ -147,15 +129,18 @@ export default async function HomePage() {
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="text-center">
-            <Link href="/events">
-              <Button className="btn-hero group">
-                View All Adventures
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
+            
+            {events.length > 6 && (
+              <div className="text-center mt-8">
+                <Link
+                  href="/events"
+                  className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors duration-200"
+                >
+                  View All Events
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -238,113 +223,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Stories Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-foreground mb-4">
-                Adventure Stories
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-                Real stories from real adventurers. Get inspired by their journeys and start planning your own.
-              </p>
-          </div>
-          
-          {/* Featured Story */}
-            {stories.length > 0 && (
-              <div className="mb-16">
-                <div className="bg-card rounded-2xl shadow-xl overflow-hidden border">
-                  <div className="lg:flex">
-                    <div className="lg:w-1/2">
-                      <img
-                        src={stories[0].coverImage}
-                        alt={stories[0].title}
-                        className="w-full h-64 lg:h-full object-cover"
-                      />
-                    </div>
-                    <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
-                      <div className="flex items-center mb-4">
-                        <span className="bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full">
-                          Featured Story
-                        </span>
-                        <span className="ml-3 text-sm text-muted-foreground">
-                          {stories[0].readTime || 5} min read
-                        </span>
-                      </div>
-                      <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">
-                        {stories[0].title}
-                      </h3>
-                      <p className="text-muted-foreground mb-6 text-lg leading-relaxed">
-                        {stories[0].excerpt}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <img
-                            src={stories[0].userId?.avatar || '/placeholder.svg'}
-                            alt={stories[0].userId?.name || 'Author'}
-                            className="w-10 h-10 rounded-full mr-3"
-                          />
-                          <div>
-                            <p className="font-semibold text-foreground">{stories[0].userId?.name || 'Anonymous'}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {new Date(stories[0].publishedAt || stories[0].createdAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                        <Link
-                          href={`/stories/${stories[0].slug}`}
-                          className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors duration-200"
-                        >
-                          Read Story
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          
-          {/* More Stories Grid */}
-           {stories.length > 1 && (
-             <div className="mb-12">
-               <h3 className="text-2xl font-bold text-foreground mb-8 text-center">
-                 More Adventures
-               </h3>
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                 {stories.slice(1).map((story) => (
-                   <StoryCard key={story._id} story={story} />
-                 ))}
-               </div>
-             </div>
-           )}
-           
-           {/* No Stories Message */}
-           {stories.length === 0 && (
-             <div className="text-center py-16">
-               <div className="max-w-md mx-auto">
-                 <div className="text-muted-foreground mb-4">
-                   <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                   </svg>
-                 </div>
-                 <h3 className="text-xl font-semibold text-foreground mb-2">No stories found</h3>
-                 <p className="text-muted-foreground">Check back later for new adventure stories from our community.</p>
-               </div>
-             </div>
-           )}
-          
-          <div className="text-center">
-            <Link
-              href="/stories"
-              className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 transition-colors duration-200"
-            >
-              Read More Stories
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
+
 
       <Footer />
     </div>
