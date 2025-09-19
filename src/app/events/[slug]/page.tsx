@@ -32,7 +32,9 @@ import {
   Flag,
   Sunrise,
   Camera,
-  Plane
+  Plane,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingRing } from '@/components/ui/loading-ring';
@@ -107,6 +109,7 @@ export default function EventDetailPage() {
   const [relatedLoading, setRelatedLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set());
   const carouselApiRef = useRef<any>(null);
 
   useEffect(() => {
@@ -174,6 +177,16 @@ export default function EventDetailPage() {
   // Compute itinerary helpers
   const hasDeparture = event?.itinerary?.some((d) => d.day === 0) ?? false;
   const totalDays = event ? Math.max(...event.itinerary.map((d) => d.day)) : 0;
+
+  const toggleDayExpansion = (dayNumber: number) => {
+    const newExpanded = new Set(expandedDays);
+    if (newExpanded.has(dayNumber)) {
+      newExpanded.delete(dayNumber);
+    } else {
+      newExpanded.add(dayNumber);
+    }
+    setExpandedDays(newExpanded);
+  };
 
   if (loading) {
     return (
@@ -249,7 +262,6 @@ export default function EventDetailPage() {
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'itinerary', label: 'Itinerary' },
-    { id: 'departure', label: 'Travel Departure' },
     { id: 'inclusions', label: 'What\'s Included' },
     { id: 'preparation', label: 'Preparation' },
   ];
@@ -491,243 +503,132 @@ export default function EventDetailPage() {
               {activeTab === 'itinerary' && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-montserrat font-bold mb-4">Day by Day Itinerary</h2>
-                  <div className="space-y-4">
-                    {event.itinerary?.map((day, index) => (
-                      <div key={index} className="border border-border rounded-lg p-6">
-                        <div className="flex items-center mb-4">
-                          <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold mr-3">
-                            {day.day === 0 ? 'D' : day.day}
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-lg">
-                              {day.day === 0 ? 'Departure Day' : `Day ${day.day}`}: {day.title}
-                            </h3>
-                            {day.location && (
-                              <div className="flex items-center text-sm text-muted-foreground mt-1">
-                                <MapPin className="h-3 w-3 mr-1" />
-                                {day.location}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <div className="ml-11 space-y-4">
-                          <p className="text-muted-foreground">{day.description}</p>
-                          
-                          {/* Day Images Carousel */}
-                          {day.images && day.images.length > 0 && (
-                            <div className="my-4">
-                              <h4 className="font-medium text-sm mb-3 flex items-center">
-                                <Camera className="h-4 w-4 mr-1 text-primary" />
-                                Day Photos
-                              </h4>
-                              <Carousel className="w-full max-w-md">
-                                <CarouselContent>
-                                  {day.images.map((image, imgIndex) => (
-                                    <CarouselItem key={imgIndex}>
-                                      <div className="aspect-video bg-muted overflow-hidden rounded-lg">
-                                        <img
-                                          src={image}
-                                          alt={`Day ${day.day} - Photo ${imgIndex + 1}`}
-                                          className="w-full h-full object-cover"
-                                        />
-                                      </div>
-                                    </CarouselItem>
-                                  ))}
-                                </CarouselContent>
-                                <CarouselPrevious />
-                                <CarouselNext />
-                              </Carousel>
+                  <div className="space-y-3">
+                    {event.itinerary?.map((day, index) => {
+                      const isExpanded = expandedDays.has(day.day);
+                      const hasAdditionalInfo = (day.images && day.images.length > 0) || 
+                                               (day.activities && day.activities.length > 0) || 
+                                               (day.meals && day.meals.length > 0) || 
+                                               day.accommodation;
+                      
+                      return (
+                        <div key={index} className="bg-muted/30 rounded-lg overflow-hidden">
+                          <button
+                            onClick={() => hasAdditionalInfo && toggleDayExpansion(day.day)}
+                            className={`w-full flex items-center p-4 text-left transition-colors ${
+                              hasAdditionalInfo ? 'hover:bg-muted/50 cursor-pointer' : 'cursor-default'
+                            }`}
+                          >
+                            <div className="bg-gray-600 text-white rounded-full px-3 py-1 text-sm font-medium mr-4 min-w-fit">
+                              Day {day.day === 0 ? 'D' : day.day}
                             </div>
-                          )}
-                          
-                          {day.activities && day.activities.length > 0 && (
-                            <div>
-                              <h4 className="font-medium text-sm mb-2 flex items-center">
-                                <Mountain className="h-4 w-4 mr-1 text-primary" />
-                                Activities
-                              </h4>
-                              <ul className="space-y-1">
-                                {day.activities.map((activity, actIndex) => (
-                                  <li key={actIndex} className="text-sm text-muted-foreground flex items-start">
-                                    <CheckCircle className="h-3 w-3 mr-2 text-green-500 mt-0.5 flex-shrink-0" />
-                                    {activity}
-                                  </li>
-                                ))}
-                              </ul>
+                            <div className="flex-1">
+                              <h3 className="font-medium text-base text-foreground">
+                                {day.title}
+                              </h3>
                             </div>
-                          )}
-                          
-                          {day.meals && day.meals.length > 0 && (
-                            <div>
-                              <h4 className="font-medium text-sm mb-2 flex items-center">
-                                <Sunrise className="h-4 w-4 mr-1 text-primary" />
-                                Meals
-                              </h4>
-                              <ul className="space-y-1">
-                                {day.meals.map((meal, mealIndex) => (
-                                  <li key={mealIndex} className="text-sm text-muted-foreground flex items-start">
-                                    <CheckCircle className="h-3 w-3 mr-2 text-orange-500 mt-0.5 flex-shrink-0" />
-                                    {meal}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          
-                          {day.accommodation && (
-                            <div>
-                              <h4 className="font-medium text-sm mb-2 flex items-center">
-                                <Flag className="h-4 w-4 mr-1 text-primary" />
-                                Accommodation
-                              </h4>
-                              <p className="text-sm text-muted-foreground">{day.accommodation}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'departure' && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-montserrat font-bold mb-4">Travel Departure Options</h2>
-                  
-                  {/* Available Dates Section */}
-                  {event.availableDates && event.availableDates.length > 0 ? (
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold mb-3">Available Departure Dates</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {event.availableDates.map((dateGroup, index) => (
-                          <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-5 w-5 text-primary" />
-                                <h4 className="font-semibold">{dateGroup.month} {dateGroup.year}</h4>
-                              </div>
-                              {(dateGroup.availableSeats !== undefined || dateGroup.totalSeats !== undefined) && (
-                                <div className="flex items-center gap-1 text-sm">
-                                  <Users className="h-4 w-4 text-muted-foreground" />
-                                  <span className={`font-medium ${
-                                    dateGroup.availableSeats && dateGroup.availableSeats <= 3 
-                                      ? 'text-red-600' 
-                                      : dateGroup.availableSeats && dateGroup.availableSeats <= 6
-                                      ? 'text-orange-600'
-                                      : 'text-green-600'
-                                  }`}>
-                                    {dateGroup.availableSeats || 0}
-                                  </span>
-                                  {dateGroup.totalSeats && (
-                                    <span className="text-muted-foreground">
-                                      /{dateGroup.totalSeats} seats
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                            {dateGroup.location && (
-                              <div className="flex items-center gap-2 mb-2">
-                                <MapPin className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">{dateGroup.location}</span>
-                              </div>
-                            )}
-                            <div className="flex flex-wrap gap-2 mb-3">
-                              {dateGroup.dates.map((date, dateIndex) => (
-                                <div 
-                                  key={dateIndex} 
-                                  className="px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-xs font-medium hover:bg-primary/20 hover:border-primary/40 transition-all duration-200 cursor-pointer"
-                                >
-                                  {date}
-                                </div>
-                              ))}
-                            </div>
-                            {(dateGroup.availableSeats !== undefined) && (
-                              <div className="mt-3">
-                                {dateGroup.availableSeats === 0 ? (
-                                  <Badge variant="destructive" className="text-xs">
-                                    Fully Booked
-                                  </Badge>
-                                ) : dateGroup.availableSeats <= 3 ? (
-                                  <Badge variant="destructive" className="text-xs">
-                                    Only {dateGroup.availableSeats} seats left!
-                                  </Badge>
-                                ) : dateGroup.availableSeats <= 6 ? (
-                                  <Badge variant="secondary" className="text-xs">
-                                    Limited seats available
-                                  </Badge>
+                            {hasAdditionalInfo && (
+                              <div className="ml-2">
+                                {isExpanded ? (
+                                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
                                 ) : (
-                                  <Badge variant="default" className="text-xs">
-                                    Available
-                                  </Badge>
+                                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
                                 )}
                               </div>
                             )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <Plane className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">Departure Dates Coming Soon</h3>
-                      <p className="text-muted-foreground">
-                        We're currently planning departure dates for this adventure. 
-                        Please contact us for more information about upcoming trips.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Available Months Section */}
-                  {event.availableMonths && event.availableMonths.length > 0 && (
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold mb-3">Best Travel Months</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {event.availableMonths.map((month, index) => (
-                          <Badge key={index} variant="secondary" className="px-3 py-1">
-                            {month}
-                          </Badge>
-                        ))}
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        These months offer the best weather and conditions for this adventure.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Season Information */}
-                  {event.season && event.season.length > 0 && (
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold mb-3">Recommended Seasons</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {event.season.map((seasonItem, index) => (
-                          <Badge key={index} variant="outline" className="px-3 py-1">
-                            {seasonItem}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Contact Information */}
-                  <div className="bg-muted/50 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold mb-3">Need Help Planning Your Trip?</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Our travel experts are here to help you choose the perfect departure date 
-                      and plan your adventure. Contact us for personalized assistance.
-                    </p>
-                    <div className="flex flex-wrap gap-3">
-                      <Button variant="default">
-                        Contact Travel Expert
-                      </Button>
-                      <Button variant="outline">
-                        Request Custom Dates
-                      </Button>
-                    </div>
+                          </button>
+                          
+                          {isExpanded && hasAdditionalInfo && (
+                            <div className="px-4 pb-4 space-y-4 border-t border-border/50">
+                              <p className="text-muted-foreground text-sm mt-4">{day.description}</p>
+                              
+                              {day.location && (
+                                <div className="flex items-center text-sm text-muted-foreground">
+                                  <MapPin className="h-3 w-3 mr-1" />
+                                  {day.location}
+                                </div>
+                              )}
+                              
+                              {/* Day Images Carousel */}
+                              {day.images && day.images.length > 0 && (
+                                <div>
+                                  <h4 className="font-medium text-sm mb-3 flex items-center">
+                                    <Camera className="h-4 w-4 mr-1 text-primary" />
+                                    Day Photos
+                                  </h4>
+                                  <Carousel className="w-full max-w-md">
+                                    <CarouselContent>
+                                      {day.images.map((image, imgIndex) => (
+                                        <CarouselItem key={imgIndex}>
+                                          <div className="aspect-video bg-muted overflow-hidden rounded-lg">
+                                            <img
+                                              src={image}
+                                              alt={`Day ${day.day} - Photo ${imgIndex + 1}`}
+                                              className="w-full h-full object-cover"
+                                            />
+                                          </div>
+                                        </CarouselItem>
+                                      ))}
+                                    </CarouselContent>
+                                    <CarouselPrevious />
+                                    <CarouselNext />
+                                  </Carousel>
+                                </div>
+                              )}
+                              
+                              {day.activities && day.activities.length > 0 && (
+                                <div>
+                                  <h4 className="font-medium text-sm mb-2 flex items-center">
+                                    <Mountain className="h-4 w-4 mr-1 text-primary" />
+                                    Activities
+                                  </h4>
+                                  <ul className="space-y-1">
+                                    {day.activities.map((activity, actIndex) => (
+                                      <li key={actIndex} className="text-sm text-muted-foreground flex items-start">
+                                        <CheckCircle className="h-3 w-3 mr-2 text-green-500 mt-0.5 flex-shrink-0" />
+                                        {activity}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              
+                              {day.meals && day.meals.length > 0 && (
+                                <div>
+                                  <h4 className="font-medium text-sm mb-2 flex items-center">
+                                    <Sunrise className="h-4 w-4 mr-1 text-primary" />
+                                    Meals
+                                  </h4>
+                                  <ul className="space-y-1">
+                                    {day.meals.map((meal, mealIndex) => (
+                                      <li key={mealIndex} className="text-sm text-muted-foreground flex items-start">
+                                        <CheckCircle className="h-3 w-3 mr-2 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        {meal}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              
+                              {day.accommodation && (
+                                <div>
+                                  <h4 className="font-medium text-sm mb-2 flex items-center">
+                                    <Flag className="h-4 w-4 mr-1 text-primary" />
+                                    Accommodation
+                                  </h4>
+                                  <p className="text-sm text-muted-foreground">{day.accommodation}</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
+
+
 
               {activeTab === 'inclusions' && (
                 <div className="space-y-6">
@@ -852,8 +753,8 @@ export default function EventDetailPage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Booking Card */}
-              <div className="card-adventure p-6">
+              {/* Booking Card - Hidden on mobile, shown on desktop */}
+              <div className="card-adventure p-6 hidden lg:block">
                 <div className="text-center mb-4">
                   {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
                     <div>
@@ -946,6 +847,38 @@ export default function EventDetailPage() {
       </article>
 
       <Footer />
+      
+      {/* Mobile Sticky Booking Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 z-50">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1">
+            {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="text-sm text-muted-foreground line-through">
+                  ₹{event.price.toLocaleString()}
+                </span>
+                <span className="text-xl font-bold text-green-600">
+                  ₹{event.discountedPrice.toLocaleString()}
+                </span>
+                <span className="text-sm text-muted-foreground">per person</span>
+              </div>
+            ) : (
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-bold text-primary">
+                  ₹{event.price.toLocaleString()}
+                </span>
+                <span className="text-sm text-muted-foreground">per person</span>
+              </div>
+            )}
+          </div>
+          <Button 
+            className="btn-hero px-8"
+            onClick={() => router.push(`/events/${params.slug}/book`)}
+          >
+            Book Now
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
