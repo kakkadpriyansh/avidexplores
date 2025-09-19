@@ -1,21 +1,87 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
-import { mockEvents } from '@/data/mockData';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
+
+interface Event {
+  _id: string;
+  slug: string;
+  title: string;
+  category: string;
+  price: number;
+  location: {
+    name: string;
+    state: string;
+    country: string;
+  };
+  difficulty: string;
+  duration: number;
+  images: string[];
+  description: string;
+  shortDescription: string;
+  highlights: string[];
+  inclusions: string[];
+  exclusions: string[];
+  maxParticipants: number;
+  tags: string[];
+  isActive: boolean;
+  isFeatured: boolean;
+}
 
 export default function EventsPage() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredEvents = mockEvents.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.location.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
-  });
+  // Fetch events from API
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/events?limit=50'); // Fetch more events for the public page
+        const data = await response.json();
+        
+        if (data.success) {
+          setEvents(data.data);
+          setFilteredEvents(data.data);
+        } else {
+          setError('Failed to load events');
+        }
+      } catch (err) {
+        setError('Failed to load events');
+        console.error('Error fetching events:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // Filter events based on search term
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredEvents(events);
+    } else {
+      const filtered = events.filter(event => {
+        const locationString = typeof event.location === 'string' 
+          ? event.location 
+          : `${event.location?.name || ''} ${event.location?.state || ''}`;
+        
+        return event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               locationString.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               event.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               event.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      });
+      setFilteredEvents(filtered);
+    }
+  }, [searchTerm, events]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,25 +122,50 @@ export default function EventsPage() {
       {/* Events Grid */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          {filteredEvents.length > 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-2 text-muted-foreground">Loading adventures...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <p className="text-lg text-red-600 mb-4">
+                {error}
+              </p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : filteredEvents.length > 0 ? (
             <>
               <div className="flex items-center justify-between mb-8">
                 <p className="text-muted-foreground">
-                  Showing {filteredEvents.length} of {mockEvents.length} adventures
+                  Showing {filteredEvents.length} of {events.length} adventures
                 </p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredEvents.map((event) => (
-                  <EventCard key={event.id} event={event} />
+                  <EventCard key={event._id} event={event} />
                 ))}
               </div>
             </>
           ) : (
             <div className="text-center py-16">
               <p className="text-lg text-muted-foreground mb-4">
-                No adventures found matching your search
+                {searchTerm ? 'No adventures found matching your search' : 'No adventures available at the moment'}
               </p>
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm('')}
+                  className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Clear Search
+                </button>
+              )}
             </div>
           )}
         </div>

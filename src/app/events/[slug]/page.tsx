@@ -35,6 +35,7 @@ import {
   Plane
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { LoadingRing } from '@/components/ui/loading-ring';
 
 // Database Event interface
 interface DatabaseEvent {
@@ -102,38 +103,43 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<DatabaseEvent | null>(null);
   const [relatedEvents, setRelatedEvents] = useState<DatabaseEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [relatedLoading, setRelatedLoading] = useState(true);
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchEventData = async () => {
       try {
-        // Fetch the specific event
-        const eventResponse = await fetch(`/api/events/${slug}`);
-        if (eventResponse.ok) {
-          const eventData = await eventResponse.json();
+        // Fetch the specific event and related events in parallel
+        const [eventResponse, eventsResponse] = await Promise.allSettled([
+          fetch(`/api/events/${slug}`),
+          fetch('/api/events?limit=10') // Limit to reduce payload
+        ]);
+
+        // Handle main event response
+        if (eventResponse.status === 'fulfilled' && eventResponse.value.ok) {
+          const eventData = await eventResponse.value.json();
           setEvent(eventData.data);
+          setLoading(false); // Show main content immediately
         } else {
-          console.error('Failed to fetch event:', eventResponse.status);
+          console.error('Failed to fetch event');
           router.push('/events');
           return;
         }
 
-        // Fetch related events
-        const eventsResponse = await fetch('/api/events');
-        if (eventsResponse.ok) {
-          const eventsData = await eventsResponse.json();
+        // Handle related events response (non-blocking)
+        if (eventsResponse.status === 'fulfilled' && eventsResponse.value.ok) {
+          const eventsData = await eventsResponse.value.json();
           const allEvents = eventsData.events || [];
           const related = allEvents.filter((e: DatabaseEvent) => e.slug !== slug).slice(0, 3);
           setRelatedEvents(related);
         }
+        setRelatedLoading(false);
       } catch (error) {
         console.error('Error fetching event:', error);
         router.push('/events');
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchEvent();
+    fetchEventData();
   }, [slug, router]);
 
   // Scroll to top when component mounts
@@ -150,7 +156,8 @@ export default function EventDetailPage() {
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 py-24">
-          <div className="text-center">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <LoadingRing size="lg" />
             <p className="text-lg text-muted-foreground">Loading event details...</p>
           </div>
         </div>
@@ -814,20 +821,26 @@ export default function EventDetailPage() {
         </div>
 
         {/* Related Events */}
-        {relatedEvents.length > 0 && (
-          <section className="py-16 bg-muted/30">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-montserrat font-bold text-center mb-12">
-                Similar Adventures
-              </h2>
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-montserrat font-bold text-center mb-12">
+              Similar Adventures
+            </h2>
+            {relatedLoading ? (
+              <div className="flex justify-center">
+                <LoadingRing size="md" />
+              </div>
+            ) : relatedEvents.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {relatedEvents.map((relatedEvent) => (
                   <EventCard key={relatedEvent._id} event={relatedEvent} />
                 ))}
               </div>
-            </div>
-          </section>
-        )}
+            ) : (
+              <p className="text-center text-muted-foreground">No similar adventures found.</p>
+            )}
+          </div>
+        </section>
       </article>
 
       <Footer />
