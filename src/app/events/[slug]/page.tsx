@@ -44,6 +44,7 @@ interface DatabaseEvent {
   title: string;
   category: string;
   price: number;
+  discountedPrice?: number;
   location: {
     name: string;
     state: string;
@@ -854,10 +855,26 @@ export default function EventDetailPage() {
               {/* Booking Card */}
               <div className="card-adventure p-6">
                 <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-primary mb-1">
-                    ₹{event.price.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground">per person</div>
+                  {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
+                    <div>
+                      <div className="flex items-center justify-center space-x-2 mb-1">
+                        <span className="text-lg text-muted-foreground line-through">
+                          ₹{event.price.toLocaleString()}
+                        </span>
+                        <div className="text-3xl font-bold text-green-600">
+                          ₹{event.discountedPrice.toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="text-sm text-muted-foreground">per person</div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="text-3xl font-bold text-primary mb-1">
+                        ₹{event.price.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-muted-foreground">per person</div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-3 mb-6">

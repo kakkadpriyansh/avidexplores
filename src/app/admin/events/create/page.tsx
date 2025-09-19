@@ -18,6 +18,7 @@ interface EventFormData {
   description: string;
   shortDescription: string;
   price: number;
+  discountedPrice?: number;
   location: string;
   duration: string;
   maxParticipants: number;
@@ -69,6 +70,7 @@ export default function CreateEventPage() {
     description: '',
     shortDescription: '',
     price: 0,
+    discountedPrice: undefined,
     location: '',
     duration: '',
     maxParticipants: 20,
@@ -365,6 +367,16 @@ export default function CreateEventPage() {
                       value={formData.price}
                       onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
                       required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="discountedPrice">Discounted Price (₹)</Label>
+                    <Input
+                      id="discountedPrice"
+                      type="number"
+                      value={formData.discountedPrice || ''}
+                      onChange={(e) => handleInputChange('discountedPrice', parseFloat(e.target.value) || undefined)}
+                      placeholder="Optional discounted price"
                     />
                   </div>
                 </div>

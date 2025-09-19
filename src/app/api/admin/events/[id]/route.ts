@@ -80,6 +80,8 @@ export async function PUT(
     const { _id, createdAt, updatedAt, ...updateData } = body;
     
     console.log('PUT /api/admin/events/[id] - Simple update approach');
+    console.log('PUT /api/admin/events/[id] - Received discountedPrice:', body.discountedPrice);
+    console.log('PUT /api/admin/events/[id] - Update data discountedPrice:', updateData.discountedPrice);
     
     // Set updatedAt to current time
     updateData.updatedAt = new Date();
@@ -87,6 +89,7 @@ export async function PUT(
     await connectDB();
 
     console.log('PUT /api/admin/events/[id] - Update data:', JSON.stringify(updateData, null, 2));
+    console.log('PUT /api/admin/events/[id] - Update data discountedPrice specifically:', updateData.discountedPrice);
 
     try {
       const event = await (Event as any).findByIdAndUpdate(
@@ -107,6 +110,7 @@ export async function PUT(
       console.log('PUT /api/admin/events/[id] - Updated event result:', {
         title: event.title,
         price: event.price,
+        discountedPrice: event.discountedPrice,
         updatedAt: event.updatedAt
       });
 

@@ -24,6 +24,7 @@ interface EventItem {
   title: string;
   slug: string;
   price: number;
+  discountedPrice?: number;
   locationStr: string;
   durationStr: string;
   maxParticipants: number;
@@ -65,6 +66,7 @@ export default function AdminEventsPage() {
           title: e.title,
           slug: e.slug,
           price: e.price,
+          discountedPrice: e.discountedPrice,
           locationStr: e?.location?.name || e?.location?.state || '—',
           durationStr: e?.duration ? `${e.duration} days` : '—',
           maxParticipants: e.maxParticipants,
@@ -256,7 +258,16 @@ export default function AdminEventsPage() {
                           {event.currentBookings || 0}/{event.maxParticipants}
                         </div>
                         <div className="flex items-center font-semibold text-primary">
-                          <span>₹{event.price.toLocaleString()}</span>
+                          {event.discountedPrice ? (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm text-muted-foreground line-through">
+                                ₹{event.price.toLocaleString()}
+                              </span>
+                              <span>₹{event.discountedPrice.toLocaleString()}</span>
+                            </div>
+                          ) : (
+                            <span>₹{event.price.toLocaleString()}</span>
+                          )}
                         </div>
                       </div>
                       
