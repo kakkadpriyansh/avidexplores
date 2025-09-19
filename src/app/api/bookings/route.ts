@@ -107,13 +107,15 @@ export async function POST(request: NextRequest) {
     const {
       eventId,
       selectedDate,
+      selectedMonth,
+      selectedYear,
       participants,
       totalAmount,
       specialRequests
     } = body;
 
     // Validate required fields
-    if (!eventId || !selectedDate || !participants || participants.length === 0) {
+    if (!eventId || !selectedDate || !selectedMonth || !selectedYear || !participants || participants.length === 0) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
@@ -129,21 +131,60 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Find the specific date entry for seat availability
+    const dateEntry = event.availableDates?.find(
+      (entry: any) => entry.month === selectedMonth && entry.year === selectedYear
+    );
+
+    if (!dateEntry) {
+      return NextResponse.json(
+        { success: false, error: 'Selected date is not available for this event' },
+        { status: 400 }
+      );
+    }
+
+    // Check if the specific date is available
+    const selectedDay = new Date(selectedDate).getDate();
+    if (!dateEntry.dates.includes(selectedDay)) {
+      return NextResponse.json(
+        { success: false, error: 'Selected date is not available' },
+        { status: 400 }
+      );
+    }
+
     // Calculate amounts
     const computedTotal = totalAmount || event.price * participants.length;
     const discountAmount = 0; // apply promo/discounts here if any
     const finalAmount = computedTotal - discountAmount;
 
-    // Check availability (simplified - you might want more complex logic)
-    const existingBookings = await (Booking as Model<IBooking>).countDocuments({
-      eventId,
-      date: new Date(selectedDate),
-      status: { $in: ['CONFIRMED', 'PENDING'] }
-    });
+    // Check seat availability for the specific month/year
+    const existingBookingsCount = await (Booking as Model<IBooking>).aggregate([
+      {
+        $match: {
+          eventId: event._id,
+          selectedMonth,
+          selectedYear,
+          status: { $in: ['CONFIRMED', 'PENDING'] }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalParticipants: { $sum: { $size: '$participants' } }
+        }
+      }
+    ]);
 
-    if (existingBookings >= event.maxParticipants) {
+    const currentBookedSeats = existingBookingsCount.length > 0 ? existingBookingsCount[0].totalParticipants : 0;
+    const availableSeats = dateEntry.availableSeats || dateEntry.totalSeats || event.maxParticipants;
+    const requestedSeats = participants.length;
+
+    if (currentBookedSeats + requestedSeats > availableSeats) {
       return NextResponse.json(
-        { success: false, error: 'Event is fully booked for this date' },
+        { 
+          success: false, 
+          error: `Only ${availableSeats - currentBookedSeats} seats available for ${selectedMonth} ${selectedYear}. You requested ${requestedSeats} seats.` 
+        },
         { status: 400 }
       );
     }
@@ -153,6 +194,8 @@ export async function POST(request: NextRequest) {
       userId: session.user.id,
       eventId,
       date: new Date(selectedDate),
+      selectedMonth,
+      selectedYear,
       participants,
       totalAmount: computedTotal,
       discountAmount,

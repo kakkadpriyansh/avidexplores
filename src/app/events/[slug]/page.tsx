@@ -8,6 +8,13 @@ import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 import { 
   MapPin, 
   Clock, 
@@ -23,7 +30,9 @@ import {
   Heart,
   Mountain,
   Flag,
-  Sunrise
+  Sunrise,
+  Camera,
+  Plane
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -57,6 +66,7 @@ interface DatabaseEvent {
     activities?: string[];
     meals?: string[];
     accommodation?: string;
+    images?: string[];
   }>;
   preparation: {
     physicalRequirements: string;
@@ -70,6 +80,8 @@ interface DatabaseEvent {
     year: number;
     dates: number[];
     location?: string;
+    availableSeats?: number;
+    totalSeats?: number;
   }[];
   availableMonths?: string[];
   thingsToCarry: string[];
@@ -206,6 +218,7 @@ export default function EventDetailPage() {
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'itinerary', label: 'Itinerary' },
+    { id: 'departure', label: 'Travel Departure' },
     { id: 'inclusions', label: 'What\'s Included' },
     { id: 'preparation', label: 'Preparation' },
   ];
@@ -370,6 +383,33 @@ export default function EventDetailPage() {
                         <div className="ml-11 space-y-4">
                           <p className="text-muted-foreground">{day.description}</p>
                           
+                          {/* Day Images Carousel */}
+                          {day.images && day.images.length > 0 && (
+                            <div className="my-4">
+                              <h4 className="font-medium text-sm mb-3 flex items-center">
+                                <Camera className="h-4 w-4 mr-1 text-primary" />
+                                Day Photos
+                              </h4>
+                              <Carousel className="w-full max-w-md">
+                                <CarouselContent>
+                                  {day.images.map((image, imgIndex) => (
+                                    <CarouselItem key={imgIndex}>
+                                      <div className="aspect-video bg-muted overflow-hidden rounded-lg">
+                                        <img
+                                          src={image}
+                                          alt={`Day ${day.day} - Photo ${imgIndex + 1}`}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                    </CarouselItem>
+                                  ))}
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                              </Carousel>
+                            </div>
+                          )}
+                          
                           {day.activities && day.activities.length > 0 && (
                             <div>
                               <h4 className="font-medium text-sm mb-2 flex items-center">
@@ -416,6 +456,141 @@ export default function EventDetailPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'departure' && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-montserrat font-bold mb-4">Travel Departure Options</h2>
+                  
+                  {/* Available Dates Section */}
+                  {event.availableDates && event.availableDates.length > 0 ? (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold mb-3">Available Departure Dates</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {event.availableDates.map((dateGroup, index) => (
+                          <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-5 w-5 text-primary" />
+                                <h4 className="font-semibold">{dateGroup.month} {dateGroup.year}</h4>
+                              </div>
+                              {(dateGroup.availableSeats !== undefined || dateGroup.totalSeats !== undefined) && (
+                                <div className="flex items-center gap-1 text-sm">
+                                  <Users className="h-4 w-4 text-muted-foreground" />
+                                  <span className={`font-medium ${
+                                    dateGroup.availableSeats && dateGroup.availableSeats <= 3 
+                                      ? 'text-red-600' 
+                                      : dateGroup.availableSeats && dateGroup.availableSeats <= 6
+                                      ? 'text-orange-600'
+                                      : 'text-green-600'
+                                  }`}>
+                                    {dateGroup.availableSeats || 0}
+                                  </span>
+                                  {dateGroup.totalSeats && (
+                                    <span className="text-muted-foreground">
+                                      /{dateGroup.totalSeats} seats
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            {dateGroup.location && (
+                              <div className="flex items-center gap-2 mb-2">
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground">{dateGroup.location}</span>
+                              </div>
+                            )}
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {dateGroup.dates.map((date, dateIndex) => (
+                                <Badge key={dateIndex} variant="outline" className="text-xs">
+                                  {date}
+                                </Badge>
+                              ))}
+                            </div>
+                            {(dateGroup.availableSeats !== undefined) && (
+                              <div className="mt-3">
+                                {dateGroup.availableSeats === 0 ? (
+                                  <Badge variant="destructive" className="text-xs">
+                                    Fully Booked
+                                  </Badge>
+                                ) : dateGroup.availableSeats <= 3 ? (
+                                  <Badge variant="destructive" className="text-xs">
+                                    Only {dateGroup.availableSeats} seats left!
+                                  </Badge>
+                                ) : dateGroup.availableSeats <= 6 ? (
+                                  <Badge variant="secondary" className="text-xs">
+                                    Limited seats available
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="default" className="text-xs">
+                                    Available
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Plane className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">Departure Dates Coming Soon</h3>
+                      <p className="text-muted-foreground">
+                        We're currently planning departure dates for this adventure. 
+                        Please contact us for more information about upcoming trips.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Available Months Section */}
+                  {event.availableMonths && event.availableMonths.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold mb-3">Best Travel Months</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {event.availableMonths.map((month, index) => (
+                          <Badge key={index} variant="secondary" className="px-3 py-1">
+                            {month}
+                          </Badge>
+                        ))}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        These months offer the best weather and conditions for this adventure.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Season Information */}
+                  {event.season && event.season.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold mb-3">Recommended Seasons</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {event.season.map((seasonItem, index) => (
+                          <Badge key={index} variant="outline" className="px-3 py-1">
+                            {seasonItem}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Contact Information */}
+                  <div className="bg-muted/50 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-3">Need Help Planning Your Trip?</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Our travel experts are here to help you choose the perfect departure date 
+                      and plan your adventure. Contact us for personalized assistance.
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <Button variant="default">
+                        Contact Travel Expert
+                      </Button>
+                      <Button variant="outline">
+                        Request Custom Dates
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}

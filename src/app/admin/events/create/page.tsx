@@ -33,6 +33,7 @@ interface EventFormData {
     activities: string[];
     meals: string[];
     accommodation?: string;
+    images?: string[];
   }[];
   preparation: {
     physicalRequirements: string;
@@ -49,6 +50,8 @@ interface EventFormData {
     year: number;
     dates: number[];
     location?: string;
+    availableSeats?: number;
+    totalSeats?: number;
   }[];
   startDate: string;
   endDate: string;
@@ -73,7 +76,7 @@ export default function CreateEventPage() {
     category: 'TREKKING',
     inclusions: [''],
     exclusions: [''],
-    itinerary: [{ day: 1, title: '', location: '', description: '', activities: [''], meals: [''], accommodation: '' }],
+    itinerary: [{ day: 1, title: '', location: '', description: '', activities: [''], meals: [''], accommodation: '', images: [''] }],
     preparation: {
       physicalRequirements: '',
       medicalRequirements: '',
@@ -162,7 +165,8 @@ export default function CreateEventPage() {
         description: '', 
         activities: [''], 
         meals: [''], 
-        accommodation: '' 
+        accommodation: '',
+        images: ['']
       }]
     }));
   };
@@ -176,7 +180,7 @@ export default function CreateEventPage() {
     setFormData(prev => ({ ...prev, itinerary: newItinerary }));
   };
 
-  const handleItineraryArrayChange = (dayIndex: number, field: 'activities' | 'meals', itemIndex: number, value: string) => {
+  const handleItineraryArrayChange = (dayIndex: number, field: 'activities' | 'meals' | 'images', itemIndex: number, value: string) => {
     const newItinerary = [...formData.itinerary];
     const newArray = [...newItinerary[dayIndex][field]];
     newArray[itemIndex] = value;
@@ -184,7 +188,7 @@ export default function CreateEventPage() {
     setFormData(prev => ({ ...prev, itinerary: newItinerary }));
   };
 
-  const addItineraryArrayItem = (dayIndex: number, field: 'activities' | 'meals') => {
+  const addItineraryArrayItem = (dayIndex: number, field: 'activities' | 'meals' | 'images') => {
     const newItinerary = [...formData.itinerary];
     newItinerary[dayIndex] = {
       ...newItinerary[dayIndex],
@@ -193,7 +197,7 @@ export default function CreateEventPage() {
     setFormData(prev => ({ ...prev, itinerary: newItinerary }));
   };
 
-  const removeItineraryArrayItem = (dayIndex: number, field: 'activities' | 'meals', itemIndex: number) => {
+  const removeItineraryArrayItem = (dayIndex: number, field: 'activities' | 'meals' | 'images', itemIndex: number) => {
     const newItinerary = [...formData.itinerary];
     const newArray = newItinerary[dayIndex][field].filter((_, i) => i !== itemIndex);
     newItinerary[dayIndex] = { ...newItinerary[dayIndex], [field]: newArray };
@@ -579,6 +583,47 @@ export default function CreateEventPage() {
                       />
                     </div>
                     
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor={`totalSeats-${index}`}>Total Seats</Label>
+                        <Input
+                          id={`totalSeats-${index}`}
+                          type="number"
+                          value={dateEntry.totalSeats || ''}
+                          onChange={(e) => {
+                            const newDates = [...formData.availableDates];
+                            const totalSeats = parseInt(e.target.value) || 0;
+                            newDates[index].totalSeats = totalSeats;
+                            // Auto-set available seats to total seats if not set
+                            if (!newDates[index].availableSeats) {
+                              newDates[index].availableSeats = totalSeats;
+                            }
+                            setFormData(prev => ({ ...prev, availableDates: newDates }));
+                          }}
+                          placeholder="Total seats available"
+                          min="1"
+                          max="100"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor={`availableSeats-${index}`}>Available Seats</Label>
+                        <Input
+                          id={`availableSeats-${index}`}
+                          type="number"
+                          value={dateEntry.availableSeats || ''}
+                          onChange={(e) => {
+                            const newDates = [...formData.availableDates];
+                            newDates[index].availableSeats = parseInt(e.target.value) || 0;
+                            setFormData(prev => ({ ...prev, availableDates: newDates }));
+                          }}
+                          placeholder="Currently available seats"
+                          min="0"
+                          max={dateEntry.totalSeats || 100}
+                        />
+                      </div>
+                    </div>
+                    
                     <div>
                       <Label>Available Dates in {dateEntry.month || 'Selected Month'}</Label>
                       <div className="mt-2">
@@ -653,7 +698,9 @@ export default function CreateEventPage() {
                         month: '',
                         year: new Date().getFullYear(),
                         dates: [],
-                        location: ''
+                        location: '',
+                        totalSeats: 20,
+                        availableSeats: 20
                       }]
                     }));
                   }}
@@ -949,6 +996,41 @@ export default function CreateEventPage() {
                         onChange={(e) => handleItineraryChange(dayIndex, 'accommodation', e.target.value)}
                         placeholder="Accommodation details for this day"
                       />
+                    </div>
+                    
+                    <div>
+                      <Label>Day Images (Optional)</Label>
+                      <p className="text-sm text-gray-600 mb-2">Add images for this specific day</p>
+                      {day.images?.map((image, imgIndex) => (
+                        <div key={imgIndex} className="space-y-2 mt-4 p-4 border rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <Label>Image {imgIndex + 1}</Label>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeItineraryArrayItem(dayIndex, 'images', imgIndex)}
+                              disabled={day.images?.length === 1}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                          <ImageUpload
+                            value={image}
+                            onChange={(url) => handleItineraryArrayChange(dayIndex, 'images', imgIndex, url)}
+                            placeholder="https://example.com/day-image.jpg"
+                          />
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => addItineraryArrayItem(dayIndex, 'images')}
+                        className="mt-2"
+                        size="sm"
+                      >
+                        Add Day Image
+                      </Button>
                     </div>
                   </div>
                 ))}

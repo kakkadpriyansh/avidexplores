@@ -42,6 +42,14 @@ interface Event {
   maxParticipants: number;
   minParticipants: number;
   dates: Date[];
+  availableDates?: {
+    month: string;
+    year: number;
+    dates: number[];
+    location?: string;
+    availableSeats?: number;
+    totalSeats?: number;
+  }[];
   images: string[];
   description: string;
   inclusions: string[];
@@ -72,6 +80,9 @@ export default function BookEventPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedMonth, setSelectedMonth] = useState<string>('');
+  const [selectedYear, setSelectedYear] = useState<number>(0);
+  const [selectedDay, setSelectedDay] = useState<number>(0);
   const [participants, setParticipants] = useState<Participant[]>([{
     name: '',
     age: 18,
@@ -184,6 +195,18 @@ export default function BookEventPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!event || !selectedDate) return;
+    
+    // Check if using new availableDates structure and validate accordingly
+    if (event.availableDates && event.availableDates.length > 0) {
+      if (!selectedMonth || !selectedYear || !selectedDay) {
+        toast({
+          title: "Validation Error",
+          description: "Please select a complete date (month, year, and day)",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
 
     // Validation
     const isValid = participants.every(p => 
@@ -211,6 +234,8 @@ export default function BookEventPage() {
         body: JSON.stringify({
           eventId: event._id,
           selectedDate,
+          selectedMonth,
+          selectedYear,
           participants,
           totalAmount: calculateTotal(),
           specialRequests
@@ -302,23 +327,89 @@ export default function BookEventPage() {
                       </div>
                       <div>
                         <Label htmlFor="selected-date">Select Date *</Label>
-                        <Select value={selectedDate} onValueChange={setSelectedDate}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose your preferred date" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {event.dates.map((date, index) => (
-                              <SelectItem key={index} value={new Date(date).toISOString()}>
-                                {new Date(date).toLocaleDateString('en-IN', {
-                                  weekday: 'long',
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric'
-                                })}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        {event.availableDates && event.availableDates.length > 0 ? (
+                          <div className="space-y-4">
+                            {/* Month/Year Selection */}
+                            <Select 
+                              value={selectedMonth ? `${selectedMonth}-${selectedYear}` : ''} 
+                              onValueChange={(value) => {
+                                const [month, year] = value.split('-');
+                                setSelectedMonth(month);
+                                setSelectedYear(parseInt(year));
+                                setSelectedDay(0);
+                                setSelectedDate('');
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Choose month and year" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {event.availableDates.map((dateEntry, index) => (
+                                  <SelectItem key={index} value={`${dateEntry.month}-${dateEntry.year}`}>
+                                    {dateEntry.month} {dateEntry.year}
+                                    {dateEntry.availableSeats !== undefined && (
+                                      <span className="ml-2 text-sm text-muted-foreground">
+                                        ({dateEntry.availableSeats}/{dateEntry.totalSeats || dateEntry.availableSeats} seats)
+                                      </span>
+                                    )}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            {/* Day Selection */}
+                            {selectedMonth && selectedYear && (
+                              <Select 
+                                value={selectedDay.toString()} 
+                                onValueChange={(value) => {
+                                  const day = parseInt(value);
+                                  setSelectedDay(day);
+                                  const selectedDateEntry = event.availableDates?.find(
+                                    d => d.month === selectedMonth && d.year === selectedYear
+                                  );
+                                  if (selectedDateEntry) {
+                                    const date = new Date(selectedYear, 
+                                      new Date(`${selectedMonth} 1, ${selectedYear}`).getMonth(), 
+                                      day
+                                    );
+                                    setSelectedDate(date.toISOString());
+                                  }
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Choose day" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {event.availableDates
+                                    .find(d => d.month === selectedMonth && d.year === selectedYear)
+                                    ?.dates.map((day) => (
+                                      <SelectItem key={day} value={day.toString()}>
+                                        {day}
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
+                        ) : (
+                          <Select value={selectedDate} onValueChange={setSelectedDate}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Choose your preferred date" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {event.dates.map((date, index) => (
+                                <SelectItem key={index} value={new Date(date).toISOString()}>
+                                  {new Date(date).toLocaleDateString('en-IN', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                  })}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
                       </div>
                     </div>
                   </CardContent>

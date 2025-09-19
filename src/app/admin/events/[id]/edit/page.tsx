@@ -28,6 +28,8 @@ interface Event {
     year: number;
     dates: number[];
     location?: string;
+    availableSeats?: number;
+    totalSeats?: number;
   }[];
   itinerary: {
     day: number;
@@ -37,6 +39,7 @@ interface Event {
     activities: string[];
     meals: string[];
     accommodation?: string;
+    images?: string[];
   }[];
   inclusions: string[];
   exclusions: string[];
@@ -182,7 +185,8 @@ export default function EditEventPage() {
       description: '',
       activities: [],
       meals: [],
-      accommodation: ''
+      accommodation: '',
+      images: ['']
     };
     setEvent({ ...event, itinerary: [...event.itinerary, newDay] });
   };
@@ -215,6 +219,32 @@ export default function EditEventPage() {
     const currentArray = (event as any)[field] || [];
     const newArray = currentArray.filter((_: any, i: number) => i !== index);
     setEvent({ ...event, [field]: newArray });
+  };
+
+  const handleItineraryArrayChange = (dayIndex: number, field: 'activities' | 'meals' | 'images', itemIndex: number, value: string) => {
+    if (!event) return;
+    const newItinerary = [...event.itinerary];
+    const currentArray = newItinerary[dayIndex][field] || [];
+    currentArray[itemIndex] = value;
+    newItinerary[dayIndex] = { ...newItinerary[dayIndex], [field]: currentArray };
+    setEvent({ ...event, itinerary: newItinerary });
+  };
+
+  const addItineraryArrayItem = (dayIndex: number, field: 'activities' | 'meals' | 'images') => {
+    if (!event) return;
+    const newItinerary = [...event.itinerary];
+    const currentArray = newItinerary[dayIndex][field] || [];
+    newItinerary[dayIndex] = { ...newItinerary[dayIndex], [field]: [...currentArray, ''] };
+    setEvent({ ...event, itinerary: newItinerary });
+  };
+
+  const removeItineraryArrayItem = (dayIndex: number, field: 'activities' | 'meals' | 'images', itemIndex: number) => {
+    if (!event) return;
+    const newItinerary = [...event.itinerary];
+    const currentArray = newItinerary[dayIndex][field] || [];
+    const newArray = currentArray.filter((_: any, i: number) => i !== itemIndex);
+    newItinerary[dayIndex] = { ...newItinerary[dayIndex], [field]: newArray };
+    setEvent({ ...event, itinerary: newItinerary });
   };
 
   if (loading) {
@@ -718,6 +748,49 @@ export default function EditEventPage() {
                         />
                       </div>
 
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor={`totalSeats-${index}`}>Total Seats</Label>
+                          <Input
+                            id={`totalSeats-${index}`}
+                            type="number"
+                            value={dateEntry.totalSeats || ''}
+                            onChange={(e) => {
+                              if (!event) return;
+                              const newDates = [...(event.availableDates || [])];
+                              const totalSeats = parseInt(e.target.value) || 0;
+                              newDates[index] = { 
+                                ...newDates[index], 
+                                totalSeats,
+                                availableSeats: newDates[index].availableSeats || totalSeats
+                              };
+                              setEvent({ ...event, availableDates: newDates });
+                            }}
+                            placeholder="20"
+                            min={1}
+                            max={100}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`availableSeats-${index}`}>Available Seats</Label>
+                          <Input
+                            id={`availableSeats-${index}`}
+                            type="number"
+                            value={dateEntry.availableSeats || ''}
+                            onChange={(e) => {
+                              if (!event) return;
+                              const newDates = [...(event.availableDates || [])];
+                              newDates[index] = { ...newDates[index], availableSeats: parseInt(e.target.value) || 0 };
+                              setEvent({ ...event, availableDates: newDates });
+                            }}
+                            placeholder="20"
+                            min={0}
+                            max={dateEntry.totalSeats || 100}
+                          />
+                        </div>
+                      </div>
+
                       <div>
                         <Label>Available Dates in {dateEntry.month || 'Selected Month'}</Label>
                         <div className="mt-2">
@@ -799,7 +872,14 @@ export default function EditEventPage() {
                         ...prev,
                         availableDates: [
                           ...(prev.availableDates || []),
-                          { month: '', year: new Date().getFullYear(), dates: [], location: '' }
+                          { 
+                            month: '', 
+                            year: new Date().getFullYear(), 
+                            dates: [], 
+                            location: '',
+                            totalSeats: 20,
+                            availableSeats: 20
+                          }
                         ]
                       } : prev);
                     }}
@@ -882,6 +962,41 @@ export default function EditEventPage() {
                           value={day.accommodation || ''}
                           onChange={(e) => updateItineraryDay(index, 'accommodation', e.target.value)}
                         />
+                      </div>
+                      
+                      <div>
+                        <Label>Day Images (Optional)</Label>
+                        <p className="text-sm text-gray-600 mb-2">Add images for this specific day</p>
+                        {day.images?.map((image, imgIndex) => (
+                          <div key={imgIndex} className="space-y-2 mt-4 p-4 border rounded-lg">
+                            <div className="flex justify-between items-center">
+                              <Label>Image {imgIndex + 1}</Label>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removeItineraryArrayItem(index, 'images', imgIndex)}
+                                disabled={day.images?.length === 1}
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                            <ImageUpload
+                              value={image}
+                              onChange={(url) => handleItineraryArrayChange(index, 'images', imgIndex, url)}
+                              placeholder="https://example.com/day-image.jpg"
+                            />
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => addItineraryArrayItem(index, 'images')}
+                          className="mt-2"
+                          size="sm"
+                        >
+                          Add Day Image
+                        </Button>
                       </div>
                     </div>
                   </div>
