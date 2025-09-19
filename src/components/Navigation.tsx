@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Menu, Mountain, User, LogOut } from 'lucide-react';
+import { Menu, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -41,10 +41,16 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <Mountain className="h-8 w-8 text-primary group-hover:text-primary-glow transition-colors" />
-            <span className="font-montserrat font-bold text-xl text-foreground">
-              Avid Explorers
-            </span>
+            <img 
+              src="/logo/Avid Red Black.png" 
+              alt="Avid Explorers" 
+              className="h-8 sm:h-12 w-auto transition-opacity group-hover:opacity-80"
+            />
+            <img 
+              src="/logo/Avid name black.png" 
+              alt="Avid Explorers" 
+              className="h-5 sm:h-8 w-auto transition-opacity group-hover:opacity-80"
+            />
           </Link>
 
           {/* Desktop Navigation */}
