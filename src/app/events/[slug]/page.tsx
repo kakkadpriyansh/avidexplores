@@ -370,17 +370,17 @@ export default function EventDetailPage() {
                     <Calendar className="h-4 w-4 mr-2 text-primary" />
                     Available Dates
                   </h3>
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="flex flex-wrap gap-3 mb-4">
                     {event.availableDates.map((dateGroup, index) => {
                       const monthKey = `${dateGroup.month}-${dateGroup.year}`;
                       return (
                         <button
                           key={index}
                           onClick={() => setSelectedMonth(selectedMonth === monthKey ? null : monthKey)}
-                          className={`px-3 py-2 rounded-md text-sm border transition-all ${
+                          className={`px-6 py-3 rounded-full text-sm font-medium border-2 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg ${
                             selectedMonth === monthKey
-                              ? 'bg-primary text-primary-foreground border-primary'
-                              : 'bg-background hover:bg-muted border-border'
+                              ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                              : 'bg-background hover:bg-primary/10 border-border hover:border-primary/50 hover:text-primary'
                           }`}
                         >
                           {dateGroup.month} {dateGroup.year}
@@ -390,16 +390,16 @@ export default function EventDetailPage() {
                   </div>
                   
                   {selectedMonth && (
-                    <div className="mt-3 p-3 bg-background rounded-md border">
+                    <div className="mt-4 p-3 bg-background rounded-xl border border-border/50 shadow-sm">
                       {event.availableDates
                         .filter(dateGroup => `${dateGroup.month}-${dateGroup.year}` === selectedMonth)
                         .map((dateGroup, index) => (
                           <div key={index}>
-                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1">
                               {dateGroup.dates.map((date, dateIndex) => (
                                 <button
                                   key={dateIndex}
-                                  className="p-2 text-center border rounded hover:bg-primary hover:text-primary-foreground transition-colors text-sm"
+                                  className="h-11 w-11 flex items-center justify-center text-center border-2 rounded-full hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-md text-sm font-medium bg-background border-border hover:border-primary/50"
                                 >
                                   {date}
                                 </button>
@@ -634,9 +634,12 @@ export default function EventDetailPage() {
                             )}
                             <div className="flex flex-wrap gap-2 mb-3">
                               {dateGroup.dates.map((date, dateIndex) => (
-                                <Badge key={dateIndex} variant="outline" className="text-xs">
+                                <div 
+                                  key={dateIndex} 
+                                  className="px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-xs font-medium hover:bg-primary/20 hover:border-primary/40 transition-all duration-200 cursor-pointer"
+                                >
                                   {date}
-                                </Badge>
+                                </div>
                               ))}
                             </div>
                             {(dateGroup.availableSeats !== undefined) && (
