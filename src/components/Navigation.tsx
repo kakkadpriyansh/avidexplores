@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Menu, User, LogOut } from 'lucide-react';
+import { Menu, User, LogOut, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -95,9 +95,9 @@ const Navigation = () => {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard" className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      Dashboard
+                    <Link href="/bookings" className="flex items-center">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      My Bookings
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -167,10 +167,10 @@ const Navigation = () => {
                           </div>
                         </div>
                         <SheetClose asChild>
-                          <Link href="/dashboard">
+                          <Link href="/bookings">
                             <Button variant="outline" className="w-full justify-start">
-                              <User className="mr-2 h-4 w-4" />
-                              Dashboard
+                              <Calendar className="mr-2 h-4 w-4" />
+                              My Bookings
                             </Button>
                           </Link>
                         </SheetClose>
