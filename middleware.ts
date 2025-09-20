@@ -66,7 +66,8 @@ export default withAuth(
           pathname.startsWith('/api/events') ||
           pathname.startsWith('/api/stories') ||
           pathname.startsWith('/api/subscribers') ||
-          pathname.startsWith('/api/teams')
+          pathname.startsWith('/api/teams') ||
+          pathname.startsWith('/uploads/')
         ) {
           return true;
         }
@@ -85,8 +86,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - uploads (uploaded files)
      * - public folder
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|uploads/.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
