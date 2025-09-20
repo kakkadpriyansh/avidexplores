@@ -86,16 +86,26 @@ export async function PUT(
     // Validate price fields
     if (updateData.price !== undefined && updateData.price < 0) {
       return NextResponse.json(
-        { error: 'Price cannot be negative' },
+        { success: false, error: 'Price cannot be negative' },
         { status: 400 }
       );
     }
     
     if (updateData.discountedPrice !== undefined && updateData.discountedPrice < 0) {
       return NextResponse.json(
-        { error: 'Discounted price cannot be negative' },
+        { success: false, error: 'Discounted price cannot be negative' },
         { status: 400 }
       );
+    }
+
+    // Validate that discounted price is less than regular price
+    if (updateData.discountedPrice !== undefined && updateData.price !== undefined) {
+      if (updateData.discountedPrice >= updateData.price) {
+        return NextResponse.json(
+          { success: false, error: 'Discounted price must be less than regular price' },
+          { status: 400 }
+        );
+      }
     }
 
     // Set updatedAt to current time
