@@ -131,6 +131,21 @@ export async function POST(request: NextRequest) {
       discountedPrice
     } = body;
 
+    // Validate price fields
+    if (price !== undefined && price < 0) {
+      return NextResponse.json(
+        { success: false, error: 'Price cannot be negative' },
+        { status: 400 }
+      );
+    }
+    
+    if (discountedPrice !== undefined && discountedPrice < 0) {
+      return NextResponse.json(
+        { success: false, error: 'Discounted price cannot be negative' },
+        { status: 400 }
+      );
+    }
+
     // Generate slug from title
     const slug = title
       .toLowerCase()

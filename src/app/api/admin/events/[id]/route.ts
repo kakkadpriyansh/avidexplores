@@ -83,6 +83,21 @@ export async function PUT(
     console.log('PUT /api/admin/events/[id] - Received discountedPrice:', body.discountedPrice);
     console.log('PUT /api/admin/events/[id] - Update data discountedPrice:', updateData.discountedPrice);
     
+    // Validate price fields
+    if (updateData.price !== undefined && updateData.price < 0) {
+      return NextResponse.json(
+        { error: 'Price cannot be negative' },
+        { status: 400 }
+      );
+    }
+    
+    if (updateData.discountedPrice !== undefined && updateData.discountedPrice < 0) {
+      return NextResponse.json(
+        { error: 'Discounted price cannot be negative' },
+        { status: 400 }
+      );
+    }
+
     // Set updatedAt to current time
     updateData.updatedAt = new Date();
 

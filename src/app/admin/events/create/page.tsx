@@ -364,8 +364,17 @@ export default function CreateEventPage() {
                     <Input
                       id="price"
                       type="number"
+                      min="0"
+                      step="0.01"
                       value={formData.price}
-                      onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (isNaN(value) || value < 0) {
+                          handleInputChange('price', 0);
+                        } else {
+                          handleInputChange('price', value);
+                        }
+                      }}
                       required
                     />
                   </div>
@@ -374,8 +383,17 @@ export default function CreateEventPage() {
                     <Input
                       id="discountedPrice"
                       type="number"
+                      min="0"
+                      step="0.01"
                       value={formData.discountedPrice || ''}
-                      onChange={(e) => handleInputChange('discountedPrice', parseFloat(e.target.value) || undefined)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (isNaN(value) || value < 0) {
+                          handleInputChange('discountedPrice', undefined);
+                        } else {
+                          handleInputChange('discountedPrice', value);
+                        }
+                      }}
                       placeholder="Optional discounted price"
                     />
                   </div>

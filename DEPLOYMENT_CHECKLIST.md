@@ -48,6 +48,12 @@
 ### 📦 Build & Test
 - [ ] Test application locally with production environment variables
 - [ ] Verify all features work correctly:
+- [ ] **Price Validation Testing** (Critical):
+  - [ ] Test event creation form with negative prices (should be blocked)
+  - [ ] Test event editing form with negative prices (should be blocked)
+  - [ ] Test discounted price greater than regular price (should be blocked)
+  - [ ] Verify API endpoints reject negative prices with proper error messages
+  - [ ] Test form validation prevents submission of invalid price data
   - [ ] User authentication (login/register)
   - [ ] Event booking functionality
   - [ ] Payment processing with Razorpay

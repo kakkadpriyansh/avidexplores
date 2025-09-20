@@ -410,8 +410,17 @@ export default function EditEventPage() {
                     <Input
                       id="price"
                       type="number"
+                      min="0"
+                      step="0.01"
                       value={event.price || ''}
-                      onChange={(e) => updateEvent('price', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (isNaN(value) || value < 0) {
+                          updateEvent('price', 0);
+                        } else {
+                          updateEvent('price', value);
+                        }
+                      }}
                       required
                     />
                   </div>
@@ -420,8 +429,17 @@ export default function EditEventPage() {
                     <Input
                       id="discountedPrice"
                       type="number"
+                      min="0"
+                      step="0.01"
                       value={event.discountedPrice || ''}
-                      onChange={(e) => updateEvent('discountedPrice', parseFloat(e.target.value) || undefined)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (isNaN(value) || value < 0) {
+                          updateEvent('discountedPrice', undefined);
+                        } else {
+                          updateEvent('discountedPrice', value);
+                        }
+                      }}
                       placeholder="Optional discounted price"
                     />
                   </div>
