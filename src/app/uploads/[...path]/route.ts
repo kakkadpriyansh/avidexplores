@@ -34,7 +34,7 @@ export async function GET(
     const mimeType = lookup(fullPath) || 'application/octet-stream';
 
     // Return the file with appropriate headers
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(new Uint8Array(fileBuffer), {
       headers: {
         'Content-Type': mimeType,
         'Cache-Control': 'public, max-age=86400', // Cache for 1 day
