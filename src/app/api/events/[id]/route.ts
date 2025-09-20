@@ -76,6 +76,21 @@ export async function PUT(
     const { id } = params;
     const body = await request.json();
 
+    // Validate price fields
+    if (body.price !== undefined && body.price < 0) {
+      return NextResponse.json(
+        { success: false, error: 'Price cannot be negative' },
+        { status: 400 }
+      );
+    }
+    
+    if (body.discountedPrice !== undefined && body.discountedPrice < 0) {
+      return NextResponse.json(
+        { success: false, error: 'Discounted price cannot be negative' },
+        { status: 400 }
+      );
+    }
+
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(

@@ -99,7 +99,17 @@ const EventSchema = new Schema<IEvent>({
   discountedPrice: {
     type: Number,
     required: false,
-    min: [0, 'Discounted price cannot be negative']
+    min: [0, 'Discounted price cannot be negative'],
+    validate: {
+      validator: function(this: IEvent, value: number) {
+        // Only validate if discounted price is provided
+        if (value !== undefined && value !== null) {
+          return value < this.price;
+        }
+        return true;
+      },
+      message: 'Discounted price must be less than regular price'
+    }
   },
   dates: [{
     type: Date,
