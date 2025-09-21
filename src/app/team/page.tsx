@@ -31,7 +31,7 @@ export default async function TeamPage() {
     return (
       <div className="mb-16">
         <h2 className="text-3xl font-bold text-foreground text-center mb-8">{title}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 [&>*:nth-child(3):nth-last-child(1)]:col-span-2 [&>*:nth-child(3):nth-last-child(1)]:justify-self-center [&>*:nth-child(3):nth-last-child(1)]:max-w-sm lg:[&>*:nth-child(3):nth-last-child(1)]:col-span-1 lg:[&>*:nth-child(3):nth-last-child(1)]:max-w-none lg:[&>*:nth-child(3):nth-last-child(1)]:justify-self-auto">
           {members.map((member: any, index: number) => (
             <div key={member._id || index} className="card-glass p-6 flex flex-col">
               <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full bg-muted">
