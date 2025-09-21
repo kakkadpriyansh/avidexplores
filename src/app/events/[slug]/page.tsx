@@ -319,9 +319,8 @@ export default function EventDetailPage() {
           <div className="absolute top-2 sm:top-4 md:top-8 left-2 sm:left-4">
             <Link href="/events">
               <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/20 text-xs sm:text-sm">
-                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1 md:mr-2" />
                 <span className="hidden sm:inline">Back to Adventures</span>
-                <span className="sm:hidden">Back</span>
               </Button>
             </Link>
           </div>
@@ -333,8 +332,8 @@ export default function EventDetailPage() {
               className="text-primary-foreground hover:bg-primary-foreground/20 text-xs sm:text-sm"
               onClick={handleShare}
             >
-              <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              Share
+              <Share2 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Share</span>
             </Button>
           </div>
 
