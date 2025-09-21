@@ -273,7 +273,7 @@ export default function EventDetailPage() {
       {/* Event Header */}
       <article className="pt-24">
         {/* Image Gallery */}
-        <div className="relative h-96 overflow-hidden">
+        <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] overflow-hidden">
           {event.images && event.images.length > 0 ? (
             <Carousel 
               className="w-full h-full"
@@ -289,7 +289,7 @@ export default function EventDetailPage() {
               <CarouselContent>
                 {event.images.map((image, index) => (
                   <CarouselItem key={index}>
-                    <div className="relative h-96 overflow-hidden">
+                    <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] overflow-hidden">
                       <img
                         src={image || '/placeholder-event.jpg'}
                         alt={`${event.title} - Image ${index + 1}`}
@@ -297,23 +297,15 @@ export default function EventDetailPage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                       
-                      {/* Image Counter */}
-                      <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                        {currentImageIndex + 1} / {event.images.length}
-                      </div>
+
                     </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              {event.images.length > 1 && (
-                <>
-                  <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 border-none" />
-                  <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 border-none" />
-                </>
-              )}
+
             </Carousel>
           ) : (
-            <div className="relative h-96 overflow-hidden">
+            <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] overflow-hidden">
               <img
                 src="/placeholder-event.jpg"
                 alt={event.title}
@@ -324,30 +316,31 @@ export default function EventDetailPage() {
           )}
           
           {/* Back Button */}
-          <div className="absolute top-8 left-4">
+          <div className="absolute top-2 sm:top-4 md:top-8 left-2 sm:left-4">
             <Link href="/events">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/20">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Adventures
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/20 text-xs sm:text-sm">
+                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Back to Adventures</span>
+                <span className="sm:hidden">Back</span>
               </Button>
             </Link>
           </div>
 
           {/* Share Button */}
-          <div className="absolute top-8 right-4">
+          <div className="absolute top-2 sm:top-4 md:top-8 right-2 sm:right-4">
             <Button 
               variant="ghost" 
-              className="text-primary-foreground hover:bg-primary-foreground/20"
+              className="text-primary-foreground hover:bg-primary-foreground/20 text-xs sm:text-sm"
               onClick={handleShare}
             >
-              <Share2 className="h-4 w-4 mr-2" />
+              <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               Share
             </Button>
           </div>
 
           {/* Event Info Overlay */}
-          <div className="absolute bottom-8 left-4 right-4">
-            <div className="flex flex-wrap gap-2 mb-4">
+          <div className="absolute bottom-2 sm:bottom-4 md:bottom-8 left-2 sm:left-4 right-2 sm:right-4">
+            <div className="flex flex-wrap gap-1 sm:gap-2 mb-2 sm:mb-4">
               <Badge className={getDifficultyColor(event.difficulty)}>
                 {formatDifficulty(event.difficulty)}
               </Badge>
@@ -355,21 +348,46 @@ export default function EventDetailPage() {
                 {event.category}
               </Badge>
             </div>
-            <h1 className="text-3xl md:text-4xl font-montserrat font-bold text-primary-foreground mb-2">
+            <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-montserrat font-bold text-primary-foreground mb-1 sm:mb-2">
               {event.title}
             </h1>
-            <div className="flex items-center text-white/90 text-sm">
-              <MapPin className="h-4 w-4 mr-1" />
-              <span className="mr-4">{event.location?.name}, {event.location?.state}</span>
-              <Clock className="h-4 w-4 mr-1" />
-              <span className="mr-4">{event.duration} {event.duration === 1 ? 'day' : 'days'}</span>
-              <Users className="h-4 w-4 mr-1" />
-              <span>Max {event.maxParticipants} people</span>
+            <div className="flex flex-col text-white/90 text-xs sm:text-sm gap-0.5">
+              <div className="flex items-center">
+                <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span>{event.location?.name}, {event.location?.state}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center">
+                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  <span>{event.duration} {event.duration === 1 ? 'day' : 'days'}</span>
+                </div>
+                <div className="flex items-center">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  <span>{event.maxParticipants} people</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-
+        {/* Image Dots Indicator */}
+        {event.images && event.images.length > 1 && (
+          <div className="flex justify-center py-4 bg-background/95">
+            <div className="flex space-x-2">
+              {event.images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    currentImageIndex === index
+                      ? 'bg-primary w-6'
+                      : 'bg-muted-foreground/40 hover:bg-muted-foreground/60'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Event Details */}
         <div className="container mx-auto px-4 py-12">
