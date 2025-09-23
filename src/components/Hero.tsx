@@ -1,52 +1,69 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Users, MapPin, Calendar, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { adventureStats } from '@/data/mockData';
-// Using direct path to image in assets folder
 
-const Hero = () => {
+interface HeroSettings {
+  backgroundImage: string;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  ctaLink: string;
+}
+
+export default function Hero() {
+  const [heroSettings, setHeroSettings] = useState<HeroSettings>({
+    backgroundImage: '/hero-adventure.jpg',
+    title: 'Discover Your Next Adventure',
+    subtitle: 'From challenging mountain treks to peaceful camping escapes, embark on unforgettable journeys with expert guides and fellow adventurers.',
+    ctaText: 'Explore Adventures',
+    ctaLink: '/events'
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHeroSettings = async () => {
+      try {
+        const response = await fetch('/api/settings/hero');
+        if (response.ok) {
+          const data = await response.json();
+          setHeroSettings(data.data);
+        } else {
+          console.error('Failed to fetch hero settings, using defaults');
+        }
+      } catch (error) {
+        console.error('Error fetching hero settings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHeroSettings();
+  }, []);
+
   return (
-    <section className="relative min-h-[60vh] sm:h-[50vh] flex flex-col items-center justify-center overflow-hidden pt-16 pb-8">
-      {/* Background Image */}
-      <img
-        src="/hero-adventure.jpg"
-        alt="Adventure landscape"
-        className="absolute inset-0 w-full h-full object-cover z-0"
-      />
-      <span className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/50 z-0" />
-
-      {/* Main Heading */}
-      <h1 className="relative z-10 text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-montserrat font-bold text-white mb-4 sm:mb-6 mt-8 sm:mt-12 md:mt-16 fade-in-up text-center px-4 leading-tight">
-        <span className="block">Discover Your Next</span>
-        <span className="block text-transparent bg-gradient-sunset bg-clip-text">
-          Adventure
-        </span>
-      </h1>
-
-      {/* Subtitle */}
-      <p className="relative z-10 text-sm sm:text-lg md:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto fade-in-up text-center px-4 leading-relaxed">
-        From challenging mountain treks to peaceful camping escapes, 
-        embark on unforgettable journeys with expert guides and fellow adventurers.
-      </p>
-
-      {/* CTA Buttons */}
-      <nav className="relative z-10 flex flex-col sm:flex-row gap-4 items-center justify-center mb-16 fade-in-up">
-        <Link href="/events">
-          <Button className="btn-hero group w-full sm:w-auto">
-            Explore Adventures
-            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+    <section 
+      className="relative h-screen flex items-center justify-center text-white"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${heroSettings.backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="text-center max-w-4xl px-6">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6">
+          {heroSettings.title}
+        </h1>
+        <p className="text-xl md:text-2xl mb-8 text-gray-200">
+          {heroSettings.subtitle}
+        </p>
+        <Link href={heroSettings.ctaLink}>
+          <Button size="lg" className="text-lg px-8 py-3">
+            {heroSettings.ctaText}
           </Button>
         </Link>
-        <Link href="/stories">
-          <Button variant="outline" className="btn-outline hidden w-full sm:w-auto">
-            Read Stories
-          </Button>
-        </Link>
-      </nav>
-
-
+      </div>
     </section>
   );
-};
-
-export default Hero;
+}

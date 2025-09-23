@@ -14,6 +14,15 @@ export interface ISiteSettings extends Document {
     favicon: string; // URL to favicon
   };
   
+  // Hero section
+  hero: {
+    backgroundImage: string; // URL to hero background image
+    title: string; // Main hero title
+    subtitle: string; // Hero subtitle/description
+    ctaText: string; // Call-to-action button text
+    ctaLink: string; // Call-to-action button link
+  };
+  
   // Theme and styling
   theme: {
     primaryColor: string;
@@ -247,7 +256,40 @@ const SiteSettingsSchema = new Schema<ISiteSettings>({
       trim: true
     }
   },
-  
+
+  hero: {
+    backgroundImage: {
+      type: String,
+      required: [true, 'Hero background image is required'],
+      trim: true,
+      default: '/hero-adventure.jpg'
+    },
+    title: {
+      type: String,
+      required: [true, 'Hero title is required'],
+      trim: true,
+      default: 'Discover Your Next Adventure'
+    },
+    subtitle: {
+      type: String,
+      required: [true, 'Hero subtitle is required'],
+      trim: true,
+      default: 'From challenging mountain treks to peaceful camping escapes, embark on unforgettable journeys with expert guides and fellow adventurers.'
+    },
+    ctaText: {
+      type: String,
+      required: [true, 'Hero CTA text is required'],
+      trim: true,
+      default: 'Explore Adventures'
+    },
+    ctaLink: {
+      type: String,
+      required: [true, 'Hero CTA link is required'],
+      trim: true,
+      default: '/events'
+    }
+  },
+
   theme: {
     primaryColor: {
       type: String,
@@ -705,6 +747,13 @@ SiteSettingsSchema.statics.createDefaultSettings = function(userId: string) {
       light: '/images/logo-light.png',
       dark: '/images/logo-dark.png',
       favicon: '/images/favicon.ico'
+    },
+    hero: {
+      backgroundImage: '/hero-adventure.jpg',
+      title: 'Discover Your Next Adventure',
+      subtitle: 'From challenging mountain treks to peaceful camping escapes, embark on unforgettable journeys with expert guides and fellow adventurers.',
+      ctaText: 'Explore Adventures',
+      ctaLink: '/events'
     },
     contact: {
       email: 'info@avidexplorers.com',

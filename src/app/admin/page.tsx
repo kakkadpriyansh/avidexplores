@@ -17,7 +17,8 @@ import {
   Plus,
   Eye,
   Edit,
-  Trash2
+  Trash2,
+  Image
 } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
@@ -135,6 +136,13 @@ export default function AdminDashboard() {
       icon: Eye,
       color: 'bg-blue-600',
       action: () => router.push('/admin/events'),
+    },
+    {
+      title: 'Hero Section',
+      description: 'Manage hero image & content',
+      icon: Image,
+      color: 'bg-indigo-600',
+      action: () => router.push('/admin/hero'),
     },
     {
       title: 'Create Story',
