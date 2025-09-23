@@ -119,7 +119,8 @@ export async function PUT(
     }
 
     // Validate section exists
-    if (!settings.schema.paths[section]) {
+    const validSections = ['general', 'hero', 'theme', 'business', 'seo', 'email', 'payment', 'security', 'integrations', 'maintenance'];
+    if (!validSections.includes(section)) {
       return NextResponse.json(
         { error: `Invalid section: ${section}` },
         { status: 400 }
@@ -209,10 +210,13 @@ export async function PUT(
     });
   } catch (error) {
     console.error(`Error updating ${params.section} settings:`, error);
+    console.error('Error name:', (error as any).name);
+    console.error('Error message:', (error as any).message);
     
     // Handle validation errors
     if ((error as any).name === 'ValidationError') {
       const validationErrors = Object.values((error as any).errors).map((err: any) => err.message);
+      console.error('Validation errors:', validationErrors);
       return NextResponse.json(
         { 
           error: 'Validation failed',
