@@ -7,7 +7,7 @@ import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
-import { Mountain, LayoutDashboard, Calendar, BookOpen, Users, Menu, LogOut, PenSquare, MapPin, Image } from 'lucide-react';
+import { Mountain, LayoutDashboard, Calendar, BookOpen, Users, Menu, LogOut, PenSquare, MapPin, Image, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -15,6 +15,7 @@ const navItems = [
   { href: '/admin/events', label: 'Events', icon: Calendar },
   { href: '/admin/bookings', label: 'Bookings', icon: BookOpen },
   { href: '/admin/stories', label: 'Stories', icon: PenSquare },
+  { href: '/admin/testimonials', label: 'Testimonials', icon: Star },
   { href: '/admin/hero', label: 'Hero Section', icon: Image },
   { href: '/admin/destination-cards', label: 'Destination Cards', icon: MapPin },
   { href: '/admin/teams', label: 'Teams', icon: Users },

@@ -18,6 +18,7 @@ interface Event {
     state: string;
     country: string;
   };
+  region?: string;
   difficulty: string;
   duration: number;
   images: string[];
@@ -77,11 +78,29 @@ export default function EventsPage() {
         return event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                locationString.toLowerCase().includes(searchTerm.toLowerCase()) ||
                event.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               (event.region && event.region.toLowerCase().includes(searchTerm.toLowerCase())) ||
                event.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
       });
       setFilteredEvents(filtered);
     }
   }, [searchTerm, events]);
+
+  // Group events by region
+  const groupedEvents = filteredEvents.reduce((groups: { [key: string]: Event[] }, event) => {
+    const region = event.region || 'Other Adventures';
+    if (!groups[region]) {
+      groups[region] = [];
+    }
+    groups[region].push(event);
+    return groups;
+  }, {});
+
+  // Sort regions alphabetically, but keep "Other Adventures" at the end
+  const sortedRegions = Object.keys(groupedEvents).sort((a, b) => {
+    if (a === 'Other Adventures') return 1;
+    if (b === 'Other Adventures') return -1;
+    return a.localeCompare(b);
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -119,7 +138,7 @@ export default function EventsPage() {
         </div>
       </section>
 
-      {/* Events Grid */}
+      {/* Events by Region */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           {loading ? (
@@ -143,15 +162,30 @@ export default function EventsPage() {
             <>
               <div className="flex items-center justify-between mb-8">
                 <p className="text-muted-foreground">
-                  Showing {filteredEvents.length} of {events.length} adventures
+                  Showing {filteredEvents.length} of {events.length} adventures across {sortedRegions.length} regions
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredEvents.map((event) => (
-                  <EventCard key={event._id} event={event} />
-                ))}
-              </div>
+              {sortedRegions.map((region) => (
+                <div key={region} className="mb-12">
+                  {/* Region Header */}
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-montserrat font-bold text-foreground mb-2">
+                      {region}
+                    </h2>
+                    <p className="text-muted-foreground">
+                      {groupedEvents[region].length} adventure{groupedEvents[region].length !== 1 ? 's' : ''} available
+                    </p>
+                  </div>
+                  
+                  {/* Events Grid for this region */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {groupedEvents[region].map((event) => (
+                      <EventCard key={event._id} event={event} />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </>
           ) : (
             <div className="text-center py-16">

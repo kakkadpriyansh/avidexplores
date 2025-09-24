@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 interface ImageUploadProps {
   value: string;
   onChange: (url: string) => void;
+  onRemove?: () => void;
   label?: string;
   placeholder?: string;
   className?: string;
@@ -19,6 +20,7 @@ interface ImageUploadProps {
 export function ImageUpload({ 
   value, 
   onChange, 
+  onRemove,
   label = 'Image', 
   placeholder = 'https://example.com/image.jpg',
   className = '' 
@@ -32,18 +34,17 @@ export function ImageUpload({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowedTypes.includes(file.type)) {
+    console.log('Starting file upload:', file.name, file.size, file.type);
+    
+    if (!file.type.startsWith('image/')) {
       toast({
         title: 'Invalid file type',
-        description: 'Please select a JPEG, PNG, WebP, or GIF image.',
+        description: 'Please select an image file.',
         variant: 'destructive',
       });
       return;
     }
 
-    // Validate file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast({
         title: 'File too large',
@@ -54,33 +55,50 @@ export function ImageUpload({
     }
 
     setUploading(true);
+
     try {
       const formData = new FormData();
       formData.append('file', file);
 
+      console.log('Making fetch request to /api/upload...');
+      
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
+        credentials: 'include', // Ensure cookies are sent
       });
 
+      console.log('Upload response status:', response.status);
+      console.log('Upload response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Upload failed');
+        const errorData = await response.text();
+        console.error('Upload error response:', errorData);
+        
+        // Try to parse as JSON for better error messages
+        try {
+          const errorJson = JSON.parse(errorData);
+          throw new Error(errorJson.error || `Upload failed: ${response.status}`);
+        } catch {
+          throw new Error(`Upload failed: ${response.status} - ${errorData}`);
+        }
       }
 
-      const result = await response.json();
-      onChange(result.url);
-      setUrlInput(result.url);
+      const data = await response.json();
+      console.log('Upload success response:', data);
+      
+      onChange(data.url);
+      setUrlInput(data.url);
       
       toast({
-        title: 'Success',
-        description: 'Image uploaded successfully!',
+        title: 'Upload successful',
+        description: 'Image uploaded successfully.',
       });
     } catch (error) {
       console.error('Upload error:', error);
       toast({
         title: 'Upload failed',
-        description: error instanceof Error ? error.message : 'Failed to upload image',
+        description: error instanceof Error ? error.message : 'Failed to upload image.',
         variant: 'destructive',
       });
     } finally {
@@ -98,7 +116,11 @@ export function ImageUpload({
   };
 
   const clearImage = () => {
-    onChange('');
+    if (onRemove) {
+      onRemove();
+    } else {
+      onChange('');
+    }
     setUrlInput('');
   };
 

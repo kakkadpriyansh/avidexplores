@@ -1,12 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ITestimonial extends Document {
-  userId: mongoose.Types.ObjectId;
-  eventId: mongoose.Types.ObjectId;
-  bookingId: mongoose.Types.ObjectId;
+  userId?: mongoose.Types.ObjectId;
+  eventId?: mongoose.Types.ObjectId;
+  bookingId?: mongoose.Types.ObjectId;
+  customerName?: string;
+  customerEmail?: string;
+  eventName?: string;
   rating: number;
   review: string;
   title?: string;
+  customerPhoto?: string;
   images?: string[];
   approved: boolean;
   isPublic: boolean;
@@ -25,17 +29,36 @@ const TestimonialSchema = new Schema<ITestimonial>({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'User ID is required']
+    required: false,
+    default: null
   },
   eventId: {
     type: Schema.Types.ObjectId,
     ref: 'Event',
-    required: [true, 'Event ID is required']
+    required: false,
+    default: null
   },
   bookingId: {
     type: Schema.Types.ObjectId,
     ref: 'Booking',
-    required: [true, 'Booking ID is required']
+    required: false,
+    default: null
+  },
+  customerName: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Customer name cannot exceed 100 characters']
+  },
+  customerEmail: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    maxlength: [255, 'Customer email cannot exceed 255 characters']
+  },
+  eventName: {
+    type: String,
+    trim: true,
+    maxlength: [200, 'Event name cannot exceed 200 characters']
   },
   rating: {
     type: Number,
@@ -54,6 +77,10 @@ const TestimonialSchema = new Schema<ITestimonial>({
     type: String,
     trim: true,
     maxlength: [100, 'Title cannot exceed 100 characters']
+  },
+  customerPhoto: {
+    type: String,
+    trim: true
   },
   images: [{
     type: String
@@ -93,7 +120,7 @@ const TestimonialSchema = new Schema<ITestimonial>({
 });
 
 // Ensure one testimonial per user per event
-TestimonialSchema.index({ userId: 1, eventId: 1 }, { unique: true });
+TestimonialSchema.index({ userId: 1, eventId: 1 }, { unique: true, sparse: true });
 
 // Other indexes for performance
 TestimonialSchema.index({ eventId: 1 });

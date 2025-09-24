@@ -20,6 +20,7 @@ interface FlexibleEvent {
     state: string;
     country: string;
   };
+  region?: string;
   difficulty: string;
   duration: number | string;
   images?: string[];
@@ -144,6 +145,11 @@ const EventCard = ({ event }: EventCardProps) => {
                   ? event.location 
                   : `${event.location?.name || 'Location TBD'}, ${event.location?.state || ''}`
                 }
+                {event.region && (
+                  <span className="text-primary font-medium ml-1">
+                    • {event.region}
+                  </span>
+                )}
               </span>
             </div>
             <div className="flex items-center space-x-2">
