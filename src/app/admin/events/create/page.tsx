@@ -20,6 +20,7 @@ interface EventFormData {
   price: number;
   discountedPrice?: number;
   location: string;
+  region?: string;
   duration: string;
   maxParticipants: number;
   difficulty: 'EASY' | 'MODERATE' | 'DIFFICULT' | 'EXTREME';
@@ -72,6 +73,7 @@ export default function CreateEventPage() {
     price: 0,
     discountedPrice: undefined,
     location: '',
+    region: '',
     duration: '',
     maxParticipants: 20,
     difficulty: 'MODERATE',
@@ -346,6 +348,18 @@ export default function CreateEventPage() {
                     />
                   </div>
                   
+                  <div>
+                    <Label htmlFor="region">Region</Label>
+                    <Input
+                      id="region"
+                      value={formData.region || ''}
+                      onChange={(e) => handleInputChange('region', e.target.value)}
+                      placeholder="e.g., North India, South India, Himalayas"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="duration">Duration *</Label>
                     <Input

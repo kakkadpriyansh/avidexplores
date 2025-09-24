@@ -44,7 +44,7 @@ export default function Hero() {
 
   return (
     <section 
-      className="relative h-screen flex items-center justify-center text-white"
+      className="relative h-[50vh] flex items-center justify-center text-white"
       style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${heroSettings.backgroundImage})`,
         backgroundSize: 'cover',

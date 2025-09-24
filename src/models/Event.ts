@@ -48,6 +48,7 @@ export interface IEvent extends Document {
       longitude: number;
     };
   };
+  region?: string;
   duration: number; // in days
   maxParticipants: number;
   minParticipants: number;
@@ -222,6 +223,11 @@ const EventSchema = new Schema<IEvent>({
       longitude: Number
     }
   },
+  region: {
+    type: String,
+    required: false,
+    trim: true
+  },
   duration: {
     type: Number,
     required: [true, 'Duration is required'],
@@ -285,6 +291,7 @@ EventSchema.index({ difficulty: 1 });
 EventSchema.index({ isActive: 1 });
 EventSchema.index({ isFeatured: 1 });
 EventSchema.index({ 'location.state': 1 });
+EventSchema.index({ region: 1 });
 EventSchema.index({ dates: 1 });
 EventSchema.index({ price: 1 });
 

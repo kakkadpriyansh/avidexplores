@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     // Build filter - only show approved and public testimonials
     const filter: any = {
-      isApproved: true,
+      approved: true,
       isPublic: true
     };
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       review,
       title,
       images: images || [],
-      isApproved: false, // Requires admin approval
+      approved: false, // Requires admin approval
       isPublic: true
     });
 

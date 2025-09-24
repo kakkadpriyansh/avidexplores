@@ -63,6 +63,7 @@ interface Event {
       longitude: number;
     };
   };
+  region?: string;
   duration: number;
   maxParticipants: number;
   minParticipants: number;
@@ -553,6 +554,16 @@ export default function EditEventPage() {
                         required
                       />
                     </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="region">Region</Label>
+                    <Input
+                      id="region"
+                      value={event.region || ''}
+                      onChange={(e) => updateEvent('region', e.target.value)}
+                      placeholder="e.g., North India, South India, Himalayas"
+                    />
                   </div>
                 </CardContent>
               </Card>

@@ -320,7 +320,7 @@ export default function HeroManagement() {
           </CardHeader>
           <CardContent>
             <div 
-              className="relative h-96 rounded-lg overflow-hidden flex items-center justify-center text-white"
+              className="relative h-48 rounded-lg overflow-hidden flex items-center justify-center text-white"
               style={{
                 backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${heroSettings.backgroundImage})`,
                 backgroundSize: 'cover',
