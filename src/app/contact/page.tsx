@@ -32,7 +32,12 @@ export default function ContactPage() {
     {
       icon: MapPin,
       title: 'Address',
-      details: ['123 Adventure Street', 'Mumbai, Maharashtra 400001', 'India']
+      details: [
+        'Nakshatra -8, 704, Sadhu Vasvani Rd',
+        'Indian Park, Rajkot, Gujarat 360005',
+        'India',
+        <a href="https://maps.app.goo.gl/dnu32o4nsHkHrWXr7" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">View on Map</a>
+      ]
     },
     {
       icon: Phone,
@@ -186,26 +191,7 @@ export default function ContactPage() {
                 ))}
               </div>
 
-              {/* Quick Actions */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-montserrat font-semibold text-foreground">
-                  Quick Actions
-                </h3>
-                <div className="flex flex-col space-y-3">
-                  <Button className="btn-adventure justify-start" asChild>
-                    <a href="tel:+919876543210">
-                      <Phone className="h-4 w-4 mr-2" />
-                      Call Us Now
-                    </a>
-                  </Button>
-                  <Button variant="outline" className="btn-outline justify-start" asChild>
-                    <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer">
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      WhatsApp Chat
-                    </a>
-                  </Button>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
@@ -218,19 +204,25 @@ export default function ContactPage() {
             <h2 className="text-3xl font-montserrat font-bold text-foreground mb-4">
               Visit Our Office
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-4">
               Drop by our office to discuss your next adventure in person
             </p>
+            <a href="https://maps.app.goo.gl/dnu32o4nsHkHrWXr7" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+              View on Google Maps
+            </a>
           </div>
           
           <div className="bg-card rounded-2xl overflow-hidden shadow-card">
-            <div className="aspect-video bg-muted flex items-center justify-center">
-              <div className="text-center text-muted-foreground">
-                <MapPin className="h-12 w-12 mx-auto mb-4" />
-                <p>Interactive map would be integrated here</p>
-                <p className="text-sm">123 Adventure Street, Mumbai, Maharashtra</p>
-              </div>
-            </div>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3691.5008724056406!2d70.75889609999999!3d22.29688939999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959cb780cbc7991%3A0x4d30206cf885f8b!2sAvid%20Explorers!5e0!3m2!1sen!2sin!4v1758803858396!5m2!1sen!2sin"
+              width="100%"
+              height="400"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-96"
+            />
           </div>
         </div>
       </section>

@@ -27,8 +27,8 @@ const Navigation = () => {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/events', label: 'Events' },
-    { href: '/stories', label: 'Stories' },
-    { href: '/team', label: 'Team' },
+    // { href: '/stories', label: 'Stories' },
+    // { href: '/team', label: 'Team' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
