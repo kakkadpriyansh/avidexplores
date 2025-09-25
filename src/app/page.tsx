@@ -77,6 +77,8 @@ async function getTestimonials() {
 
 
 
+
+
 export default async function HomePage() {
   const [events, destinations, testimonials] = await Promise.all([
     getEvents(),
@@ -198,13 +200,13 @@ export default async function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-gradient-mountain">
+      <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-foreground mb-4">
               What Our Adventurers Say
             </h2>
-            <p className="text-lg text-white/80 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Real experiences from real adventurers who've explored with us
             </p>
           </div>
@@ -216,14 +218,12 @@ export default async function HomePage() {
               ))
             ) : (
               <div className="col-span-full text-center py-8">
-                <p className="text-white/80">No testimonials available at the moment.</p>
+                <p className="text-muted-foreground">No testimonials available at the moment.</p>
               </div>
             )}
           </div>
         </div>
       </section>
-
-
 
       <Footer />
     </div>

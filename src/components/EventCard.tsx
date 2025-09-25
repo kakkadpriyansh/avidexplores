@@ -76,29 +76,29 @@ const EventCard = ({ event }: EventCardProps) => {
 
   return (
     <Link href={`/events/${event.slug}`} className="block">
-      <div className="card-adventure group cursor-pointer hover:shadow-lg transition-shadow">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100 dark:border-gray-700">
         {/* Image Gallery */}
-        <div className="relative overflow-hidden h-48">
+        <div className="relative overflow-hidden h-56">
           <img
             src={images[currentImageIndex]}
             alt={`${event.title} - Image ${currentImageIndex + 1}`}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
           {images.length > 1 && (
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-2">
                 {images.map((_, index) => (
                   <button
                     key={index}
@@ -106,8 +106,8 @@ const EventCard = ({ event }: EventCardProps) => {
                       e.preventDefault();
                       setCurrentImageIndex(index);
                     }}
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentImageIndex ? 'bg-white scale-125' : 'bg-white/60 hover:bg-white/80'
                     }`}
                   />
                 ))}
@@ -115,12 +115,12 @@ const EventCard = ({ event }: EventCardProps) => {
             </>
           )}
           <div className="absolute top-4 left-4">
-            <Badge className={getDifficultyColor(event.difficulty)}>
+            <Badge className={`${getDifficultyColor(event.difficulty)} font-medium px-3 py-1`}>
               {formatDifficulty(event.difficulty)}
             </Badge>
           </div>
           <div className="absolute top-4 right-4">
-            <Badge variant="secondary" className="bg-background/90 text-foreground">
+            <Badge variant="secondary" className="bg-background/90 text-foreground font-medium px-3 py-1">
               {event.category}
             </Badge>
           </div>
@@ -128,13 +128,17 @@ const EventCard = ({ event }: EventCardProps) => {
 
         {/* Content */}
         <div className="p-6">
-          <h3 className="text-xl font-montserrat font-bold text-card-foreground mb-2 group-hover:text-primary transition-colors">
-            {event.title}
-          </h3>
-          
-          <p className="text-muted-foreground mb-4 line-clamp-2">
-            {event.shortDescription}
-          </p>
+          <div className="mb-3">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+              {event.title}
+            </h3>
+            
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 mb-4">
+              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-2">
+                {event.shortDescription}
+              </p>
+            </div>
+          </div>
 
           {/* Details */}
           <div className="flex flex-col space-y-2 mb-4 text-sm text-muted-foreground">
@@ -177,7 +181,7 @@ const EventCard = ({ event }: EventCardProps) => {
           </div>
 
           {/* Price Section */}
-          <div className="flex items-center">
+          <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
             <div>
               {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
                 <div className="flex flex-col">

@@ -6,6 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ThemeToggle from "@/components/ThemeToggle";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import ClientProviders from './providers';
 
 const inter = Inter({ subsets: ['latin'] })
@@ -29,6 +30,7 @@ export default function RootLayout({
             <Sonner />
             {children}
             <ThemeToggle />
+            <WhatsAppButton />
           </TooltipProvider>
         </ClientProviders>
       </body>

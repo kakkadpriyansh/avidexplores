@@ -5,7 +5,8 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
 import { Input } from '@/components/ui/input';
-import { Search, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, Loader2, Mountain, MapPin, Trees, Waves, Building2, Globe } from 'lucide-react';
 
 interface Event {
   _id: string;
@@ -37,6 +38,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,12 +67,13 @@ export default function EventsPage() {
     fetchEvents();
   }, []);
 
-  // Filter events based on search term
+  // Filter events based on search term and selected region
   useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredEvents(events);
-    } else {
-      const filtered = events.filter(event => {
+    let filtered = events;
+    
+    // Filter by search term
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(event => {
         const locationString = typeof event.location === 'string' 
           ? event.location 
           : `${event.location?.name || ''} ${event.location?.state || ''}`;
@@ -81,11 +84,27 @@ export default function EventsPage() {
                (event.region && event.region.toLowerCase().includes(searchTerm.toLowerCase())) ||
                event.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
       });
-      setFilteredEvents(filtered);
     }
-  }, [searchTerm, events]);
+    
+    // Filter by selected region
+    if (selectedRegion !== 'all') {
+      filtered = filtered.filter(event => 
+        (event.region || 'Other Adventures') === selectedRegion
+      );
+    }
+    
+    setFilteredEvents(filtered);
+  }, [searchTerm, selectedRegion, events]);
 
-  // Group events by region
+  // Get all unique regions from events
+  const allRegions = Array.from(new Set(events.map(event => event.region || 'Other Adventures')));
+  const sortedAllRegions = allRegions.sort((a, b) => {
+    if (a === 'Other Adventures') return 1;
+    if (b === 'Other Adventures') return -1;
+    return a.localeCompare(b);
+  });
+
+  // Group filtered events by region for display
   const groupedEvents = filteredEvents.reduce((groups: { [key: string]: Event[] }, event) => {
     const region = event.region || 'Other Adventures';
     if (!groups[region]) {
@@ -95,34 +114,77 @@ export default function EventsPage() {
     return groups;
   }, {});
 
-  // Sort regions alphabetically, but keep "Other Adventures" at the end
+  // Sort regions for display - prioritize selected region
   const sortedRegions = Object.keys(groupedEvents).sort((a, b) => {
+    if (selectedRegion !== 'all') {
+      if (a === selectedRegion) return -1;
+      if (b === selectedRegion) return 1;
+    }
     if (a === 'Other Adventures') return 1;
     if (b === 'Other Adventures') return -1;
     return a.localeCompare(b);
   });
+
+  // Region icon mapping
+  const getRegionIcon = (region: string) => {
+    const iconMap: { [key: string]: any } = {
+      'Himalayas': Mountain,
+      'Western Ghats': Trees,
+      'Coastal': Waves,
+      'Urban': Building2,
+      'Other Adventures': Globe,
+    };
+    return iconMap[region] || MapPin;
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
       {/* Header */}
-      <section className="pt-24 pb-16 bg-gradient-mountain">
+      <section className="pt-20 pb-8 bg-gradient-mountain">
         <div className="container mx-auto px-4">
           <div className="text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-montserrat font-bold mb-4">
+            <h1 className="text-3xl md:text-4xl font-montserrat font-bold mb-3">
               All Adventures
             </h1>
-            <p className="text-lg text-white/80 max-w-2xl mx-auto">
+            <p className="text-base text-white/80 max-w-xl mx-auto">
               Discover amazing adventures tailored to your interests and skill level
             </p>
           </div>
         </div>
       </section>
 
-      {/* Search */}
-      <section className="py-8 border-b border-border/50">
+      {/* Region Tabs */}
+      <section className="py-6 border-b border-border/50">
         <div className="container mx-auto px-4">
+          <div className="flex flex-wrap gap-2 justify-center mb-6">
+            <Button
+              variant={selectedRegion === 'all' ? 'default' : 'outline'}
+              onClick={() => setSelectedRegion('all')}
+              className="flex items-center gap-2"
+            >
+              <Globe className="h-4 w-4" />
+              All Regions
+            </Button>
+            {sortedAllRegions.map((region) => {
+              const IconComponent = getRegionIcon(region);
+              const regionCount = events.filter(event => (event.region || 'Other Adventures') === region).length;
+              return (
+                <Button
+                  key={region}
+                  variant={selectedRegion === region ? 'default' : 'outline'}
+                  onClick={() => setSelectedRegion(region)}
+                  className="flex items-center gap-2"
+                >
+                  <IconComponent className="h-4 w-4" />
+                  {region} ({regionCount})
+                </Button>
+              );
+            })}
+          </div>
+          
+          {/* Search */}
           <div className="flex justify-center">
             <div className="relative w-full max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -162,18 +224,27 @@ export default function EventsPage() {
             <>
               <div className="flex items-center justify-between mb-8">
                 <p className="text-muted-foreground">
-                  Showing {filteredEvents.length} of {events.length} adventures across {sortedRegions.length} regions
+                  {selectedRegion === 'all' 
+                    ? `Showing ${filteredEvents.length} of ${events.length} adventures across ${sortedRegions.length} regions`
+                    : `Showing ${filteredEvents.length} adventures in ${selectedRegion}`
+                  }
                 </p>
               </div>
               
               {sortedRegions.map((region) => (
-                <div key={region} className="mb-12">
+                <div key={region} className="mb-16">
                   {/* Region Header */}
-                  <div className="mb-6">
-                    <h2 className="text-2xl font-montserrat font-bold text-foreground mb-2">
-                      {region}
-                    </h2>
-                    <p className="text-muted-foreground">
+                  <div className="mb-8 pb-4 border-b-2 border-primary/20">
+                    <div className="flex items-center gap-4 mb-3">
+                      {(() => {
+                        const IconComponent = getRegionIcon(region);
+                        return <IconComponent className="h-8 w-8 text-primary" />;
+                      })()}
+                      <h2 className="text-3xl font-montserrat font-bold text-foreground">
+                        {region}
+                      </h2>
+                    </div>
+                    <p className="text-lg text-muted-foreground ml-12">
                       {groupedEvents[region].length} adventure{groupedEvents[region].length !== 1 ? 's' : ''} available
                     </p>
                   </div>
