@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Mountain, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { Mountain, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube, Linkedin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -19,17 +19,20 @@ const Footer = () => {
               Explore the world with expert guides and fellow adventurers.
             </p>
             <div className="flex space-x-4">
-              <Button variant="ghost" size="sm" className="p-2">
-                <Facebook className="h-4 w-4" />
+              <Button variant="ghost" size="sm" className="p-2" asChild>
+                <a href="https://youtube.com/@avidexplorersindia?si=lYLJZpfa_JaAl32S" target="_blank" rel="noopener noreferrer">
+                  <Youtube className="h-4 w-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="sm" className="p-2">
-                <Instagram className="h-4 w-4" />
+              <Button variant="ghost" size="sm" className="p-2" asChild>
+                <a href="https://www.linkedin.com/company/avid-explorers/" target="_blank" rel="noopener noreferrer">
+                  <Linkedin className="h-4 w-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="sm" className="p-2">
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" className="p-2">
-                <Youtube className="h-4 w-4" />
+              <Button variant="ghost" size="sm" className="p-2" asChild>
+                <a href="https://www.instagram.com/avidexplorers.in" target="_blank" rel="noopener noreferrer">
+                  <Instagram className="h-4 w-4" />
+                </a>
               </Button>
             </div>
           </div>
@@ -88,11 +91,11 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-slate-300">
                 <Mail className="h-4 w-4 text-orange-400" />
-                <span>hello@avidexplorers.com</span>
+                <span>info@avidexplorers.in</span>
               </div>
               <div className="flex items-center space-x-3 text-slate-300">
                 <Phone className="h-4 w-4 text-orange-400" />
-                <span>+91 98765 43210</span>
+                <span>+91 88665 52400</span>
               </div>
               <div className="flex items-center space-x-3 text-slate-300">
                 <MapPin className="h-4 w-4 text-orange-400" />
