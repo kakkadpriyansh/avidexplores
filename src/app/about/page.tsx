@@ -191,19 +191,19 @@ export default async function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary text-primary-foreground">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Start Your Adventure?</h2>
-          <p className="text-xl mb-8 opacity-90">Join our community of adventurers and discover what you're capable of.</p>
+          <h2 className="text-3xl font-bold mb-4 text-foreground">Ready to Start Your Adventure?</h2>
+          <p className="text-xl mb-8 text-muted-foreground">Join our community of adventurers and discover what you're capable of.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/events">
-              <Button size="lg" variant="secondary" className="group">
+              <Button size="lg" variant="default" className="group">
                 Browse Adventures
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+              <Button size="lg" variant="outline">
                 Get in Touch
               </Button>
             </Link>
