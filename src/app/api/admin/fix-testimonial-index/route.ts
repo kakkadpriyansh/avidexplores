@@ -11,7 +11,7 @@ export async function POST() {
     
     // Drop the existing problematic index
     try {
-      await collection.dropIndex({ userId: 1, eventId: 1 });
+      await collection.dropIndex('userId_1_eventId_1');
       console.log('Dropped old index');
     } catch (error: any) {
       console.log('Index may not exist:', error.message);
