@@ -44,14 +44,14 @@ export default function Hero() {
 
   return (
     <section 
-      className="relative min-h-[70vh] md:min-h-[60vh] lg:min-h-[60vh] xl:min-h-[70vh] flex items-center justify-center text-white"
+      className="relative min-h-[40vh] md:min-h-[40vh] lg:min-h-[40vh] xl:min-h-[50vh] flex items-end justify-center text-white"
       style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${heroSettings.backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
     >
-      <div className="text-center max-w-4xl px-4 sm:px-6">
+      <div className="text-center max-w-4xl px-4 sm:px-6 pb-4 sm:pb-8 md:pb-12 lg:pb-16">
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
           {heroSettings.title}
         </h1>
