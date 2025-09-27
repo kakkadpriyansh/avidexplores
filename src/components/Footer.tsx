@@ -11,10 +11,8 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <Mountain className="h-8 w-8 text-secondary" />
-              <span className="font-montserrat font-bold text-xl">
-                Avid Explorers
-              </span>
+              <img src="/logo/avid Full white (1).png" alt="Avid Explorers Logo" className="h-8" />
+              <img src="/logo/Avid name white.png" alt="Adventure Explorers" className="h-6" />
             </div>
             <p className="text-slate-300">
               Your trusted partner for unforgettable adventures. 
@@ -50,7 +48,7 @@ const Footer = () => {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-slate-300 hover:text-orange-400 transition-colors"
+                    className="text-slate-300 :text-orange-400 transition-colors"
                   >
                     {link.label}
                   </Link>
