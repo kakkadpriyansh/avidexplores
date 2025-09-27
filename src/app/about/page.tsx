@@ -149,11 +149,11 @@ export default async function AboutPage() {
                     <p className="text-sm text-muted-foreground mb-4">{member.experience} experience</p>
                   )}
                   <div className="flex flex-wrap gap-2 justify-center">
-                    {(member.specialties || []).map((specialty: string, idx: number) => (
+                    {/* {(member.specialties || []).map((specialty: string, idx: number) => (
                       <span key={idx} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                         {specialty}
                       </span>
-                    ))}
+                    ))} */}
                   </div>
                 </div>
               ))}
