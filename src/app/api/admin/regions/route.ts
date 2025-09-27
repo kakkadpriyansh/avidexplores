@@ -10,7 +10,13 @@ export async function GET() {
     const collection = db.collection('events');
     
     // Get distinct regions from events
-    const regions = await collection.distinct('region', { region: { $exists: true, $ne: null, $ne: '' } });
+    const regions = await collection.distinct('region', { 
+      $and: [
+        { region: { $exists: true } },
+        { region: { $ne: null } },
+        { region: { $ne: '' } }
+      ]
+    });
     
     return NextResponse.json({
       success: true,
