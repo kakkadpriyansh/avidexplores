@@ -109,33 +109,63 @@ export default function BookingHistoryPage() {
   };
 
   const downloadBookingReceipt = (booking: UserBooking) => {
-    // Generate a simple receipt
-    const receiptContent = [
-      'AVID EXPLORES - BOOKING RECEIPT',
-      '================================',
-      '',
-      `Booking ID: ${booking.bookingId}`,
-      `Event: ${booking.eventId.title}`,
-      `Location: ${booking.eventId.location}`,
-      `Participants: ${booking.participants.length}`,
-      `Total Amount: ₹${booking.totalAmount.toLocaleString()}`,
-      `Status: ${booking.status}`,
-      `Payment Status: ${booking.paymentInfo.paymentStatus}`,
-      `Booking Date: ${new Date(booking.createdAt).toLocaleDateString()}`,
-      '',
-      'Participants:',
-      ...booking.participants.map((p, i) => `${i + 1}. ${p.name} (${p.age} years, ${p.gender})`),
-      '',
-      'Thank you for choosing Avid Explores!'
-    ].join('\n');
+    // Generate PDF receipt
+    const receiptContent = `
+      <html>
+        <head>
+          <title>Booking Receipt</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .title { font-size: 24px; font-weight: bold; color: #333; }
+            .subtitle { font-size: 16px; color: #666; margin-top: 5px; }
+            .section { margin: 20px 0; }
+            .label { font-weight: bold; }
+            .participants { margin-top: 15px; }
+            .participant { margin: 5px 0; }
+            .footer { margin-top: 40px; text-align: center; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="title">AVID EXPLORES</div>
+            <div class="subtitle">Booking Receipt</div>
+          </div>
+          
+          <div class="section">
+            <div><span class="label">Booking ID:</span> ${booking.bookingId}</div>
+            <div><span class="label">Event:</span> ${booking.eventId.title}</div>
+            <div><span class="label">Location:</span> ${booking.eventId.location}</div>
+            <div><span class="label">Total Amount:</span> ₹${booking.totalAmount.toLocaleString()}</div>
+            <div><span class="label">Status:</span> ${booking.status}</div>
+            <div><span class="label">Payment Status:</span> ${booking.paymentInfo.paymentStatus}</div>
+            <div><span class="label">Booking Date:</span> ${new Date(booking.createdAt).toLocaleDateString()}</div>
+          </div>
+          
+          <div class="section">
+            <div class="label">Participants (${booking.participants.length}):</div>
+            <div class="participants">
+              ${booking.participants.map((p, i) => `<div class="participant">${i + 1}. ${p.name} (${p.age} years, ${p.gender})</div>`).join('')}
+            </div>
+          </div>
+          
+          <div class="footer">
+            Thank you for choosing Avid Explores!
+          </div>
+        </body>
+      </html>
+    `;
     
-    const blob = new Blob([receiptContent], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `booking-receipt-${booking.bookingId}.txt`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(receiptContent);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+    }
   };
 
   const filteredBookings = bookings.filter(booking => {
@@ -337,19 +367,10 @@ export default function BookingHistoryPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => router.push(`/booking/${booking._id}`)}
-                          >
-                            <Eye className="h-3 w-3 mr-1" />
-                            View Details
-                          </Button>
-                          
-                          <Button
-                            size="sm"
-                            variant="outline"
                             onClick={() => downloadBookingReceipt(booking)}
                           >
                             <Download className="h-3 w-3 mr-1" />
-                            Download Receipt
+                            Download PDF Receipt
                           </Button>
                           
                           {booking.status === 'COMPLETED' && (

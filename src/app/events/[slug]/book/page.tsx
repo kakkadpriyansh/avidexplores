@@ -13,6 +13,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Calendar, 
@@ -83,6 +92,7 @@ export default function BookEventPage() {
   const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<number>(0);
   const [selectedDay, setSelectedDay] = useState<number>(0);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([{
     name: '',
     age: 18,
@@ -245,12 +255,7 @@ export default function BookEventPage() {
       const data = await response.json();
 
       if (response.ok) {
-        toast({
-          title: "Booking Created",
-          description: "Your booking has been created successfully. Redirecting to payment...",
-        });
-        // Redirect to payment page with booking ID
-        router.push(`/booking/${data.data.bookingId}/payment`);
+        setShowSuccessDialog(true);
       } else {
         toast({
           title: "Booking Failed",
@@ -345,7 +350,7 @@ export default function BookEventPage() {
                               </SelectTrigger>
                               <SelectContent>
                                 {event.availableDates.map((dateEntry, index) => (
-                                  <SelectItem key={index} value={`${dateEntry.month}-${dateEntry.year}`}>
+                                  <SelectItem key={`${dateEntry.month}-${dateEntry.year}-${index}`} value={`${dateEntry.month}-${dateEntry.year}`}>
                                     {dateEntry.month} {dateEntry.year}
                                     {dateEntry.availableSeats !== undefined && (
                                       <span className="ml-2 text-sm text-muted-foreground">
@@ -533,12 +538,21 @@ export default function BookEventPage() {
                             </div>
                             <div>
                               <Label htmlFor={`emergency-relationship-${index}`}>Relationship *</Label>
-                              <Input
-                                id={`emergency-relationship-${index}`}
+                              <Select
                                 value={participant.emergencyContact.relationship}
-                                onChange={(e) => updateParticipant(index, 'emergencyContact.relationship', e.target.value)}
-                                placeholder="Father, Mother, Spouse, etc."
-                              />
+                                onValueChange={(value) => updateParticipant(index, 'emergencyContact.relationship', value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select relationship" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="parents">Parents</SelectItem>
+                                  <SelectItem value="self">Self</SelectItem>
+                                  <SelectItem value="brother">Brother</SelectItem>
+                                  <SelectItem value="sister">Sister</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                           </div>
 
@@ -557,13 +571,19 @@ export default function BookEventPage() {
                             </div>
                             <div>
                               <Label htmlFor={`dietary-${index}`}>Dietary Restrictions</Label>
-                              <Textarea
-                                id={`dietary-${index}`}
+                              <Select
                                 value={participant.dietaryRestrictions}
-                                onChange={(e) => updateParticipant(index, 'dietaryRestrictions', e.target.value)}
-                                placeholder="Any dietary restrictions or preferences"
-                                rows={2}
-                              />
+                                onValueChange={(value) => updateParticipant(index, 'dietaryRestrictions', value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select dietary preference" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="jain">Jain</SelectItem>
+                                  <SelectItem value="swaminarayan">Swaminarayan</SelectItem>
+                                  <SelectItem value="regular">Regular</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                           </div>
                         </div>
@@ -646,6 +666,27 @@ export default function BookEventPage() {
       </div>
       
       <Footer />
+      
+      {/* Success Dialog */}
+      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Booking Registration Done!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your booking has been successfully registered. Complete payment by visiting our office. 
+              You can view your booking details and status in your bookings page.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setShowSuccessDialog(false);
+              router.push('/bookings');
+            }}>
+              View My Bookings
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

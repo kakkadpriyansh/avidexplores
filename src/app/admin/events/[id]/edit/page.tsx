@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ImageUpload } from '@/components/ui/image-upload';
+import { RegionSelect } from '@/components/ui/region-select';
 import { Trash2, Plus, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -558,11 +559,10 @@ export default function EditEventPage() {
                   
                   <div>
                     <Label htmlFor="region">Region</Label>
-                    <Input
-                      id="region"
+                    <RegionSelect
                       value={event.region || ''}
-                      onChange={(e) => updateEvent('region', e.target.value)}
-                      placeholder="e.g., North India, South India, Himalayas"
+                      onChange={(value) => updateEvent('region', value)}
+                      placeholder="Select or enter region"
                     />
                   </div>
                 </CardContent>

@@ -12,18 +12,23 @@ export async function GET(
   try {
     const { id } = params;
 
-    // Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    await connectDB();
+
+    // Use direct MongoDB query to avoid model issues
+    const db = mongoose.connection.db;
+    const collection = db.collection('testimonials');
+    
+    let objectId;
+    try {
+      objectId = new mongoose.Types.ObjectId(id);
+    } catch (error) {
       return NextResponse.json(
-        { success: false, error: 'Invalid testimonial ID' },
+        { success: false, error: 'Invalid testimonial ID format' },
         { status: 400 }
       );
     }
-
-    await connectDB();
-
-    // First check if testimonial exists without populate
-    const testimonial = await (Testimonial as Model<ITestimonial>).findById(id).lean();
+    
+    const testimonial = await collection.findOne({ _id: objectId });
 
     if (!testimonial) {
       return NextResponse.json(
@@ -32,26 +37,10 @@ export async function GET(
       );
     }
 
-    // Try to populate, but handle errors gracefully
-    try {
-      const populatedTestimonial = await (Testimonial as Model<ITestimonial>).findById(id)
-        .populate('userId', 'name email avatar')
-        .populate('eventId', 'title slug location images')
-        .populate('bookingId', 'bookingId status')
-        .lean();
-
-      return NextResponse.json({
-        success: true,
-        data: populatedTestimonial
-      });
-    } catch (populateError) {
-      // If populate fails, return the basic testimonial without populated fields
-      console.warn('Populate failed, returning basic testimonial:', populateError);
-      return NextResponse.json({
-        success: true,
-        data: testimonial
-      });
-    }
+    return NextResponse.json({
+      success: true,
+      data: testimonial
+    });
 
   } catch (error: any) {
     console.error('Error fetching testimonial:', error);
@@ -71,20 +60,12 @@ export async function PUT(
     await connectDB();
 
     const { id } = params;
-
-    // Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid testimonial ID' },
-        { status: 400 }
-      );
-    }
-
     const body = await request.json();
     const {
       rating,
       review,
       title,
+      customerPhoto,
       images,
       approved,
       isFeatured,
@@ -104,10 +85,11 @@ export async function PUT(
     }
 
     // Build update object
-    const updateData: any = {};
+    const updateData: any = { updatedAt: new Date() };
     if (rating !== undefined) updateData.rating = rating;
     if (review !== undefined) updateData.review = review;
     if (title !== undefined) updateData.title = title;
+    if (customerPhoto !== undefined) updateData.customerPhoto = customerPhoto;
     if (images !== undefined) updateData.images = images;
     if (approved !== undefined) updateData.approved = approved;
     if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
@@ -122,15 +104,27 @@ export async function PUT(
       };
     }
 
-    const testimonial = await (Testimonial as Model<ITestimonial>).findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    )
-      .populate('userId', 'name email avatar')
-      .populate('eventId', 'title slug location images');
+    // Use direct MongoDB update
+    const db = mongoose.connection.db;
+    const collection = db.collection('testimonials');
+    
+    let objectId;
+    try {
+      objectId = new mongoose.Types.ObjectId(id);
+    } catch (error) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid testimonial ID format' },
+        { status: 400 }
+      );
+    }
+    
+    const result = await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: updateData },
+      { returnDocument: 'after' }
+    );
 
-    if (!testimonial) {
+    if (!result.value) {
       return NextResponse.json(
         { success: false, error: 'Testimonial not found' },
         { status: 404 }
@@ -139,7 +133,7 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      data: testimonial,
+      data: result.value,
       message: 'Testimonial updated successfully'
     });
   } catch (error) {
@@ -161,17 +155,23 @@ export async function DELETE(
 
     const { id } = params;
 
-    // Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    // Use direct MongoDB delete
+    const db = mongoose.connection.db;
+    const collection = db.collection('testimonials');
+    
+    let objectId;
+    try {
+      objectId = new mongoose.Types.ObjectId(id);
+    } catch (error) {
       return NextResponse.json(
-        { success: false, error: 'Invalid testimonial ID' },
+        { success: false, error: 'Invalid testimonial ID format' },
         { status: 400 }
       );
     }
+    
+    const result = await collection.deleteOne({ _id: objectId });
 
-    const testimonial = await (Testimonial as Model<ITestimonial>).findByIdAndDelete(id);
-
-    if (!testimonial) {
+    if (result.deletedCount === 0) {
       return NextResponse.json(
         { success: false, error: 'Testimonial not found' },
         { status: 404 }

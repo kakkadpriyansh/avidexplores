@@ -27,7 +27,6 @@ export default function CreateTestimonial() {
     approved: true,
     isPublic: true,
     isFeatured: false,
-    customerPhoto: '',
     images: [] as string[],
   });
 
@@ -50,24 +49,27 @@ export default function CreateTestimonial() {
     setLoading(true);
 
     try {
+      // Create a copy of the form data to modify
+      const submissionData = {
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail,
+        eventName: formData.eventName,
+        rating: formData.rating,
+        title: formData.title,
+        review: formData.review,
+        approved: formData.approved,
+        isPublic: formData.isPublic,
+        isFeatured: formData.isFeatured,
+        customerPhoto: formData.images && formData.images.length > 0 ? formData.images[0] : '',
+        images: formData.images || [],
+      };
+      
       const response = await fetch('/api/admin/testimonials', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          customerName: formData.customerName,
-          customerEmail: formData.customerEmail,
-          eventName: formData.eventName,
-          rating: formData.rating,
-          title: formData.title,
-          review: formData.review,
-          approved: formData.approved,
-          isPublic: formData.isPublic,
-          isFeatured: formData.isFeatured,
-          customerPhoto: formData.customerPhoto,
-          images: formData.images,
-        }),
+        body: JSON.stringify(submissionData),
       });
 
       if (response.ok) {
@@ -214,16 +216,6 @@ export default function CreateTestimonial() {
             {/* Customer Photo */}
             <div className="space-y-2">
               <Label>Customer Photo (Optional)</Label>
-              <ImageUpload
-                value={formData.customerPhoto}
-                onChange={(url) => handleInputChange('customerPhoto', url)}
-                onRemove={() => handleInputChange('customerPhoto', '')}
-              />
-            </div>
-
-            {/* Additional Images */}
-            <div className="space-y-2">
-              <Label>Additional Images (Optional)</Label>
               <div className="space-y-2">
                 {formData.images.map((image, index) => (
                   <div key={index} className="flex items-center gap-2">
