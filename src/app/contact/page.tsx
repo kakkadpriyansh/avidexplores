@@ -42,12 +42,12 @@ export default function ContactPage() {
     {
       icon: Phone,
       title: 'Phone',
-      details: ['+91 98765 43210', '+91 87654 32109']
+      details: ['+91 88665 52400']
     },
     {
       icon: Mail,
       title: 'Email',
-      details: ['hello@avidexplorers.com', 'bookings@avidexplorers.com']
+      details: ['info@avidexplorers.in']
     },
     {
       icon: Clock,
