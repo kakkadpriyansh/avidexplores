@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ImageUpload } from '@/components/ui/image-upload';
+import { RegionSelect } from '@/components/ui/region-select';
 import { ArrowLeft, Save, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -20,6 +21,7 @@ interface EventFormData {
   price: number;
   discountedPrice?: number;
   location: string;
+  region?: string;
   duration: string;
   maxParticipants: number;
   difficulty: 'EASY' | 'MODERATE' | 'DIFFICULT' | 'EXTREME';
@@ -72,6 +74,7 @@ export default function CreateEventPage() {
     price: 0,
     discountedPrice: undefined,
     location: '',
+    region: '',
     duration: '',
     maxParticipants: 20,
     difficulty: 'MODERATE',
@@ -347,15 +350,24 @@ export default function CreateEventPage() {
                   </div>
                   
                   <div>
-                    <Label htmlFor="duration">Duration *</Label>
-                    <Input
-                      id="duration"
-                      value={formData.duration}
-                      onChange={(e) => handleInputChange('duration', e.target.value)}
-                      placeholder="e.g., 3 Days 2 Nights"
-                      required
+                    <Label htmlFor="region">Region</Label>
+                    <RegionSelect
+                      value={formData.region || ''}
+                      onChange={(value) => handleInputChange('region', value)}
+                      placeholder="Select or enter region"
                     />
                   </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="duration">Duration *</Label>
+                  <Input
+                    id="duration"
+                    value={formData.duration}
+                    onChange={(e) => handleInputChange('duration', e.target.value)}
+                    placeholder="e.g., 3 Days 2 Nights"
+                    required
+                  />
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
