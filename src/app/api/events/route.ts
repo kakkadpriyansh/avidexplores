@@ -37,8 +37,10 @@ export async function GET(request: NextRequest) {
     // Build filter object
     const filter: any = {};
 
-    // Public view only shows active events
-    if (!adminView) {
+    // Show only active events by default (both public and admin)
+    // Admin can see inactive events only if specifically requested with showDeleted=true
+    const showDeleted = searchParams.get('showDeleted') === 'true';
+    if (!showDeleted) {
       filter.isActive = true;
     }
 
