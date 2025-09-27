@@ -67,17 +67,21 @@ export default function AdminEventsPage() {
           slug: e.slug,
           price: e.price,
           discountedPrice: e.discountedPrice,
-          locationStr: e?.location?.name || e?.location?.state || '—',
-          durationStr: e?.duration ? `${e.duration} days` : '—',
-          maxParticipants: e.maxParticipants,
+          locationStr: typeof e.location === 'string' ? e.location : (e?.location?.name || e?.location?.state || '—'),
+          durationStr: e?.duration || '—',
+          maxParticipants: e.maxParticipants || 0,
           currentBookings: e.currentBookings || 0,
-          status: e.isActive ? 'PUBLISHED' : 'DRAFT',
+          status: e.status || (e.isActive ? 'PUBLISHED' : 'DRAFT'),
           createdAt: e.createdAt
         }));
         setEvents(items);
+      } else {
+        console.error('Failed to fetch events:', response.statusText);
+        setEvents([]);
       }
     } catch (error) {
       console.error('Error fetching events:', error);
+      setEvents([]);
     } finally {
       setLoading(false);
     }
