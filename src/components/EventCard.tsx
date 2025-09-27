@@ -76,29 +76,29 @@ const EventCard = ({ event }: EventCardProps) => {
 
   return (
     <Link href={`/events/${event.slug}`} className="block">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 dark:border-gray-700 transform hover:-translate-y-1">
         {/* Image Gallery */}
-        <div className="relative overflow-hidden h-56">
+        <div className="relative overflow-hidden h-44">
           <img
             src={images[currentImageIndex]}
             alt={`${event.title} - Image ${currentImageIndex + 1}`}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
           {images.length > 1 && (
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3 w-3" />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3 w-3" />
               </button>
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-2">
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
                 {images.map((_, index) => (
                   <button
                     key={index}
@@ -106,7 +106,7 @@ const EventCard = ({ event }: EventCardProps) => {
                       e.preventDefault();
                       setCurrentImageIndex(index);
                     }}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                       index === currentImageIndex ? 'bg-white scale-125' : 'bg-white/60 hover:bg-white/80'
                     }`}
                   />
@@ -114,99 +114,87 @@ const EventCard = ({ event }: EventCardProps) => {
               </div>
             </>
           )}
-          <div className="absolute top-4 left-4">
-            <Badge className={`${getDifficultyColor(event.difficulty)} font-medium px-3 py-1`}>
+          <div className="absolute top-2 left-2">
+            <Badge className={`${getDifficultyColor(event.difficulty)} font-medium px-2 py-0.5 text-xs`}>
               {formatDifficulty(event.difficulty)}
             </Badge>
           </div>
-          <div className="absolute top-4 right-4">
-            <Badge variant="secondary" className="bg-background/90 text-foreground font-medium px-3 py-1">
+          <div className="absolute top-2 right-2">
+            <Badge variant="secondary" className="bg-background/90 text-foreground font-medium px-2 py-0.5 text-xs">
               {event.category}
             </Badge>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4">
           <div className="mb-3">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+            <h3 className="text-base font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
               {event.title}
             </h3>
             
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 mb-4">
-              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-2">
-                {event.shortDescription}
-              </p>
-            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-xs leading-relaxed line-clamp-2 mb-3">
+              {event.shortDescription}
+            </p>
           </div>
 
           {/* Details */}
-          <div className="flex flex-col space-y-2 mb-4 text-sm text-muted-foreground">
-            <div className="flex items-center space-x-2">
-              <MapPin className="h-4 w-4 text-primary" />
-              <span>
+          <div className="flex flex-col space-y-1.5 mb-3 text-xs text-muted-foreground">
+            <div className="flex items-center space-x-1.5">
+              <MapPin className="h-3 w-3 text-primary flex-shrink-0" />
+              <span className="truncate">
                 {typeof event.location === 'string' 
                   ? event.location 
                   : `${event.location?.name || 'Location TBD'}, ${event.location?.state || ''}`
                 }
-                {event.region && (
-                  <span className="text-primary font-medium ml-1">
-                    • {event.region}
-                  </span>
-                )}
               </span>
             </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="h-4 w-4 text-primary" />
-              <span>
-                {typeof event.duration === 'number' 
-                  ? `${event.duration} ${event.duration === 1 ? 'day' : 'days'}`
-                  : event.duration
-                }
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Users className="h-4 w-4 text-primary" />
-              <span>Up to {event.maxParticipants} participants</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-1.5">
+                <Clock className="h-3 w-3 text-primary" />
+                <span>
+                  {typeof event.duration === 'number' 
+                    ? `${event.duration}d`
+                    : event.duration
+                  }
+                </span>
+              </div>
+              <div className="flex items-center space-x-1.5">
+                <Users className="h-3 w-3 text-primary" />
+                <span>{event.maxParticipants}</span>
+              </div>
             </div>
           </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {event.tags?.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs">
+          <div className="flex flex-wrap gap-1 mb-3">
+            {event.tags?.slice(0, 2).map((tag) => (
+              <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0.5">
                 {tag}
               </Badge>
             )) || null}
           </div>
 
           {/* Price Section */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+          <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
             <div>
               {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
-                <div className="flex flex-col">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-lg text-gray-500 dark:text-gray-400 line-through">
-                      ₹{event.price}
-                    </span>
-                    <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      ₹{event.discountedPrice}
-                    </span>
-                  </div>
-                  <span className="text-gray-600 dark:text-gray-400 text-sm">
-                    per person
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                    ₹{event.price}
+                  </span>
+                  <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                    ₹{event.discountedPrice}
                   </span>
                 </div>
               ) : (
-                <div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    ₹{event.price}
-                  </span>
-                  <span className="text-gray-600 dark:text-gray-400 ml-1">
-                    per person
-                  </span>
-                </div>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  ₹{event.price}
+                </span>
               )}
+              <span className="text-gray-500 dark:text-gray-400 text-xs block">
+                per person
+              </span>
             </div>
           </div>
         </div>
