@@ -149,7 +149,7 @@ const StoriesPage = () => {
                       
                       {/* Featured Badge */}
                       <div className="absolute top-6 left-6">
-                        <Badge className="bg-yellow-500 text-yellow-950 dark:text-yellow-50 font-semibold px-4 py-2 text-sm">
+                        <Badge className="bg-yellow-500 text-yellow-950 font-semibold px-4 py-2 text-sm">
                           <TrendingUp className="w-4 h-4 mr-2" />
                           Featured Story
                         </Badge>
