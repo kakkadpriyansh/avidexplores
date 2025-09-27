@@ -56,15 +56,15 @@ const EventCard = ({ event }: EventCardProps) => {
     const normalizedDifficulty = difficulty.toLowerCase();
     switch (normalizedDifficulty) {
       case 'easy':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return 'bg-green-100 text-green-800';
       case 'moderate':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return 'bg-yellow-100 text-yellow-800';
       case 'difficult':
       case 'challenging':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+        return 'bg-orange-100 text-orange-800';
       case 'extreme':
       case 'expert':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -76,7 +76,7 @@ const EventCard = ({ event }: EventCardProps) => {
 
   return (
     <Link href={`/events/${event.slug}`} className="block">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 dark:border-gray-700 transform hover:-translate-y-1">
+      <div className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 transform hover:-translate-y-1">
         {/* Image Gallery */}
         <div className="relative overflow-hidden h-44">
           <img
@@ -129,11 +129,11 @@ const EventCard = ({ event }: EventCardProps) => {
         {/* Content */}
         <div className="p-4">
           <div className="mb-3">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
+            <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
               {event.title}
             </h3>
             
-            <p className="text-gray-600 dark:text-gray-400 text-xs leading-relaxed line-clamp-2 mb-3">
+            <p className="text-gray-600 text-xs leading-relaxed line-clamp-2 mb-3">
               {event.shortDescription}
             </p>
           </div>
@@ -176,23 +176,23 @@ const EventCard = ({ event }: EventCardProps) => {
           </div>
 
           {/* Price Section */}
-          <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
+          <div className="pt-3 border-t border-gray-100">
             <div>
               {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                  <span className="text-sm text-gray-500 line-through">
                     ₹{event.price}
                   </span>
-                  <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                  <span className="text-lg font-bold text-green-600">
                     ₹{event.discountedPrice}
                   </span>
                 </div>
               ) : (
-                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                <span className="text-lg font-bold text-gray-900">
                   ₹{event.price}
                 </span>
               )}
-              <span className="text-gray-500 dark:text-gray-400 text-xs block">
+              <span className="text-gray-500 text-xs block">
                 per person
               </span>
             </div>
