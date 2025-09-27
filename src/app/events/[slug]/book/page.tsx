@@ -181,12 +181,11 @@ export default function BookEventPage() {
     const updated = [...participants];
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
-      const parentValue = updated[index][parent as keyof Participant];
-      if (typeof parentValue === 'object' && parentValue !== null) {
+      if (parent === 'emergencyContact') {
         updated[index] = {
           ...updated[index],
-          [parent]: {
-            ...parentValue,
+          emergencyContact: {
+            ...updated[index].emergencyContact,
             [child]: value
           }
         };
