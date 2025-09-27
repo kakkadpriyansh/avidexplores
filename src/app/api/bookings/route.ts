@@ -189,10 +189,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Generate unique booking ID
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).substr(2, 4).toUpperCase();
+    const bookingId = `AE${timestamp}${random}`;
+
     // Create booking with authenticated user ID and required schema fields
     const booking = await (Booking as Model<IBooking>).create({
       userId: session.user.id,
       eventId,
+      bookingId,
       date: new Date(selectedDate),
       selectedMonth,
       selectedYear,

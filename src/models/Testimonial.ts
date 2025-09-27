@@ -16,6 +16,7 @@ export interface ITestimonial extends Document {
   isPublic: boolean;
   isFeatured: boolean;
   helpfulVotes: mongoose.Types.ObjectId[];
+  manualId?: number;
   adminResponse?: {
     message: string;
     respondedBy: mongoose.Types.ObjectId;
@@ -101,6 +102,10 @@ const TestimonialSchema = new Schema<ITestimonial>({
     type: Schema.Types.ObjectId,
     ref: 'User'
   }],
+  manualId: {
+    type: Number,
+    sparse: true
+  },
   adminResponse: {
     message: {
       type: String,
@@ -119,8 +124,8 @@ const TestimonialSchema = new Schema<ITestimonial>({
   timestamps: true
 });
 
-// Ensure one testimonial per user per event
-TestimonialSchema.index({ userId: 1, eventId: 1 }, { unique: true, sparse: true });
+// Index for performance (removed unique constraint to avoid conflicts with manual testimonials)
+TestimonialSchema.index({ userId: 1, eventId: 1 });
 
 // Other indexes for performance
 TestimonialSchema.index({ eventId: 1 });
@@ -129,4 +134,9 @@ TestimonialSchema.index({ isFeatured: 1 });
 TestimonialSchema.index({ rating: -1 });
 TestimonialSchema.index({ createdAt: -1 });
 
-export default mongoose.models.Testimonial || mongoose.model<ITestimonial>('Testimonial', TestimonialSchema);
+// Force model recreation to remove old indexes
+if (mongoose.models.Testimonial) {
+  delete mongoose.models.Testimonial;
+}
+
+export default mongoose.model<ITestimonial>('Testimonial', TestimonialSchema);

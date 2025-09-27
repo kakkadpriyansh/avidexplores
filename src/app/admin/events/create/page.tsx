@@ -4,13 +4,16 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/ui/image-upload';
-import { ArrowLeft, Save, Eye } from 'lucide-react';
+import { RegionSelect } from '@/components/ui/region-select';
+import { ArrowLeft, Save, Eye, Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface EventFormData {
@@ -23,6 +26,7 @@ interface EventFormData {
   region?: string;
   duration: string;
   maxParticipants: number;
+  minParticipants: number;
   difficulty: 'EASY' | 'MODERATE' | 'DIFFICULT' | 'EXTREME';
   category: string;
   inclusions: string[];
@@ -61,6 +65,11 @@ interface EventFormData {
   status: 'DRAFT' | 'PUBLISHED';
 }
 
+const months = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
 export default function CreateEventPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -76,6 +85,7 @@ export default function CreateEventPage() {
     region: '',
     duration: '',
     maxParticipants: 20,
+    minParticipants: 1,
     difficulty: 'MODERATE',
     category: 'TREKKING',
     inclusions: [''],
@@ -91,7 +101,7 @@ export default function CreateEventPage() {
     highlights: [''],
     thingsToCarry: [''],
     availableMonths: [],
-    availableDates: [],
+    availableDates: [{ month: '', year: new Date().getFullYear(), dates: [], location: '', totalSeats: 20, availableSeats: 20 }],
     startDate: '',
     endDate: '',
     images: [''],
@@ -129,99 +139,11 @@ export default function CreateEventPage() {
     setFormData(prev => ({ ...prev, [field]: newArray }));
   };
 
-  const handlePreparationArrayChange = (field: 'safetyGuidelines', index: number, value: string) => {
-    const newArray = [...formData.preparation[field]];
-    newArray[index] = value;
-    setFormData(prev => ({
-      ...prev,
-      preparation: { ...prev.preparation, [field]: newArray }
-    }));
-  };
-
-  const addPreparationArrayItem = (field: 'safetyGuidelines') => {
-    setFormData(prev => ({
-      ...prev,
-      preparation: { ...prev.preparation, [field]: [...prev.preparation[field], ''] }
-    }));
-  };
-
-  const removePreparationArrayItem = (field: 'safetyGuidelines', index: number) => {
-    const newArray = formData.preparation[field].filter((_, i) => i !== index);
-    setFormData(prev => ({
-      ...prev,
-      preparation: { ...prev.preparation, [field]: newArray }
-    }));
-  };
-
-  const handleItineraryChange = (index: number, field: keyof typeof formData.itinerary[0], value: string | number) => {
-    const newItinerary = [...formData.itinerary];
-    newItinerary[index] = { ...newItinerary[index], [field]: value };
-    setFormData(prev => ({ ...prev, itinerary: newItinerary }));
-  };
-
-  const addItineraryDay = () => {
-    setFormData(prev => ({
-      ...prev,
-      itinerary: [...prev.itinerary, { 
-        day: prev.itinerary.length + 1, 
-        title: '', 
-        location: '', 
-        description: '', 
-        activities: [''], 
-        meals: [''], 
-        accommodation: '',
-        images: ['']
-      }]
-    }));
-  };
-
-  const removeItineraryDay = (index: number) => {
-    const newItinerary = formData.itinerary.filter((_, i) => i !== index);
-    // Renumber days
-    newItinerary.forEach((item, i) => {
-      item.day = i + 1;
-    });
-    setFormData(prev => ({ ...prev, itinerary: newItinerary }));
-  };
-
-  const handleItineraryArrayChange = (dayIndex: number, field: 'activities' | 'meals' | 'images', itemIndex: number, value: string) => {
-    const newItinerary = [...formData.itinerary];
-    const newArray = [...newItinerary[dayIndex][field]];
-    newArray[itemIndex] = value;
-    newItinerary[dayIndex] = { ...newItinerary[dayIndex], [field]: newArray };
-    setFormData(prev => ({ ...prev, itinerary: newItinerary }));
-  };
-
-  const addItineraryArrayItem = (dayIndex: number, field: 'activities' | 'meals' | 'images') => {
-    const newItinerary = [...formData.itinerary];
-    newItinerary[dayIndex] = {
-      ...newItinerary[dayIndex],
-      [field]: [...newItinerary[dayIndex][field], '']
-    };
-    setFormData(prev => ({ ...prev, itinerary: newItinerary }));
-  };
-
-  const removeItineraryArrayItem = (dayIndex: number, field: 'activities' | 'meals' | 'images', itemIndex: number) => {
-    const newItinerary = [...formData.itinerary];
-    const newArray = newItinerary[dayIndex][field].filter((_, i) => i !== itemIndex);
-    newItinerary[dayIndex] = { ...newItinerary[dayIndex], [field]: newArray };
-    setFormData(prev => ({ ...prev, itinerary: newItinerary }));
-  };
-
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9 -]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
-  };
-
   const handleSubmit = async (isDraft: boolean = false) => {
     setLoading(true);
     
     try {
-      const slug = generateSlug(formData.title);
+      const slug = formData.title.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
       const eventData = {
         ...formData,
         slug,
@@ -234,14 +156,11 @@ export default function CreateEventPage() {
 
       const response = await fetch('/api/events', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventData)
       });
 
       if (response.ok) {
-        const result = await response.json();
         router.push('/admin/events');
       } else {
         const error = await response.json();
@@ -273,868 +192,700 @@ export default function CreateEventPage() {
       
       <div className="pt-24 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                onClick={() => router.back()}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-              <div>
-                <h1 className="text-3xl font-montserrat font-bold text-foreground">
-                  Create New Event
-                </h1>
-                <p className="text-muted-foreground">
-                  Add a new adventure event to your platform
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center gap-4 mb-6">
+            <Button variant="outline" onClick={() => router.back()}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            <h1 className="text-3xl font-bold">Create New Event</h1>
           </div>
 
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
-            {/* Basic Information */}
-            <Card className="card-adventure">
-              <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="title">Event Title *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Enter event title"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="shortDescription">Short Description *</Label>
-                  <Textarea
-                    id="shortDescription"
-                    value={formData.shortDescription}
-                    onChange={(e) => handleInputChange('shortDescription', e.target.value)}
-                    placeholder="Brief description for event cards"
-                    rows={2}
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="description">Full Description *</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Detailed event description"
-                    rows={6}
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="location">Location *</Label>
-                    <Input
-                      id="location"
-                      value={formData.location}
-                      onChange={(e) => handleInputChange('location', e.target.value)}
-                      placeholder="Event location"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="region">Region</Label>
-                    <Input
-                      id="region"
-                      value={formData.region || ''}
-                      onChange={(e) => handleInputChange('region', e.target.value)}
-                      placeholder="e.g., North India, South India, Himalayas"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="duration">Duration *</Label>
-                    <Input
-                      id="duration"
-                      value={formData.duration}
-                      onChange={(e) => handleInputChange('duration', e.target.value)}
-                      placeholder="e.g., 3 Days 2 Nights"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="price">Price (₹)</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={formData.price}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (isNaN(value) || value < 0) {
-                          handleInputChange('price', 0);
-                        } else {
-                          handleInputChange('price', value);
-                        }
-                      }}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="discountedPrice">Discounted Price (₹)</Label>
-                    <Input
-                      id="discountedPrice"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={formData.discountedPrice || ''}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (isNaN(value) || value < 0) {
-                          handleInputChange('discountedPrice', undefined);
-                        } else {
-                          handleInputChange('discountedPrice', value);
-                        }
-                      }}
-                      placeholder="Optional discounted price"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="maxParticipants">Max Participants *</Label>
-                    <Input
-                      id="maxParticipants"
-                      type="number"
-                      value={formData.maxParticipants}
-                      onChange={(e) => handleInputChange('maxParticipants', Number(e.target.value))}
-                      placeholder="20"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="difficulty">Difficulty Level *</Label>
-                    <select
-                      id="difficulty"
-                      value={formData.difficulty}
-                      onChange={(e) => handleInputChange('difficulty', e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-                      required
-                    >
-                      <option value="EASY">Easy</option>
-                      <option value="MODERATE">Moderate</option>
-                      <option value="DIFFICULT">Difficult</option>
-                      <option value="EXTREME">Extreme</option>
-                    </select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <Tabs defaultValue="basic" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-6">
+                <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                <TabsTrigger value="details">Details</TabsTrigger>
+                <TabsTrigger value="availability">Availability</TabsTrigger>
+                <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
+                <TabsTrigger value="inclusions">Inclusions</TabsTrigger>
+                <TabsTrigger value="preparation">Preparation</TabsTrigger>
+              </TabsList>
 
-            {/* Highlights */}
-            <Card className="card-adventure">
-              <CardHeader>
-                <CardTitle>Event Highlights</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {formData.highlights.map((highlight, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={highlight}
-                      onChange={(e) => handleArrayChange('highlights', index, e.target.value)}
-                      placeholder="Enter event highlight"
-                      className="flex-1"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeArrayItem('highlights', index)}
-                      disabled={formData.highlights.length === 1}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => addArrayItem('highlights')}
-                >
-                  Add Highlight
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Things to Carry */}
-            <Card className="card-adventure">
-              <CardHeader>
-                <CardTitle>Things to Carry</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {formData.thingsToCarry.map((item, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={item}
-                      onChange={(e) => handleArrayChange('thingsToCarry', index, e.target.value)}
-                      placeholder="Enter item to carry"
-                      className="flex-1"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeArrayItem('thingsToCarry', index)}
-                      disabled={formData.thingsToCarry.length === 1}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => addArrayItem('thingsToCarry')}
-                >
-                  Add Item
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Available Months */}
-            <Card className="card-adventure">
-              <CardHeader>
-                <CardTitle>Available Months</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((month) => (
-                    <label key={month} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.availableMonths.includes(month)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData(prev => ({
-                              ...prev,
-                              availableMonths: [...prev.availableMonths, month]
-                            }));
-                          } else {
-                            setFormData(prev => ({
-                              ...prev,
-                              availableMonths: prev.availableMonths.filter(m => m !== month)
-                            }));
-                          }
-                        }}
-                        className="rounded"
+              <TabsContent value="basic">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Basic Information</CardTitle>
+                    <CardDescription>Essential event details</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label htmlFor="title">Event Title *</Label>
+                      <Input
+                        id="title"
+                        value={formData.title}
+                        onChange={(e) => handleInputChange('title', e.target.value)}
+                        placeholder="Enter event title"
+                        required
                       />
-                      <span className="text-sm">{month}</span>
-                    </label>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Available Dates */}
-            <Card className="card-adventure">
-              <CardHeader>
-                <CardTitle>Available Dates</CardTitle>
-                <p className="text-sm text-gray-600">Add specific dates when this event is available</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {formData.availableDates.map((dateEntry, index) => (
-                  <div key={index} className="border rounded-lg p-4 space-y-4">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-medium">Date Entry {index + 1}</h4>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setFormData(prev => ({
-                            ...prev,
-                            availableDates: prev.availableDates.filter((_, i) => i !== index)
-                          }));
-                        }}
-                        disabled={formData.availableDates.length === 1}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor={`month-${index}`}>Month</Label>
-                        <select
-                          id={`month-${index}`}
-                          value={dateEntry.month}
-                          onChange={(e) => {
-                            const newDates = [...formData.availableDates];
-                            newDates[index].month = e.target.value;
-                            setFormData(prev => ({ ...prev, availableDates: newDates }));
-                          }}
-                          className="w-full p-2 border rounded-md"
-                        >
-                          <option value="">Select Month</option>
-                          {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((month) => (
-                            <option key={month} value={month}>{month}</option>
-                          ))}
-                        </select>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor={`year-${index}`}>Year</Label>
-                        <Input
-                          id={`year-${index}`}
-                          type="number"
-                          value={dateEntry.year || ''}
-                          onChange={(e) => {
-                            const newDates = [...formData.availableDates];
-                            newDates[index].year = parseInt(e.target.value) || new Date().getFullYear();
-                            setFormData(prev => ({ ...prev, availableDates: newDates }));
-                          }}
-                          placeholder="2024"
-                          min={new Date().getFullYear()}
-                          max={new Date().getFullYear() + 5}
-                        />
-                      </div>
                     </div>
                     
                     <div>
-                      <Label htmlFor={`location-${index}`}>Location (Optional)</Label>
-                      <Input
-                        id={`location-${index}`}
-                        value={dateEntry.location || ''}
-                        onChange={(e) => {
-                          const newDates = [...formData.availableDates];
-                          newDates[index].location = e.target.value;
-                          setFormData(prev => ({ ...prev, availableDates: newDates }));
-                        }}
-                        placeholder="Starting location for this date"
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor={`totalSeats-${index}`}>Total Seats</Label>
-                        <Input
-                          id={`totalSeats-${index}`}
-                          type="number"
-                          value={dateEntry.totalSeats || ''}
-                          onChange={(e) => {
-                            const newDates = [...formData.availableDates];
-                            const totalSeats = parseInt(e.target.value) || 0;
-                            newDates[index].totalSeats = totalSeats;
-                            // Auto-set available seats to total seats if not set
-                            if (!newDates[index].availableSeats) {
-                              newDates[index].availableSeats = totalSeats;
-                            }
-                            setFormData(prev => ({ ...prev, availableDates: newDates }));
-                          }}
-                          placeholder="Total seats available"
-                          min="1"
-                          max="100"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor={`availableSeats-${index}`}>Available Seats</Label>
-                        <Input
-                          id={`availableSeats-${index}`}
-                          type="number"
-                          value={dateEntry.availableSeats || ''}
-                          onChange={(e) => {
-                            const newDates = [...formData.availableDates];
-                            newDates[index].availableSeats = parseInt(e.target.value) || 0;
-                            setFormData(prev => ({ ...prev, availableDates: newDates }));
-                          }}
-                          placeholder="Currently available seats"
-                          min="0"
-                          max={dateEntry.totalSeats || 100}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label>Available Dates in {dateEntry.month || 'Selected Month'}</Label>
-                      <div className="mt-2">
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {dateEntry.dates.map((date, dateIndex) => (
-                            <span key={dateIndex} className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-                              {date}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const newDates = [...formData.availableDates];
-                                  newDates[index].dates = newDates[index].dates.filter((_, i) => i !== dateIndex);
-                                  setFormData(prev => ({ ...prev, availableDates: newDates }));
-                                }}
-                                className="text-blue-600 hover:text-blue-800"
-                              >
-                                ×
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            placeholder="Add date (1-31)"
-                            min="1"
-                            max="31"
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                const input = e.target as HTMLInputElement;
-                                const date = parseInt(input.value);
-                                if (date >= 1 && date <= 31 && !dateEntry.dates.includes(date)) {
-                                  const newDates = [...formData.availableDates];
-                                  newDates[index].dates = [...newDates[index].dates, date].sort((a, b) => a - b);
-                                  setFormData(prev => ({ ...prev, availableDates: newDates }));
-                                  input.value = '';
-                                }
-                              }
-                            }}
-                            className="flex-1"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={(e) => {
-                              const input = (e.target as HTMLElement).previousElementSibling as HTMLInputElement;
-                              const date = parseInt(input.value);
-                              if (date >= 1 && date <= 31 && !dateEntry.dates.includes(date)) {
-                                const newDates = [...formData.availableDates];
-                                newDates[index].dates = [...newDates[index].dates, date].sort((a, b) => a - b);
-                                setFormData(prev => ({ ...prev, availableDates: newDates }));
-                                input.value = '';
-                              }
-                            }}
-                          >
-                            Add Date
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setFormData(prev => ({
-                      ...prev,
-                      availableDates: [...prev.availableDates, {
-                        month: '',
-                        year: new Date().getFullYear(),
-                        dates: [],
-                        location: '',
-                        totalSeats: 20,
-                        availableSeats: 20
-                      }]
-                    }));
-                  }}
-                >
-                  Add Date Entry
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Preparation Guidelines */}
-            <Card className="card-adventure">
-              <CardHeader>
-                <CardTitle>Preparation Guidelines</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="physicalRequirements">Physical Requirements</Label>
-                  <Textarea
-                    id="physicalRequirements"
-                    value={formData.preparation.physicalRequirements}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      preparation: { ...prev.preparation, physicalRequirements: e.target.value }
-                    }))}
-                    placeholder="Describe physical fitness requirements"
-                    rows={3}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="medicalRequirements">Medical Requirements</Label>
-                  <Textarea
-                    id="medicalRequirements"
-                    value={formData.preparation.medicalRequirements}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      preparation: { ...prev.preparation, medicalRequirements: e.target.value }
-                    }))}
-                    placeholder="Describe any medical requirements or restrictions"
-                    rows={3}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="experienceLevel">Experience Level Required</Label>
-                  <Textarea
-                    id="experienceLevel"
-                    value={formData.preparation.experienceLevel}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      preparation: { ...prev.preparation, experienceLevel: e.target.value }
-                    }))}
-                    placeholder="Describe required experience level"
-                    rows={2}
-                  />
-                </div>
-                
-                <div>
-                  <Label>Safety Guidelines</Label>
-                  {formData.preparation.safetyGuidelines.map((guideline, index) => (
-                    <div key={index} className="flex gap-2 mt-2">
-                      <Input
-                        value={guideline}
-                        onChange={(e) => handlePreparationArrayChange('safetyGuidelines', index, e.target.value)}
-                        placeholder="Enter safety guideline"
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removePreparationArrayItem('safetyGuidelines', index)}
-                        disabled={formData.preparation.safetyGuidelines.length === 1}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => addPreparationArrayItem('safetyGuidelines')}
-                    className="mt-2"
-                  >
-                    Add Safety Guideline
-                  </Button>
-                </div>
-                
-                <div>
-                  <Label htmlFor="additionalNotes">Additional Notes</Label>
-                  <Textarea
-                    id="additionalNotes"
-                    value={formData.preparation.additionalNotes}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      preparation: { ...prev.preparation, additionalNotes: e.target.value }
-                    }))}
-                    placeholder="Any additional preparation notes"
-                    rows={3}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Inclusions & Exclusions */}
-            <Card className="card-adventure">
-              <CardHeader>
-                <CardTitle>What's Included & Excluded</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label className="text-base font-semibold">Inclusions</Label>
-                  {formData.inclusions.map((inclusion, index) => (
-                    <div key={index} className="flex gap-2 mt-2">
-                      <Input
-                        value={inclusion}
-                        onChange={(e) => handleArrayChange('inclusions', index, e.target.value)}
-                        placeholder="What's included in the package"
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeArrayItem('inclusions', index)}
-                        disabled={formData.inclusions.length === 1}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => addArrayItem('inclusions')}
-                    className="mt-2"
-                  >
-                    Add Inclusion
-                  </Button>
-                </div>
-                
-                <div>
-                  <Label className="text-base font-semibold">Exclusions</Label>
-                  {formData.exclusions.map((exclusion, index) => (
-                    <div key={index} className="flex gap-2 mt-2">
-                      <Input
-                        value={exclusion}
-                        onChange={(e) => handleArrayChange('exclusions', index, e.target.value)}
-                        placeholder="What's not included in the package"
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeArrayItem('exclusions', index)}
-                        disabled={formData.exclusions.length === 1}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => addArrayItem('exclusions')}
-                    className="mt-2"
-                  >
-                    Add Exclusion
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Enhanced Itinerary */}
-            <Card className="card-adventure">
-              <CardHeader>
-                <CardTitle>Detailed Itinerary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {formData.itinerary.map((day, dayIndex) => (
-                  <div key={dayIndex} className="border rounded-lg p-4 space-y-4">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-semibold">Day {dayIndex + 1}</h4>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeItineraryDay(dayIndex)}
-                        disabled={formData.itinerary.length === 1}
-                      >
-                        Remove Day
-                      </Button>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label>Title</Label>
-                        <Input
-                          value={day.title}
-                          onChange={(e) => handleItineraryChange(dayIndex, 'title', e.target.value)}
-                          placeholder="Day title"
-                        />
-                      </div>
-                      <div>
-                        <Label>Location</Label>
-                        <Input
-                          value={day.location}
-                          onChange={(e) => handleItineraryChange(dayIndex, 'location', e.target.value)}
-                          placeholder="Location for this day"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label>Description</Label>
+                      <Label htmlFor="shortDescription">Short Description *</Label>
                       <Textarea
-                        value={day.description}
-                        onChange={(e) => handleItineraryChange(dayIndex, 'description', e.target.value)}
-                        placeholder="Describe the day's activities"
-                        rows={3}
+                        id="shortDescription"
+                        value={formData.shortDescription}
+                        onChange={(e) => handleInputChange('shortDescription', e.target.value)}
+                        placeholder="Brief description for event cards"
+                        rows={2}
+                        required
                       />
                     </div>
                     
                     <div>
-                      <Label>Activities</Label>
-                      {day.activities.map((activity, actIndex) => (
-                        <div key={actIndex} className="flex gap-2 mt-2">
-                          <Input
-                            value={activity}
-                            onChange={(e) => handleItineraryArrayChange(dayIndex, 'activities', actIndex, e.target.value)}
-                            placeholder="Activity description"
-                            className="flex-1"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeItineraryArrayItem(dayIndex, 'activities', actIndex)}
-                            disabled={day.activities.length === 1}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => addItineraryArrayItem(dayIndex, 'activities')}
-                        className="mt-2"
-                        size="sm"
-                      >
-                        Add Activity
-                      </Button>
-                    </div>
-                    
-                    <div>
-                      <Label>Meals</Label>
-                      {day.meals.map((meal, mealIndex) => (
-                        <div key={mealIndex} className="flex gap-2 mt-2">
-                          <Input
-                            value={meal}
-                            onChange={(e) => handleItineraryArrayChange(dayIndex, 'meals', mealIndex, e.target.value)}
-                            placeholder="Meal description (e.g., Breakfast: Continental)"
-                            className="flex-1"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeItineraryArrayItem(dayIndex, 'meals', mealIndex)}
-                            disabled={day.meals.length === 1}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => addItineraryArrayItem(dayIndex, 'meals')}
-                        className="mt-2"
-                        size="sm"
-                      >
-                        Add Meal
-                      </Button>
-                    </div>
-                    
-                    <div>
-                      <Label>Accommodation (Optional)</Label>
-                      <Input
-                        value={day.accommodation || ''}
-                        onChange={(e) => handleItineraryChange(dayIndex, 'accommodation', e.target.value)}
-                        placeholder="Accommodation details for this day"
+                      <Label htmlFor="description">Full Description *</Label>
+                      <Textarea
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => handleInputChange('description', e.target.value)}
+                        placeholder="Detailed event description"
+                        rows={4}
+                        required
                       />
                     </div>
-                    
-                    <div>
-                      <Label>Day Images (Optional)</Label>
-                      <p className="text-sm text-gray-600 mb-2">Add images for this specific day</p>
-                      {day.images?.map((image, imgIndex) => (
-                        <div key={imgIndex} className="space-y-2 mt-4 p-4 border rounded-lg">
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="category">Category</Label>
+                        <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="TREKKING">TREKKING</SelectItem>
+                            <SelectItem value="CAMPING">CAMPING</SelectItem>
+                            <SelectItem value="WILDLIFE">WILDLIFE</SelectItem>
+                            <SelectItem value="CULTURAL">CULTURAL</SelectItem>
+                            <SelectItem value="ADVENTURE">ADVENTURE</SelectItem>
+                            <SelectItem value="SPIRITUAL">SPIRITUAL</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="difficulty">Difficulty</Label>
+                        <Select value={formData.difficulty} onValueChange={(value) => handleInputChange('difficulty', value)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="EASY">EASY</SelectItem>
+                            <SelectItem value="MODERATE">MODERATE</SelectItem>
+                            <SelectItem value="DIFFICULT">DIFFICULT</SelectItem>
+                            <SelectItem value="EXTREME">EXTREME</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="duration">Duration *</Label>
+                        <Input
+                          id="duration"
+                          value={formData.duration}
+                          onChange={(e) => handleInputChange('duration', e.target.value)}
+                          placeholder="e.g., 3 Days 2 Nights"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="location">Location *</Label>
+                        <Input
+                          id="location"
+                          value={formData.location}
+                          onChange={(e) => handleInputChange('location', e.target.value)}
+                          placeholder="Event location"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="region">Region</Label>
+                        <RegionSelect
+                          value={formData.region || ''}
+                          onChange={(value) => handleInputChange('region', value)}
+                          placeholder="Select or enter region"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="price">Price (₹)</Label>
+                        <Input
+                          id="price"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={formData.price}
+                          onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="discountedPrice">Discounted Price (₹)</Label>
+                        <Input
+                          id="discountedPrice"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={formData.discountedPrice || ''}
+                          onChange={(e) => handleInputChange('discountedPrice', parseFloat(e.target.value) || undefined)}
+                          placeholder="Optional discounted price"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="minParticipants">Min Participants</Label>
+                        <Input
+                          id="minParticipants"
+                          type="number"
+                          value={formData.minParticipants}
+                          onChange={(e) => handleInputChange('minParticipants', parseInt(e.target.value))}
+                          min="1"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="maxParticipants">Max Participants</Label>
+                        <Input
+                          id="maxParticipants"
+                          type="number"
+                          value={formData.maxParticipants}
+                          onChange={(e) => handleInputChange('maxParticipants', parseInt(e.target.value))}
+                          min="1"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="details">
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Event Images</CardTitle>
+                      <CardDescription>Add images for the event gallery</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {formData.images.map((image, index) => (
+                        <div key={index} className="space-y-2 p-4 border rounded-lg">
                           <div className="flex justify-between items-center">
-                            <Label>Image {imgIndex + 1}</Label>
+                            <Label>Image {index + 1}</Label>
                             <Button
                               type="button"
                               variant="outline"
                               size="sm"
-                              onClick={() => removeItineraryArrayItem(dayIndex, 'images', imgIndex)}
-                              disabled={day.images?.length === 1}
+                              onClick={() => removeArrayItem('images', index)}
+                              disabled={formData.images.length === 1}
                             >
                               Remove
                             </Button>
                           </div>
                           <ImageUpload
                             value={image}
-                            onChange={(url) => handleItineraryArrayChange(dayIndex, 'images', imgIndex, url)}
-                            placeholder="https://example.com/day-image.jpg"
+                            onChange={(url) => handleArrayChange('images', index, url)}
+                            placeholder="https://example.com/event-image.jpg"
                           />
                         </div>
                       ))}
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => addItineraryArrayItem(dayIndex, 'images')}
-                        className="mt-2"
-                        size="sm"
+                        onClick={() => addArrayItem('images')}
+                        className="w-full"
                       >
-                        Add Day Image
+                        Add Another Image
                       </Button>
-                    </div>
-                  </div>
-                ))}
-                
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={addItineraryDay}
-                  className="w-full"
-                >
-                  Add New Day
-                </Button>
-              </CardContent>
-            </Card>
+                    </CardContent>
+                  </Card>
 
-            {/* Images */}
-            <Card className="card-adventure">
-              <CardHeader>
-                <CardTitle>Event Images</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label>Event Images</Label>
-                  <p className="text-sm text-gray-600 mb-2">Add images for the event gallery (upload files or provide URLs)</p>
-                  {formData.images.map((image, index) => (
-                    <div key={index} className="space-y-2 mt-4 p-4 border rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <Label>Image {index + 1}</Label>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Highlights</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {formData.highlights.map((highlight, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            value={highlight}
+                            onChange={(e) => handleArrayChange('highlights', index, e.target.value)}
+                            placeholder="Enter event highlight"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeArrayItem('highlights', index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => addArrayItem('highlights')}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add Highlight
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Things to Carry</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {formData.thingsToCarry.map((item, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            value={item}
+                            onChange={(e) => handleArrayChange('thingsToCarry', index, e.target.value)}
+                            placeholder="Enter item to carry"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeArrayItem('thingsToCarry', index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => addArrayItem('thingsToCarry')}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add Item
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="availability">
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Available Months</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {months.map((month) => (
+                          <label key={month} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              checked={formData.availableMonths.includes(month)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    availableMonths: [...prev.availableMonths, month]
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    availableMonths: prev.availableMonths.filter(m => m !== month)
+                                  }));
+                                }
+                              }}
+                              className="rounded"
+                            />
+                            <span className="text-sm">{month}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Available Dates</CardTitle>
+                      <CardDescription>Add specific dates when this event is available</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {formData.availableDates.map((dateEntry, index) => (
+                        <div key={index} className="border rounded-lg p-4 space-y-4">
+                          <div className="flex justify-between items-center">
+                            <h4 className="font-medium">Date Entry {index + 1}</h4>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  availableDates: prev.availableDates.filter((_, i) => i !== index)
+                                }));
+                              }}
+                              disabled={formData.availableDates.length === 1}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label>Month</Label>
+                              <Select 
+                                value={dateEntry.month} 
+                                onValueChange={(value) => {
+                                  const newDates = [...formData.availableDates];
+                                  newDates[index].month = value;
+                                  setFormData(prev => ({ ...prev, availableDates: newDates }));
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select Month" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {months.map((month) => (
+                                    <SelectItem key={month} value={month}>{month}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            <div>
+                              <Label>Year</Label>
+                              <Input
+                                type="number"
+                                value={dateEntry.year || ''}
+                                onChange={(e) => {
+                                  const newDates = [...formData.availableDates];
+                                  newDates[index].year = parseInt(e.target.value) || new Date().getFullYear();
+                                  setFormData(prev => ({ ...prev, availableDates: newDates }));
+                                }}
+                                placeholder="2024"
+                                min={new Date().getFullYear()}
+                                max={new Date().getFullYear() + 5}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setFormData(prev => ({
+                            ...prev,
+                            availableDates: [...prev.availableDates, {
+                              month: '',
+                              year: new Date().getFullYear(),
+                              dates: [],
+                              location: '',
+                              totalSeats: 20,
+                              availableSeats: 20
+                            }]
+                          }));
+                        }}
+                      >
+                        Add Date Entry
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="itinerary">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Itinerary</CardTitle>
+                    <CardDescription>Day-by-day event schedule</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {formData.itinerary.map((day, index) => (
+                      <div key={index} className="border rounded-lg p-4 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold">Day {day.day}</h4>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newItinerary = formData.itinerary.filter((_, i) => i !== index);
+                              newItinerary.forEach((item, i) => { item.day = i + 1; });
+                              setFormData(prev => ({ ...prev, itinerary: newItinerary }));
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label>Title</Label>
+                            <Input
+                              value={day.title}
+                              onChange={(e) => {
+                                const newItinerary = [...formData.itinerary];
+                                newItinerary[index].title = e.target.value;
+                                setFormData(prev => ({ ...prev, itinerary: newItinerary }));
+                              }}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label>Location</Label>
+                            <Input
+                              value={day.location || ''}
+                              onChange={(e) => {
+                                const newItinerary = [...formData.itinerary];
+                                newItinerary[index].location = e.target.value;
+                                setFormData(prev => ({ ...prev, itinerary: newItinerary }));
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label>Description</Label>
+                          <Textarea
+                            value={day.description}
+                            onChange={(e) => {
+                              const newItinerary = [...formData.itinerary];
+                              newItinerary[index].description = e.target.value;
+                              setFormData(prev => ({ ...prev, itinerary: newItinerary }));
+                            }}
+                            rows={2}
+                            required
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          itinerary: [...prev.itinerary, {
+                            day: prev.itinerary.length + 1,
+                            title: '',
+                            location: '',
+                            description: '',
+                            activities: [''],
+                            meals: [''],
+                            accommodation: '',
+                            images: ['']
+                          }]
+                        }));
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Day
+                    </Button>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="inclusions">
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Inclusions</CardTitle>
+                      <CardDescription>What's included in the event</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {formData.inclusions.map((inclusion, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            value={inclusion}
+                            onChange={(e) => handleArrayChange('inclusions', index, e.target.value)}
+                            placeholder="What's included"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeArrayItem('inclusions', index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => addArrayItem('inclusions')}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add Inclusion
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Exclusions</CardTitle>
+                      <CardDescription>What's not included in the event</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {formData.exclusions.map((exclusion, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            value={exclusion}
+                            onChange={(e) => handleArrayChange('exclusions', index, e.target.value)}
+                            placeholder="What's not included"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeArrayItem('exclusions', index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => addArrayItem('exclusions')}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add Exclusion
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="preparation">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Preparation Guidelines</CardTitle>
+                    <CardDescription>Important information for participants</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label>Physical Requirements</Label>
+                      <Textarea
+                        value={formData.preparation.physicalRequirements}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          preparation: { ...prev.preparation, physicalRequirements: e.target.value }
+                        }))}
+                        rows={3}
+                      />
+                    </div>
+                    <div>
+                      <Label>Medical Requirements</Label>
+                      <Textarea
+                        value={formData.preparation.medicalRequirements}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          preparation: { ...prev.preparation, medicalRequirements: e.target.value }
+                        }))}
+                        rows={3}
+                      />
+                    </div>
+                    <div>
+                      <Label>Experience Level</Label>
+                      <Textarea
+                        value={formData.preparation.experienceLevel}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          preparation: { ...prev.preparation, experienceLevel: e.target.value }
+                        }))}
+                        rows={2}
+                      />
+                    </div>
+                    <div>
+                      <Label>Safety Guidelines</Label>
+                      <div className="space-y-2">
+                        {formData.preparation.safetyGuidelines.map((guideline, index) => (
+                          <div key={index} className="flex gap-2">
+                            <Input
+                              value={guideline}
+                              onChange={(e) => {
+                                const newGuidelines = [...formData.preparation.safetyGuidelines];
+                                newGuidelines[index] = e.target.value;
+                                setFormData(prev => ({
+                                  ...prev,
+                                  preparation: { ...prev.preparation, safetyGuidelines: newGuidelines }
+                                }));
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newGuidelines = formData.preparation.safetyGuidelines.filter((_, i) => i !== index);
+                                setFormData(prev => ({
+                                  ...prev,
+                                  preparation: { ...prev.preparation, safetyGuidelines: newGuidelines }
+                                }));
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
                         <Button
                           type="button"
                           variant="outline"
-                          size="sm"
-                          onClick={() => removeArrayItem('images', index)}
-                          disabled={formData.images.length === 1}
+                          onClick={() => {
+                            const newGuidelines = [...formData.preparation.safetyGuidelines, ''];
+                            setFormData(prev => ({
+                              ...prev,
+                              preparation: { ...prev.preparation, safetyGuidelines: newGuidelines }
+                            }));
+                          }}
+                          className="flex items-center gap-2"
                         >
-                          Remove
+                          <Plus className="h-4 w-4" />
+                          Add Guideline
                         </Button>
                       </div>
-                      <ImageUpload
-                        value={image}
-                        onChange={(url) => handleArrayChange('images', index, url)}
-                        placeholder="https://example.com/event-image.jpg"
+                    </div>
+                    <div>
+                      <Label>Additional Notes</Label>
+                      <Textarea
+                        value={formData.preparation.additionalNotes}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          preparation: { ...prev.preparation, additionalNotes: e.target.value }
+                        }))}
+                        rows={3}
                       />
                     </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => addArrayItem('images')}
-                    className="mt-2"
-                  >
-                    Add Another Image
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-end">
+            <div className="flex justify-end gap-4 mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.push('/admin/events')}
+              >
+                Cancel
+              </Button>
               <Button
                 type="button"
                 variant="outline"
@@ -1144,7 +895,6 @@ export default function CreateEventPage() {
                 <Save className="h-4 w-4 mr-2" />
                 Save as Draft
               </Button>
-              
               <Button
                 type="button"
                 onClick={() => handleSubmit(false)}

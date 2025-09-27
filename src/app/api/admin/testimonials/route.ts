@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Testimonial, { ITestimonial } from '@/models/Testimonial';
 import { Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 // GET /api/admin/testimonials - Get all testimonials for admin
 export async function GET(request: NextRequest) {
@@ -122,6 +123,7 @@ export async function POST(request: NextRequest) {
       rating,
       review,
       title,
+      customerPhoto,
       images,
       approved = true,
       isFeatured = false,
@@ -144,34 +146,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create testimonial (omit userId, eventId, bookingId for manually created testimonials)
-    const testimonialData: any = {
+    // Use direct MongoDB insertion to bypass Mongoose model constraints
+    const db = mongoose.connection.db;
+    const collection = db.collection('testimonials');
+    
+    const testimonialData = {
       customerName,
       customerEmail,
       eventName,
       rating,
       review,
       title,
+      customerPhoto: customerPhoto || (images && images.length > 0 ? images[0] : ''),
       images: images || [],
       approved,
       isPublic,
-      isFeatured
+      isFeatured,
+      helpfulVotes: [],
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
-    const testimonial = await (Testimonial as Model<ITestimonial>).create(testimonialData);
-
-    // Populate the created testimonial
-    const populatedTestimonial = await (Testimonial as Model<ITestimonial>).findById(testimonial._id)
-      .populate('userId', 'name email')
-      .populate('eventId', 'title slug location');
+    const result = await collection.insertOne(testimonialData);
+    const createdTestimonial = await collection.findOne({ _id: result.insertedId });
 
     return NextResponse.json({
       success: true,
-      data: populatedTestimonial,
+      data: createdTestimonial,
       message: 'Testimonial created successfully'
     }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating testimonial:', error);
+
+    // Handle validation errors
+    if (error?.name === 'ValidationError') {
+      const details = Object.values(error.errors || {}).map((e: any) => e.message);
+      return NextResponse.json(
+        { success: false, error: 'Validation failed', details },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { success: false, error: 'Failed to create testimonial' },
       { status: 500 }
