@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import EventCard from '@/components/EventCard';
+import EventCarousel from '@/components/EventCarousel';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Loader2, Mountain, MapPin, Trees, Waves, Building2, Globe } from 'lucide-react';
@@ -158,11 +158,11 @@ export default function EventsPage() {
       {/* Region Tabs */}
       <section className="py-6 border-b border-border/50">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-2 justify-center mb-6">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 mb-6">
             <Button
               variant={selectedRegion === 'all' ? 'default' : 'outline'}
               onClick={() => setSelectedRegion('all')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 flex-shrink-0"
             >
               <Globe className="h-4 w-4" />
               All Regions
@@ -175,7 +175,7 @@ export default function EventsPage() {
                   key={region}
                   variant={selectedRegion === region ? 'default' : 'outline'}
                   onClick={() => setSelectedRegion(region)}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 flex-shrink-0"
                 >
                   <IconComponent className="h-4 w-4" />
                   {region} ({regionCount})
@@ -201,7 +201,7 @@ export default function EventsPage() {
       </section>
 
       {/* Events by Region */}
-      <section className="py-16">
+      <section className="py-8">
         <div className="container mx-auto px-4">
           {loading ? (
             <div className="flex items-center justify-center py-16">
@@ -222,40 +222,15 @@ export default function EventsPage() {
             </div>
           ) : filteredEvents.length > 0 ? (
             <>
-              <div className="flex items-center justify-between mb-8">
-                <p className="text-muted-foreground">
-                  {selectedRegion === 'all' 
-                    ? `Showing ${filteredEvents.length} of ${events.length} adventures across ${sortedRegions.length} regions`
-                    : `Showing ${filteredEvents.length} adventures in ${selectedRegion}`
-                  }
-                </p>
-              </div>
+
               
               {sortedRegions.map((region) => (
-                <div key={region} className="mb-16">
-                  {/* Region Header */}
-                  <div className="mb-8 pb-4 border-b-2 border-primary/20">
-                    <div className="flex items-center gap-4 mb-3">
-                      {(() => {
-                        const IconComponent = getRegionIcon(region);
-                        return <IconComponent className="h-8 w-8 text-primary" />;
-                      })()}
-                      <h2 className="text-3xl font-montserrat font-bold text-foreground">
-                        {region}
-                      </h2>
-                    </div>
-                    <p className="text-lg text-muted-foreground ml-12">
-                      {groupedEvents[region].length} adventure{groupedEvents[region].length !== 1 ? 's' : ''} available
-                    </p>
-                  </div>
-                  
-                  {/* Events Grid for this region */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {groupedEvents[region].map((event) => (
-                      <EventCard key={event._id} event={event} />
-                    ))}
-                  </div>
-                </div>
+                <EventCarousel
+                  key={region}
+                  events={groupedEvents[region]}
+                  title={region}
+                  icon={getRegionIcon(region)}
+                />
               ))}
             </>
           ) : (
