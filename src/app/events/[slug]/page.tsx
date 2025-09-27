@@ -302,6 +302,8 @@ export default function EventDetailPage() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
+              <CarouselPrevious className="hidden md:flex" />
+              <CarouselNext className="hidden md:flex" />
 
             </Carousel>
           ) : (
@@ -449,21 +451,46 @@ export default function EventDetailPage() {
                 </div>
               )}
 
-              {/* Tabs */}
-              <div className="flex flex-wrap gap-2 mb-8 border-b border-border">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-2 font-medium transition-colors ${
-                      activeTab === tab.id
-                        ? 'text-primary border-b-2 border-primary'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+              {/* Tabs - Carousel on mobile, regular tabs on desktop */}
+              <div className="mb-8">
+                {/* Mobile Carousel */}
+                <div className="md:hidden">
+                  <Carousel className="w-full" opts={{ align: "start" }}>
+                    <CarouselContent className="-ml-2">
+                      {tabs.map((tab) => (
+                        <CarouselItem key={tab.id} className="pl-2 basis-auto">
+                          <button
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`px-4 py-2 font-medium transition-colors whitespace-nowrap rounded-full border ${
+                              activeTab === tab.id
+                                ? 'bg-primary text-primary-foreground border-primary'
+                                : 'bg-background text-muted-foreground hover:text-foreground border-border hover:border-primary/50'
+                            }`}
+                          >
+                            {tab.label}
+                          </button>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                  </Carousel>
+                </div>
+                
+                {/* Desktop Tabs */}
+                <div className="hidden md:flex flex-wrap gap-2 border-b border-border">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`px-4 py-2 font-medium transition-colors ${
+                        activeTab === tab.id
+                          ? 'text-primary border-b-2 border-primary'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Tab Content */}
@@ -573,7 +600,7 @@ export default function EventDetailPage() {
                                     <Camera className="h-4 w-4 mr-1 text-primary" />
                                     Day Photos
                                   </h4>
-                                  <Carousel className="w-full max-w-md">
+                                  <Carousel className="w-full">
                                     <CarouselContent>
                                       {day.images.map((image, imgIndex) => (
                                         <CarouselItem key={imgIndex}>
@@ -587,8 +614,8 @@ export default function EventDetailPage() {
                                         </CarouselItem>
                                       ))}
                                     </CarouselContent>
-                                    <CarouselPrevious />
-                                    <CarouselNext />
+                                    <CarouselPrevious className="hidden md:flex" />
+                                    <CarouselNext className="hidden md:flex" />
                                   </Carousel>
                                 </div>
                               )}
