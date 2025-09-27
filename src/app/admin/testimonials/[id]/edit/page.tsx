@@ -134,7 +134,6 @@ export default function EditTestimonialPage() {
         isFeatured: formData.isFeatured,
         customerPhoto: formData.images && formData.images.length > 0 ? formData.images[0] : '',
         images: formData.images || [],
-        adminResponse: formData.adminResponse,
       };
       
       const response = await fetch(`/api/admin/testimonials/${params.id}`, {
