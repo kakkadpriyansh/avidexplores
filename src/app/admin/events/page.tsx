@@ -84,21 +84,30 @@ export default function AdminEventsPage() {
   };
 
   const handleDeleteEvent = async (eventId: string) => {
-    if (!confirm('Are you sure you want to delete this event?')) return;
+    if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
     
     try {
+      console.log('Deleting event:', eventId);
       const response = await fetch(`/api/events/${eventId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
+      
+      const data = await response.json();
+      console.log('Delete response:', response.status, data);
       
       if (response.ok) {
         setEvents(events.filter(event => event._id !== eventId));
+        alert('Event deleted successfully');
       } else {
-        alert('Failed to delete event');
+        console.error('Delete failed:', data);
+        alert(data.error || `Failed to delete event (${response.status})`);
       }
     } catch (error) {
       console.error('Error deleting event:', error);
-      alert('Error deleting event');
+      alert('Network error occurred while deleting event');
     }
   };
 
