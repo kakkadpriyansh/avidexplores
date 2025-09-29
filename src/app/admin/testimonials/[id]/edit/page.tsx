@@ -144,12 +144,19 @@ export default function EditTestimonialPage() {
         body: JSON.stringify(submissionData),
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        router.push(`/admin/testimonials/${params.id}`);
+      if (response.ok) {
+        // Redirect to testimonials list after successful update
+        router.push('/admin/testimonials');
       } else {
-        alert(data.message || 'Error updating testimonial');
+        // Try to extract a meaningful error message from the response
+        let errorMsg = 'Error updating testimonial';
+        try {
+          const data = await response.json();
+          errorMsg = (data && (data.error || data.message)) || errorMsg;
+        } catch (_) {
+          // ignore JSON parse errors
+        }
+        alert(errorMsg);
       }
     } catch (error) {
       console.error('Error updating testimonial:', error);

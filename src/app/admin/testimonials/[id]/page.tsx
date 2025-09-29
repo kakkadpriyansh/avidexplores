@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 interface Testimonial {
   _id: string;
@@ -58,6 +59,7 @@ interface Testimonial {
 export default function TestimonialDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { toast } = useToast();
   const [testimonial, setTestimonial] = useState<Testimonial | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -99,6 +101,7 @@ export default function TestimonialDetailPage() {
 
       if (response.ok) {
         fetchTestimonial();
+        toast({ title: 'Update done' });
       }
     } catch (error) {
       console.error('Error updating testimonial status:', error);
@@ -117,6 +120,7 @@ export default function TestimonialDetailPage() {
 
       if (response.ok) {
         fetchTestimonial();
+        toast({ title: 'Update done' });
       }
     } catch (error) {
       console.error('Error updating testimonial feature status:', error);
