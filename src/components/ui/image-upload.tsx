@@ -166,13 +166,24 @@ export function ImageUpload({
   const handleUrlBlur = () => {
     // Validate URL format when user leaves the input
     if (urlInput && urlInput !== value) {
-      try {
-        new URL(urlInput);
+      // Check if it's a valid URL or a valid upload path
+      const isValidUrl = (() => {
+        try {
+          new URL(urlInput);
+          return true;
+        } catch {
+          return false;
+        }
+      })();
+      
+      const isValidUploadPath = urlInput.startsWith('/uploads/');
+      
+      if (isValidUrl || isValidUploadPath) {
         onChange(urlInput);
-      } catch {
+      } else {
         toast({
           title: 'Invalid URL',
-          description: 'Please enter a valid image URL.',
+          description: 'Please enter a valid image URL or upload path.',
           variant: 'destructive',
         });
         setUrlInput(value); // Reset to original value
