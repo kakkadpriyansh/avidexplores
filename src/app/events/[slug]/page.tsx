@@ -457,13 +457,13 @@ export default function EventDetailPage() {
               <div className="mb-8">
                 {/* Mobile Carousel */}
                 <div className="md:hidden">
-                  <Carousel className="w-full" opts={{ align: "start" }}>
-                    <CarouselContent className="-ml-2">
+                  <Carousel className="w-full" opts={{ align: "start", containScroll: "trimSnaps" }}>
+                    <CarouselContent className="-ml-1">
                       {tabs.map((tab) => (
-                        <CarouselItem key={tab.id} className="pl-2 basis-auto">
+                        <CarouselItem key={tab.id} className="pl-1 basis-auto">
                           <button
                             onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-2 font-medium transition-colors whitespace-nowrap rounded-full border ${
+                            className={`px-3 py-2 font-medium transition-colors whitespace-nowrap rounded-full border text-xs min-w-[80px] ${
                               activeTab === tab.id
                                 ? 'bg-primary text-primary-foreground border-primary'
                                 : 'bg-background text-muted-foreground hover:text-foreground border-border hover:border-primary/50'
@@ -622,37 +622,42 @@ export default function EventDetailPage() {
                                 </div>
                               )}
                               
-                              {day.activities && day.activities.length > 0 && (
-                                <div>
-                                  <h4 className="font-medium text-sm mb-2 flex items-center">
-                                    <Compass className="h-4 w-4 mr-1 text-primary" />
-                                    Activities
-                                  </h4>
-                                  <ul className="space-y-1">
-                                    {day.activities.map((activity, actIndex) => (
-                                      <li key={actIndex} className="text-sm text-muted-foreground flex items-start">
-                                        <CheckCircle className="h-3 w-3 mr-2 text-green-500 mt-0.5 flex-shrink-0" />
-                                        {activity}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              
-                              {day.meals && day.meals.length > 0 && (
-                                <div>
-                                  <h4 className="font-medium text-sm mb-2 flex items-center">
-                                    <Utensils className="h-4 w-4 mr-1 text-primary" />
-                                    Meals
-                                  </h4>
-                                  <ul className="space-y-1">
-                                    {day.meals.map((meal, mealIndex) => (
-                                      <li key={mealIndex} className="text-sm text-muted-foreground flex items-start">
-                                        <CheckCircle className="h-3 w-3 mr-2 text-orange-500 mt-0.5 flex-shrink-0" />
-                                        {meal}
-                                      </li>
-                                    ))}
-                                  </ul>
+                              {/* Activities and Meals - Side by side on smaller screens */}
+                              {((day.activities && day.activities.length > 0) || (day.meals && day.meals.length > 0)) && (
+                                <div className="grid grid-cols-2 gap-3">
+                                  {day.activities && day.activities.length > 0 && (
+                                    <div>
+                                      <h4 className="font-medium text-sm mb-2 flex items-center">
+                                        <Compass className="h-4 w-4 mr-1 text-primary" />
+                                        Activities
+                                      </h4>
+                                      <ul className="space-y-1">
+                                        {day.activities.map((activity, actIndex) => (
+                                          <li key={actIndex} className="text-sm text-muted-foreground flex items-start">
+                                            <CheckCircle className="h-3 w-3 mr-2 text-green-500 mt-0.5 flex-shrink-0" />
+                                            {activity}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  
+                                  {day.meals && day.meals.length > 0 && (
+                                    <div>
+                                      <h4 className="font-medium text-sm mb-2 flex items-center">
+                                        <Utensils className="h-4 w-4 mr-1 text-primary" />
+                                        Meals
+                                      </h4>
+                                      <ul className="space-y-1">
+                                        {day.meals.map((meal, mealIndex) => (
+                                          <li key={mealIndex} className="text-sm text-muted-foreground flex items-start">
+                                            <CheckCircle className="h-3 w-3 mr-2 text-orange-500 mt-0.5 flex-shrink-0" />
+                                            {meal}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               
@@ -795,12 +800,32 @@ export default function EventDetailPage() {
                   </div>
                 </div>
               )}
+              
+              {/* Help section for mobile - shown only on smaller screens */}
+              <div className="lg:hidden card-adventure p-6 mt-8">
+                <h3 className="font-semibold mb-4">Need Help?</h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <div className="font-medium">Call us</div>
+                    <div className="text-muted-foreground">+91 98765 43210</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Email us</div>
+                    <div className="text-muted-foreground">hello@avidexplorers.com</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">WhatsApp</div>
+                    <div className="text-muted-foreground">Available 24/7</div>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Booking Card - Hidden on mobile, shown on desktop */}
-              <div className="card-adventure p-6 hidden lg:block">
+              <div className={`card-adventure p-6 hidden lg:block ${activeTab === 'itinerary' ? 'sticky top-24 z-10' : ''}`}>
                 <div className="text-center mb-4">
                   {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
                     <div>
@@ -845,26 +870,28 @@ export default function EventDetailPage() {
                   <Heart className="h-4 w-4 mr-2" />
                   Add to Wishlist
                 </Button>
-              </div>
-
-              {/* Contact Info */}
-              <div className="card-adventure p-6">
-                <h3 className="font-semibold mb-4">Need Help?</h3>
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <div className="font-medium">Call us</div>
-                    <div className="text-muted-foreground">+91 98765 43210</div>
-                  </div>
-                  <div>
-                    <div className="font-medium">Email us</div>
-                    <div className="text-muted-foreground">hello@avidexplorers.com</div>
-                  </div>
-                  <div>
-                    <div className="font-medium">WhatsApp</div>
-                    <div className="text-muted-foreground">Available 24/7</div>
+                
+                {/* Help section inside booking card */}
+                <div className="mt-6 pt-6 border-t border-border">
+                  <h3 className="font-semibold mb-4">Need Help?</h3>
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <div className="font-medium">Call us</div>
+                      <div className="text-muted-foreground">+91 98765 43210</div>
+                    </div>
+                    <div>
+                      <div className="font-medium">Email us</div>
+                      <div className="text-muted-foreground">hello@avidexplorers.com</div>
+                    </div>
+                    <div>
+                      <div className="font-medium">WhatsApp</div>
+                      <div className="text-muted-foreground">Available 24/7</div>
+                    </div>
                   </div>
                 </div>
               </div>
+
+
             </div>
           </div>
         </div>
