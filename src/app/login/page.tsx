@@ -83,11 +83,11 @@ function LoginContent() {
             <div className="text-center mb-8">
               <div className="flex items-center justify-center space-x-2 mb-4">
                 <Mountain className="h-8 w-8 text-primary" />
-                <span className="font-montserrat font-bold text-2xl text-foreground">
+                <span className="font-product-sans font-bold text-2xl text-foreground">
                   Avid Explorers
                 </span>
               </div>
-              <h1 className="text-3xl font-montserrat font-bold text-foreground mb-2">
+              <h1 className="text-3xl font-product-sans font-bold text-foreground mb-2">
                 Welcome Back
               </h1>
               <p className="text-muted-foreground">
@@ -98,7 +98,7 @@ function LoginContent() {
             {/* Login Form */}
             <Card className="card-adventure">
               <CardHeader>
-                <CardTitle className="text-center font-montserrat">Sign In</CardTitle>
+                <CardTitle className="text-center font-product-sans">Sign In</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <form onSubmit={handleSubmit} className="space-y-4">

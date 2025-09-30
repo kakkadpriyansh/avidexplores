@@ -285,7 +285,7 @@ export default function CreateEventPage() {
                 Back
               </Button>
               <div>
-                <h1 className="text-3xl font-montserrat font-bold text-foreground">
+                <h1 className="text-3xl font-product-sans font-bold text-foreground">
                   Create New Event
                 </h1>
                 <p className="text-muted-foreground">

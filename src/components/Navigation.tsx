@@ -59,7 +59,7 @@ const Navigation = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`font-inter font-medium transition-colors hover:text-primary ${
+                className={`font-product-sans font-medium transition-colors hover:text-primary ${
                   isActive(link.href) ? 'text-primary' : 'text-foreground/80'
                 }`}
               >
@@ -140,7 +140,7 @@ const Navigation = () => {
                     <SheetClose asChild key={link.href}>
                       <Link
                         href={link.href}
-                        className={`text-lg font-inter font-medium transition-colors hover:text-primary ${
+                        className={`text-lg font-product-sans font-medium transition-colors hover:text-primary ${
                           isActive(link.href) ? 'text-primary' : 'text-foreground/80'
                         }`}
                       >

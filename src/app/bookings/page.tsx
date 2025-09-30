@@ -205,7 +205,7 @@ export default function BookingHistoryPage() {
         <div className="pt-24 pb-16">
           <div className="container mx-auto px-4">
             <div className="mb-8">
-              <h1 className="text-3xl font-montserrat font-bold text-foreground mb-2">
+              <h1 className="text-3xl font-product-sans font-bold text-foreground mb-2">
                 My Bookings
               </h1>
               <p className="text-muted-foreground">
@@ -235,7 +235,7 @@ export default function BookingHistoryPage() {
       <div className="pt-24 pb-16">
         <div className="container mx-auto px-4">
           <div className="mb-8">
-            <h1 className="text-3xl font-montserrat font-bold text-foreground mb-2">
+            <h1 className="text-3xl font-product-sans font-bold text-foreground mb-2">
               My Bookings
             </h1>
             <p className="text-muted-foreground">

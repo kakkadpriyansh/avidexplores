@@ -1,5 +1,5 @@
 /* Avid Explorers Adventure Design System */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Product+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -80,11 +80,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-background text-foreground font-product-sans;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-montserrat font-bold;
+    @apply font-product-sans font-bold;
   }
 }
 
@@ -101,15 +101,15 @@
 @layer components {
   /* Adventure Button Variants */
   .btn-hero {
-    @apply bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-8 py-4 rounded-2xl font-montserrat font-semibold text-lg shadow-adventure hover:shadow-glow transition-all duration-300 hover:scale-105;
+    @apply bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-8 py-4 rounded-2xl font-product-sans font-semibold text-lg shadow-adventure hover:shadow-glow transition-all duration-300 hover:scale-105;
   }
 
   .btn-adventure {
-    @apply bg-secondary text-secondary-foreground px-6 py-3 rounded-xl font-montserrat font-semibold hover:bg-secondary/90 transition-all duration-300 hover:scale-105;
+    @apply bg-secondary text-secondary-foreground px-6 py-3 rounded-xl font-product-sans font-semibold hover:bg-secondary/90 transition-all duration-300 hover:scale-105;
   }
 
   .btn-outline {
-    @apply border-2 border-primary text-primary bg-transparent px-6 py-3 rounded-xl font-montserrat font-semibold hover:bg-primary hover:text-primary-foreground transition-all duration-300;
+    @apply border-2 border-primary text-primary bg-transparent px-6 py-3 rounded-xl font-product-sans font-semibold hover:bg-primary hover:text-primary-foreground transition-all duration-300;
   }
 
   /* Adventure Cards */

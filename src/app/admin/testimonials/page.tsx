@@ -189,7 +189,7 @@ export default function AdminTestimonialsPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-montserrat font-bold text-foreground">
+          <h1 className="text-3xl font-product-sans font-bold text-foreground">
             Testimonials Management
           </h1>
           <p className="text-muted-foreground mt-2">

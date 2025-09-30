@@ -23,10 +23,10 @@ const NotFound = () => {
           <div className="text-center max-w-2xl mx-auto">
             <div className="mb-8">
               <Mountain className="h-24 w-24 text-muted-foreground mx-auto mb-6" />
-              <h1 className="text-6xl font-montserrat font-bold text-foreground mb-4">
+              <h1 className="text-6xl font-product-sans font-bold text-foreground mb-4">
                 404
               </h1>
-              <h2 className="text-2xl font-montserrat font-semibold text-foreground mb-4">
+              <h2 className="text-2xl font-product-sans font-semibold text-foreground mb-4">
                 Adventure Not Found
               </h2>
               <p className="text-lg text-muted-foreground mb-8">

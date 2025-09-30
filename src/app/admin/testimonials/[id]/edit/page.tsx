@@ -216,7 +216,7 @@ export default function EditTestimonialPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-montserrat font-bold text-foreground">
+          <h1 className="text-3xl font-product-sans font-bold text-foreground">
             Edit Testimonial
           </h1>
           <p className="text-muted-foreground mt-2">

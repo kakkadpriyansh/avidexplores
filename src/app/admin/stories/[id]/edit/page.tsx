@@ -281,7 +281,7 @@ export default function EditStoryPage() {
             >
               ← Back to Stories
             </Button>
-            <h1 className="text-3xl font-montserrat font-bold text-foreground mb-2">
+            <h1 className="text-3xl font-product-sans font-bold text-foreground mb-2">
               Edit Story
             </h1>
             <p className="text-muted-foreground">

@@ -349,7 +349,7 @@ export default function EventDetailPage() {
                 {event.category}
               </Badge>
             </div>
-            <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-montserrat font-bold text-primary-foreground mb-1 sm:mb-2">
+            <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-product-sans font-bold text-primary-foreground mb-1 sm:mb-2">
               {event.title}
             </h1>
             <div className="flex flex-col text-white/90 text-xs sm:text-sm gap-0.5">
@@ -497,7 +497,7 @@ export default function EventDetailPage() {
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-2xl font-montserrat font-bold mb-4">About This Adventure</h2>
+                    <h2 className="text-2xl font-product-sans font-bold mb-4">About This Adventure</h2>
                     <p className="text-muted-foreground leading-relaxed mb-4">
                       {event.shortDescription}
                     </p>
@@ -546,7 +546,7 @@ export default function EventDetailPage() {
 
               {activeTab === 'itinerary' && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-montserrat font-bold mb-4">Day by Day Itinerary</h2>
+                  <h2 className="text-2xl font-product-sans font-bold mb-4">Day by Day Itinerary</h2>
                   <div className="space-y-3">
                     {event.itinerary?.map((day, index) => {
                       const isExpanded = expandedDays.has(day.day);
@@ -676,7 +676,7 @@ export default function EventDetailPage() {
 
               {activeTab === 'inclusions' && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-montserrat font-bold mb-4">What's Included</h2>
+                  <h2 className="text-2xl font-product-sans font-bold mb-4">What's Included</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <h3 className="text-lg font-semibold mb-3 text-green-600">Included</h3>
@@ -707,7 +707,7 @@ export default function EventDetailPage() {
 
               {activeTab === 'preparation' && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-montserrat font-bold mb-4">Preparation Guide</h2>
+                  <h2 className="text-2xl font-product-sans font-bold mb-4">Preparation Guide</h2>
                   <div className="space-y-6">
                     {event.preparation?.physicalRequirements && (
                       <div>
@@ -870,7 +870,7 @@ export default function EventDetailPage() {
         {/* Related Events */}
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-montserrat font-bold text-center mb-12">
+            <h2 className="text-3xl font-product-sans font-bold text-center mb-12">
               Similar Adventures
             </h2>
             {relatedLoading ? (

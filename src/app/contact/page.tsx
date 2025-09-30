@@ -64,7 +64,7 @@ export default function ContactPage() {
       <section className="pt-24 pb-16 bg-gradient-mountain">
         <div className="container mx-auto px-4">
           <div className="text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-montserrat font-bold mb-4">
+            <h1 className="text-4xl md:text-5xl font-product-sans font-bold mb-4">
               Get In Touch
             </h1>
             <p className="text-lg text-white/80 max-w-2xl mx-auto">
@@ -81,7 +81,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div>
-              <h2 className="text-3xl font-montserrat font-bold text-foreground mb-6">
+              <h2 className="text-3xl font-product-sans font-bold text-foreground mb-6">
                 Send us a Message
               </h2>
               
@@ -163,7 +163,7 @@ export default function ContactPage() {
 
             {/* Contact Information */}
             <div className="space-y-6">
-              <h2 className="text-3xl font-montserrat font-bold text-foreground mb-6">
+              <h2 className="text-3xl font-product-sans font-bold text-foreground mb-6">
                 Contact Information
               </h2>
 
@@ -176,7 +176,7 @@ export default function ContactPage() {
                           <info.icon className="h-6 w-6 text-primary" />
                         </div>
                         <div>
-                          <h3 className="font-montserrat font-semibold text-foreground mb-2">
+                          <h3 className="font-product-sans font-semibold text-foreground mb-2">
                             {info.title}
                           </h3>
                           {info.details.map((detail, idx) => (
@@ -201,7 +201,7 @@ export default function ContactPage() {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-montserrat font-bold text-foreground mb-4">
+            <h2 className="text-3xl font-product-sans font-bold text-foreground mb-4">
               Visit Our Office
             </h2>
             <p className="text-muted-foreground mb-4">

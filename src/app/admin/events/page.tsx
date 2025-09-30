@@ -168,7 +168,7 @@ export default function AdminEventsPage() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
             <div>
-              <h1 className="text-3xl font-montserrat font-bold text-foreground mb-2">
+              <h1 className="text-3xl font-product-sans font-bold text-foreground mb-2">
                 Event Management
               </h1>
               <p className="text-muted-foreground">

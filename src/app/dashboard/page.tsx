@@ -9,16 +9,11 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { 
-  User, 
   Calendar, 
-  Heart, 
-  Settings, 
   BookOpen, 
   MapPin,
   Clock,
-  Star,
   MessageSquare,
-  LogOut,
   Eye,
   ArrowRight
 } from 'lucide-react';
@@ -29,9 +24,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     activeBookings: 0,
-    wishlistCount: 0,
-    storiesShared: 0,
-    reviewsWritten: 0
+    storiesShared: 0
   });
   const [recentBookings, setRecentBookings] = useState([]);
 
@@ -42,32 +35,48 @@ export default function DashboardPage() {
       return;
     }
     
-    // Simulate loading stats
-    setTimeout(() => {
-      setStats({
-        activeBookings: 3,
-        wishlistCount: 12,
-        storiesShared: 2,
-        reviewsWritten: 5
-      });
-      setRecentBookings([
-        {
-          id: 1,
-          eventTitle: 'Himalayan Base Camp Trek',
-          date: '2024-03-15',
-          status: 'confirmed',
-          amount: 45000
-        },
-        {
-          id: 2,
-          eventTitle: 'Goa Beach Adventure',
-          date: '2024-02-28',
-          status: 'completed',
-          amount: 15000
+    // Fetch real user bookings and stats
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch user bookings
+        const bookingsResponse = await fetch('/api/user/bookings');
+        if (bookingsResponse.ok) {
+          const bookingsData = await bookingsResponse.json();
+          const bookings = bookingsData.data || [];
+          
+          // Calculate stats from real data
+          const activeBookings = bookings.filter((b: any) => 
+            b.status === 'CONFIRMED' || b.status === 'PENDING'
+          ).length;
+          
+          setStats({
+            activeBookings,
+            storiesShared: 0 // This would need a separate API endpoint
+          });
+          
+          // Set recent bookings (last 3)
+          setRecentBookings(bookings.slice(0, 3).map((booking: any) => ({
+            id: booking._id,
+            eventTitle: booking.eventId?.title || 'Unknown Event',
+            date: new Date(booking.date).toLocaleDateString(),
+            status: booking.status.toLowerCase(),
+            amount: booking.finalAmount || 0
+          })));
         }
-      ]);
-      setLoading(false);
-    }, 1000);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        // Fallback to empty state
+        setStats({
+          activeBookings: 0,
+          storiesShared: 0
+        });
+        setRecentBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, [session, status, router]);
 
   const getStatusColor = (status: string) => {
@@ -105,7 +114,7 @@ export default function DashboardPage() {
     >
 
       {/* Dashboard Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <Card 
           className="card-adventure cursor-pointer hover:shadow-lg transition-shadow"
           onClick={() => router.push('/dashboard/bookings')}
@@ -117,21 +126,6 @@ export default function DashboardPage() {
                 <p className="text-2xl font-bold text-foreground">{stats.activeBookings}</p>
               </div>
               <Calendar className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card 
-          className="card-adventure cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => router.push('/dashboard/wishlist')}
-        >
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Wishlist</p>
-                <p className="text-2xl font-bold text-foreground">{stats.wishlistCount}</p>
-              </div>
-              <Heart className="h-8 w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
@@ -150,15 +144,15 @@ export default function DashboardPage() {
         
         <Card 
           className="card-adventure cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => router.push('/dashboard/reviews')}
+          onClick={() => router.push('/events')}
         >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Reviews Written</p>
-                <p className="text-2xl font-bold text-foreground">{stats.reviewsWritten}</p>
+                <p className="text-sm font-medium text-muted-foreground">Explore Events</p>
+                <p className="text-2xl font-bold text-foreground">New</p>
               </div>
-              <Star className="h-8 w-8 text-primary" />
+              <MapPin className="h-8 w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
@@ -226,7 +220,7 @@ export default function DashboardPage() {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Button 
                 className="h-20 flex flex-col items-center justify-center space-y-2"
                 onClick={() => router.push('/events')}
@@ -241,14 +235,6 @@ export default function DashboardPage() {
               >
                 <MapPin className="h-6 w-6" />
                 <span>Explore Events</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                className="h-20 flex flex-col items-center justify-center space-y-2"
-                onClick={() => router.push('/dashboard/wishlist')}
-              >
-                <Heart className="h-6 w-6" />
-                <span>My Wishlist</span>
               </Button>
               <Button 
                 variant="outline" 

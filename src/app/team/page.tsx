@@ -98,7 +98,7 @@ export default async function TeamPage() {
       <section className="pt-24 pb-16 bg-gradient-to-b from-muted/40 to-background border-b border-border/50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-bold text-foreground mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-product-sans font-bold text-foreground mb-6 leading-tight">
               Our Team
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">

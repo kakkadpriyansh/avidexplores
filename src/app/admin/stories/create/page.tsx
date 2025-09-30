@@ -210,7 +210,7 @@ export default function CreateStoryPage() {
               Back to Stories
             </Button>
             <div>
-              <h1 className="text-3xl font-montserrat font-bold text-foreground">
+              <h1 className="text-3xl font-product-sans font-bold text-foreground">
                 Create New Story
               </h1>
               <p className="text-muted-foreground">

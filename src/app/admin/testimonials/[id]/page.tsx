@@ -197,7 +197,7 @@ export default function TestimonialDetailPage() {
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-3xl font-montserrat font-bold text-foreground">
+          <h1 className="text-3xl font-product-sans font-bold text-foreground">
             Testimonial Details
           </h1>
           <p className="text-muted-foreground mt-2">
