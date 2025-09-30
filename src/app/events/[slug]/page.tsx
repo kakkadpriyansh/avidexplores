@@ -34,7 +34,9 @@ import {
   Camera,
   Plane,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Compass,
+  Utensils
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingRing } from '@/components/ui/loading-ring';
@@ -623,7 +625,7 @@ export default function EventDetailPage() {
                               {day.activities && day.activities.length > 0 && (
                                 <div>
                                   <h4 className="font-medium text-sm mb-2 flex items-center">
-                                    <Mountain className="h-4 w-4 mr-1 text-primary" />
+                                    <Compass className="h-4 w-4 mr-1 text-primary" />
                                     Activities
                                   </h4>
                                   <ul className="space-y-1">
@@ -640,7 +642,7 @@ export default function EventDetailPage() {
                               {day.meals && day.meals.length > 0 && (
                                 <div>
                                   <h4 className="font-medium text-sm mb-2 flex items-center">
-                                    <Sunrise className="h-4 w-4 mr-1 text-primary" />
+                                    <Utensils className="h-4 w-4 mr-1 text-primary" />
                                     Meals
                                   </h4>
                                   <ul className="space-y-1">
