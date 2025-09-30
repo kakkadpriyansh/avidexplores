@@ -261,7 +261,7 @@ export default function EditEventPage() {
   const handleItineraryArrayChange = (dayIndex: number, field: 'activities' | 'meals' | 'images', itemIndex: number, value: string) => {
     if (!event) return;
     const newItinerary = [...event.itinerary];
-    const currentArray = newItinerary[dayIndex][field] || [];
+    const currentArray = [...(newItinerary[dayIndex][field] || [])];
     currentArray[itemIndex] = value;
     newItinerary[dayIndex] = { ...newItinerary[dayIndex], [field]: currentArray };
     setEvent({ ...event, itinerary: newItinerary });
