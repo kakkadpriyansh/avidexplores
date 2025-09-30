@@ -161,10 +161,11 @@ export default function CreateEventPage() {
   };
 
   const addItineraryDay = () => {
+    const nextDayNumber = formData.itinerary.length === 0 ? 1 : Math.max(...formData.itinerary.map(d => d.day)) + 1;
     setFormData(prev => ({
       ...prev,
       itinerary: [...prev.itinerary, { 
-        day: prev.itinerary.length + 1, 
+        day: nextDayNumber, 
         title: '', 
         location: '', 
         description: '', 
@@ -176,12 +177,29 @@ export default function CreateEventPage() {
     }));
   };
 
+  const addDay0 = () => {
+    // Check if Day 0 already exists
+    if (formData.itinerary.some(day => day.day === 0)) {
+      return;
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      itinerary: [{ 
+        day: 0, 
+        title: '', 
+        location: '', 
+        description: '', 
+        activities: [''], 
+        meals: [''], 
+        accommodation: '',
+        images: ['']
+      }, ...prev.itinerary]
+    }));
+  };
+
   const removeItineraryDay = (index: number) => {
     const newItinerary = formData.itinerary.filter((_, i) => i !== index);
-    // Renumber days
-    newItinerary.forEach((item, i) => {
-      item.day = i + 1;
-    });
     setFormData(prev => ({ ...prev, itinerary: newItinerary }));
   };
 
@@ -927,7 +945,9 @@ export default function CreateEventPage() {
                 {formData.itinerary.map((day, dayIndex) => (
                   <div key={dayIndex} className="border rounded-lg p-4 space-y-4">
                     <div className="flex justify-between items-center">
-                      <h4 className="font-semibold">Day {dayIndex + 1}</h4>
+                      <h4 className="font-semibold">
+                        {day.day === 0 ? 'Day 0 (Pre-arrival)' : `Day ${day.day}`}
+                      </h4>
                       <Button
                         type="button"
                         variant="outline"
@@ -1078,14 +1098,25 @@ export default function CreateEventPage() {
                   </div>
                 ))}
                 
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={addItineraryDay}
-                  className="w-full"
-                >
-                  Add New Day
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addDay0}
+                    className="flex-1"
+                    disabled={formData.itinerary.some(day => day.day === 0)}
+                  >
+                    Add Day 0 (Pre-arrival)
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addItineraryDay}
+                    className="flex-1"
+                  >
+                    Add New Day
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 

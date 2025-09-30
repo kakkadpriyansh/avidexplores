@@ -566,11 +566,11 @@ export default function EventDetailPage() {
                             }`}
                           >
                             <div className="bg-gray-600 text-white rounded-full px-3 py-1 text-sm font-medium mr-4 min-w-fit">
-                              Day {day.day === 0 ? 'D' : day.day}
+                              {day.day === 0 ? 'Day 0' : `Day ${day.day}`}
                             </div>
                             <div className="flex-1">
                               <h3 className="font-medium text-base text-foreground">
-                                {day.title}
+                                {day.day === 0 ? `${day.title} (Pre-arrival)` : day.title}
                               </h3>
                             </div>
                             {hasAdditionalInfo && (

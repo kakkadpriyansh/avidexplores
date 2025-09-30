@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
@@ -24,7 +24,40 @@ const navItems = [
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  // Handle authentication and redirect
+  useEffect(() => {
+    if (status === 'loading') return; // Still loading, don't redirect yet
+    
+    if (!session) {
+      router.push('/login?callbackUrl=' + encodeURIComponent(pathname));
+      return;
+    }
+    
+    if (session.user.role !== 'ADMIN') {
+      router.push('/dashboard');
+      return;
+    }
+  }, [session, status, router, pathname]);
+
+  // Show loading state while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render admin panel if not authenticated or not admin
+  if (!session || session.user.role !== 'ADMIN') {
+    return null;
+  }
 
   const SidebarNav = () => (
     <nav className="flex flex-col h-full">
