@@ -800,12 +800,32 @@ export default function EventDetailPage() {
                   </div>
                 </div>
               )}
+              
+              {/* Help section for mobile - shown only on smaller screens */}
+              <div className="lg:hidden card-adventure p-6 mt-8">
+                <h3 className="font-semibold mb-4">Need Help?</h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <div className="font-medium">Call us</div>
+                    <div className="text-muted-foreground">+91 98765 43210</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Email us</div>
+                    <div className="text-muted-foreground">hello@avidexplorers.com</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">WhatsApp</div>
+                    <div className="text-muted-foreground">Available 24/7</div>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Booking Card - Hidden on mobile, shown on desktop */}
-              <div className={`card-adventure p-6 hidden lg:block ${activeTab === 'itinerary' ? 'sticky top-24' : ''}`}>
+              <div className={`card-adventure p-6 hidden lg:block ${activeTab === 'itinerary' ? 'sticky top-24 z-10' : ''}`}>
                 <div className="text-center mb-4">
                   {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
                     <div>
@@ -850,26 +870,28 @@ export default function EventDetailPage() {
                   <Heart className="h-4 w-4 mr-2" />
                   Add to Wishlist
                 </Button>
-              </div>
-
-              {/* Contact Info */}
-              <div className={`card-adventure p-6 ${activeTab === 'itinerary' ? 'sticky top-96' : ''}`}>
-                <h3 className="font-semibold mb-4">Need Help?</h3>
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <div className="font-medium">Call us</div>
-                    <div className="text-muted-foreground">+91 98765 43210</div>
-                  </div>
-                  <div>
-                    <div className="font-medium">Email us</div>
-                    <div className="text-muted-foreground">hello@avidexplorers.com</div>
-                  </div>
-                  <div>
-                    <div className="font-medium">WhatsApp</div>
-                    <div className="text-muted-foreground">Available 24/7</div>
+                
+                {/* Help section inside booking card */}
+                <div className="mt-6 pt-6 border-t border-border">
+                  <h3 className="font-semibold mb-4">Need Help?</h3>
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <div className="font-medium">Call us</div>
+                      <div className="text-muted-foreground">+91 98765 43210</div>
+                    </div>
+                    <div>
+                      <div className="font-medium">Email us</div>
+                      <div className="text-muted-foreground">hello@avidexplorers.com</div>
+                    </div>
+                    <div>
+                      <div className="font-medium">WhatsApp</div>
+                      <div className="text-muted-foreground">Available 24/7</div>
+                    </div>
                   </div>
                 </div>
               </div>
+
+
             </div>
           </div>
         </div>
