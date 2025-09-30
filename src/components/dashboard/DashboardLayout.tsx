@@ -48,8 +48,20 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
         </div>
         
         {sidebarOpen && (
-          <div className="p-4 border-b bg-muted/50">
+          <div className="p-4 border-b bg-muted/50 space-y-4">
             <DashboardMobileNav />
+            
+            {/* Mobile Sign Out */}
+            <div className="pt-4 border-t border-border">
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => signOut({ callbackUrl: '/' })}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         )}
       </div>

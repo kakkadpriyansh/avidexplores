@@ -16,6 +16,7 @@ export function RegionSelect({ value, onChange, placeholder = "Select or enter r
   const [regions, setRegions] = useState<string[]>([]);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customRegion, setCustomRegion] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchRegions();
@@ -23,13 +24,19 @@ export function RegionSelect({ value, onChange, placeholder = "Select or enter r
 
   const fetchRegions = async () => {
     try {
-      const response = await fetch('/api/admin/regions');
+      setLoading(true);
+      // Use public regions API instead of admin-only endpoint
+      const response = await fetch('/api/regions');
       if (response.ok) {
         const data = await response.json();
         setRegions(data.data || []);
+      } else {
+        console.error('RegionSelect: Failed to fetch regions:', response.status);
       }
     } catch (error) {
-      console.error('Error fetching regions:', error);
+      console.error('RegionSelect: Error fetching regions:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,14 +80,20 @@ export function RegionSelect({ value, onChange, placeholder = "Select or enter r
     <div className="flex gap-2">
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="flex-1">
-          <SelectValue placeholder={placeholder} />
+          <SelectValue placeholder={loading ? "Loading regions..." : placeholder} />
         </SelectTrigger>
         <SelectContent>
-          {regions.map((region) => (
-            <SelectItem key={region} value={region}>
-              {region}
-            </SelectItem>
-          ))}
+          {loading ? (
+            <SelectItem value="__loading__" disabled>Loading regions...</SelectItem>
+          ) : regions.length === 0 ? (
+            <SelectItem value="__no_regions__" disabled>No regions found</SelectItem>
+          ) : (
+            regions.map((region) => (
+              <SelectItem key={region} value={region}>
+                {region}
+              </SelectItem>
+            ))
+          )}
         </SelectContent>
       </Select>
       <Button 
@@ -89,6 +102,7 @@ export function RegionSelect({ value, onChange, placeholder = "Select or enter r
         size="sm" 
         onClick={() => setShowCustomInput(true)}
         title="Add new region"
+        disabled={loading}
       >
         <Plus className="h-4 w-4" />
       </Button>
