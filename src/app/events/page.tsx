@@ -145,7 +145,7 @@ export default function EventsPage() {
       <section className="pt-20 pb-8 bg-gradient-mountain">
         <div className="container mx-auto px-4">
           <div className="text-center text-white">
-            <h1 className="text-3xl md:text-4xl font-montserrat font-bold mb-3">
+            <h1 className="text-3xl md:text-4xl font-product-sans font-bold mb-3">
               All Adventures
             </h1>
             <p className="text-base text-white/80 max-w-xl mx-auto">

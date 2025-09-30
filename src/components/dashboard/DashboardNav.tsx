@@ -5,12 +5,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
-  Calendar,
-  Heart,
-  Star,
-  User,
-  Settings,
-  BookOpen
+  Calendar
 } from 'lucide-react';
 
 const dashboardNavItems = [
@@ -23,21 +18,6 @@ const dashboardNavItems = [
     title: 'My Bookings',
     href: '/dashboard/bookings',
     icon: Calendar,
-  },
-  {
-    title: 'Wishlist',
-    href: '/dashboard/wishlist',
-    icon: Heart,
-  },
-  {
-    title: 'Reviews',
-    href: '/dashboard/reviews',
-    icon: Star,
-  },
-  {
-    title: 'Profile',
-    href: '/dashboard/profile',
-    icon: User,
   },
 ];
 

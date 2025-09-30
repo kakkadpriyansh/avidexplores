@@ -56,7 +56,7 @@ const EventCarousel = ({ events, title, icon: Icon }: EventCarouselProps) => {
       <div className="mb-6 pb-4 border-b-2 border-primary/20">
         <div className="flex items-center gap-4">
           {Icon && <Icon className="h-8 w-8 text-primary" />}
-          <h2 className="text-xl font-montserrat font-bold text-foreground">
+          <h2 className="text-xl font-product-sans font-bold text-foreground">
             {title}
           </h2>
         </div>

@@ -50,7 +50,7 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
 
       {/* Name and Event */}
       <div>
-        <h4 className="font-montserrat font-semibold text-card-foreground">
+        <h4 className="font-product-sans font-semibold text-card-foreground">
           {testimonial.customerName || testimonial.userId?.name || 'Anonymous'}
         </h4>
         <p className="text-sm text-muted-foreground">

@@ -37,7 +37,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
       {/* Mobile Navigation */}
       <div className="lg:hidden">
         <div className="flex items-center justify-between p-4 border-b">
-          <h1 className="text-xl font-montserrat font-bold">Dashboard</h1>
+          <h1 className="text-xl font-product-sans font-bold">Dashboard</h1>
           <Button
             variant="ghost"
             size="sm"
@@ -107,7 +107,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
             {(title || description) && (
               <div className="mb-6">
                 {title && (
-                  <h1 className="text-2xl lg:text-3xl font-montserrat font-bold text-foreground mb-2">
+                  <h1 className="text-2xl lg:text-3xl font-product-sans font-bold text-foreground mb-2">
                     {title}
                   </h1>
                 )}

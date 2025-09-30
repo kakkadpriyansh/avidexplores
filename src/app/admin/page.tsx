@@ -167,7 +167,7 @@ export default function AdminDashboard() {
           {/* Header */}
           <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-montserrat font-bold text-foreground mb-2">
+              <h1 className="text-3xl font-product-sans font-bold text-foreground mb-2">
                 Admin Dashboard
               </h1>
               <p className="text-muted-foreground">

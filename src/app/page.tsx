@@ -151,7 +151,7 @@ export default async function HomePage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-foreground mb-4">
+            <h2 className="text-3xl md:text-4xl font-product-sans font-bold text-foreground mb-4">
               Why Adventure With Us?
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -164,7 +164,7 @@ export default async function HomePage() {
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                 <Shield className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-montserrat font-semibold text-foreground">
+              <h3 className="text-xl font-product-sans font-semibold text-foreground">
                 Safety First
               </h3>
               <p className="text-muted-foreground">
@@ -176,7 +176,7 @@ export default async function HomePage() {
               <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto">
                 <Users className="h-8 w-8 text-secondary" />
               </div>
-              <h3 className="text-xl font-montserrat font-semibold text-foreground">
+              <h3 className="text-xl font-product-sans font-semibold text-foreground">
                 Expert Guides
               </h3>
               <p className="text-muted-foreground">
@@ -188,7 +188,7 @@ export default async function HomePage() {
               <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto">
                 <Zap className="h-8 w-8 text-accent" />
               </div>
-              <h3 className="text-xl font-montserrat font-semibold text-foreground">
+              <h3 className="text-xl font-product-sans font-semibold text-foreground">
                 Unforgettable Memories
               </h3>
               <p className="text-muted-foreground">
@@ -203,7 +203,7 @@ export default async function HomePage() {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-foreground mb-4">
+            <h2 className="text-3xl md:text-4xl font-product-sans font-bold text-foreground mb-4">
               What Our Adventurers Say
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

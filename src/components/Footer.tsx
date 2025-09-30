@@ -39,7 +39,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="font-montserrat font-semibold text-lg">Quick Links</h3>
+            <h3 className="font-product-sans font-semibold text-lg">Quick Links</h3>
             <ul className="space-y-2">
               {[
                 { href: '/events', label: 'All Events' },
@@ -62,7 +62,7 @@ const Footer = () => {
 
           {/* Adventure Categories */}
           <div className="space-y-4">
-            <h3 className="font-montserrat font-semibold text-lg">Adventures</h3>
+            <h3 className="font-product-sans font-semibold text-lg">Adventures</h3>
             <ul className="space-y-2">
               {[
                 'Trekking',
@@ -86,7 +86,7 @@ const Footer = () => {
 
           {/* Contact & Newsletter */}
           <div className="space-y-4">
-            <h3 className="font-montserrat font-semibold text-lg">Stay Connected</h3>
+            <h3 className="font-product-sans font-semibold text-lg">Stay Connected</h3>
             
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-slate-300">
@@ -104,7 +104,7 @@ const Footer = () => {
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-montserrat font-medium">Newsletter</h4>
+              <h4 className="font-product-sans font-medium">Newsletter</h4>
               <div className="flex space-x-2">
                 <Input
                   type="email"

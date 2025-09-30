@@ -29,7 +29,7 @@ const StoryDetail = () => {
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="pt-24 pb-16 text-center">
-          <h1 className="text-2xl font-montserrat font-bold">Story not found</h1>
+          <h1 className="text-2xl font-product-sans font-bold">Story not found</h1>
           <Link href="/stories">
             <Button className="mt-4 btn-adventure">Back to Stories</Button>
           </Link>
@@ -190,7 +190,7 @@ const StoryDetail = () => {
           <div className="max-w-4xl mx-auto">
             {/* Article Header */}
             <header className="mb-12">
-              <h1 className="text-4xl md:text-5xl font-montserrat font-bold text-foreground mb-6">
+              <h1 className="text-4xl md:text-5xl font-product-sans font-bold text-foreground mb-6">
                 {story.title}
               </h1>
               
@@ -202,7 +202,7 @@ const StoryDetail = () => {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>
-                    <div className="font-montserrat font-semibold text-foreground">
+                    <div className="font-product-sans font-semibold text-foreground">
                       {story.author}
                     </div>
                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">
@@ -263,7 +263,7 @@ const StoryDetail = () => {
                 <div 
                   className="story-content text-foreground leading-relaxed"
                   dangerouslySetInnerHTML={{ 
-                    __html: storyData.content.replace(/\n\s*\n/g, '</p><p>').replace(/\n/g, '<br>').replace(/^/, '<p>').replace(/$/, '</p>').replace(/<h3>/g, '</p><h3 class="text-2xl font-montserrat font-bold text-foreground mt-8 mb-4">').replace(/<\/h3>/g, '</h3><p>')
+                    __html: storyData.content.replace(/\n\s*\n/g, '</p><p>').replace(/\n/g, '<br>').replace(/^/, '<p>').replace(/$/, '</p>').replace(/<h3>/g, '</p><h3 class="text-2xl font-product-sans font-bold text-foreground mt-8 mb-4">').replace(/<\/h3>/g, '</h3><p>')
                   }} 
                 />
 
@@ -290,7 +290,7 @@ const StoryDetail = () => {
           <section className="py-16 bg-muted/30">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-3xl font-montserrat font-bold text-foreground mb-8 flex items-center">
+                <h2 className="text-3xl font-product-sans font-bold text-foreground mb-8 flex items-center">
                   <BookOpen className="h-6 w-6 mr-3 text-primary" />
                   Related Stories
                 </h2>

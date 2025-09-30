@@ -212,7 +212,7 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
               Back to Bookings
             </Button>
             <div>
-              <h1 className="text-3xl font-montserrat font-bold text-foreground">
+              <h1 className="text-3xl font-product-sans font-bold text-foreground">
                 Booking Details
               </h1>
               <p className="text-muted-foreground">
