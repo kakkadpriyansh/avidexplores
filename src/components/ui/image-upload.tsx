@@ -164,30 +164,9 @@ export function ImageUpload({
   };
 
   const handleUrlBlur = () => {
-    // Validate URL format when user leaves the input
+    // Simply update the value without validation in edit mode
     if (urlInput && urlInput !== value) {
-      // Check if it's a valid URL or a valid upload path
-      const isValidUrl = (() => {
-        try {
-          new URL(urlInput);
-          return true;
-        } catch {
-          return false;
-        }
-      })();
-      
-      const isValidUploadPath = urlInput.startsWith('/uploads/');
-      
-      if (isValidUrl || isValidUploadPath) {
-        onChange(urlInput);
-      } else {
-        toast({
-          title: 'Invalid URL',
-          description: 'Please enter a valid image URL or upload path.',
-          variant: 'destructive',
-        });
-        setUrlInput(value); // Reset to original value
-      }
+      onChange(urlInput);
     }
   };
 
@@ -251,7 +230,7 @@ export function ImageUpload({
           <TabsContent value="url" className="space-y-2">
             <div className="flex gap-2">
               <Input
-                type="url"
+                type="text"
                 placeholder={placeholder}
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
