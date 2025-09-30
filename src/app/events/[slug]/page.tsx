@@ -622,37 +622,42 @@ export default function EventDetailPage() {
                                 </div>
                               )}
                               
-                              {day.activities && day.activities.length > 0 && (
-                                <div>
-                                  <h4 className="font-medium text-sm mb-2 flex items-center">
-                                    <Compass className="h-4 w-4 mr-1 text-primary" />
-                                    Activities
-                                  </h4>
-                                  <ul className="space-y-1">
-                                    {day.activities.map((activity, actIndex) => (
-                                      <li key={actIndex} className="text-sm text-muted-foreground flex items-start">
-                                        <CheckCircle className="h-3 w-3 mr-2 text-green-500 mt-0.5 flex-shrink-0" />
-                                        {activity}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              
-                              {day.meals && day.meals.length > 0 && (
-                                <div>
-                                  <h4 className="font-medium text-sm mb-2 flex items-center">
-                                    <Utensils className="h-4 w-4 mr-1 text-primary" />
-                                    Meals
-                                  </h4>
-                                  <ul className="space-y-1">
-                                    {day.meals.map((meal, mealIndex) => (
-                                      <li key={mealIndex} className="text-sm text-muted-foreground flex items-start">
-                                        <CheckCircle className="h-3 w-3 mr-2 text-orange-500 mt-0.5 flex-shrink-0" />
-                                        {meal}
-                                      </li>
-                                    ))}
-                                  </ul>
+                              {/* Activities and Meals - Side by side on smaller screens */}
+                              {((day.activities && day.activities.length > 0) || (day.meals && day.meals.length > 0)) && (
+                                <div className="grid grid-cols-2 gap-3">
+                                  {day.activities && day.activities.length > 0 && (
+                                    <div>
+                                      <h4 className="font-medium text-sm mb-2 flex items-center">
+                                        <Compass className="h-4 w-4 mr-1 text-primary" />
+                                        Activities
+                                      </h4>
+                                      <ul className="space-y-1">
+                                        {day.activities.map((activity, actIndex) => (
+                                          <li key={actIndex} className="text-sm text-muted-foreground flex items-start">
+                                            <CheckCircle className="h-3 w-3 mr-2 text-green-500 mt-0.5 flex-shrink-0" />
+                                            {activity}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  
+                                  {day.meals && day.meals.length > 0 && (
+                                    <div>
+                                      <h4 className="font-medium text-sm mb-2 flex items-center">
+                                        <Utensils className="h-4 w-4 mr-1 text-primary" />
+                                        Meals
+                                      </h4>
+                                      <ul className="space-y-1">
+                                        {day.meals.map((meal, mealIndex) => (
+                                          <li key={mealIndex} className="text-sm text-muted-foreground flex items-start">
+                                            <CheckCircle className="h-3 w-3 mr-2 text-orange-500 mt-0.5 flex-shrink-0" />
+                                            {meal}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               
