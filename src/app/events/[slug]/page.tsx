@@ -805,7 +805,7 @@ export default function EventDetailPage() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Booking Card - Hidden on mobile, shown on desktop */}
-              <div className="card-adventure p-6 hidden lg:block">
+              <div className={`card-adventure p-6 hidden lg:block ${activeTab === 'itinerary' ? 'sticky top-24' : ''}`}>
                 <div className="text-center mb-4">
                   {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
                     <div>
@@ -853,7 +853,7 @@ export default function EventDetailPage() {
               </div>
 
               {/* Contact Info */}
-              <div className="card-adventure p-6">
+              <div className={`card-adventure p-6 ${activeTab === 'itinerary' ? 'sticky top-96' : ''}`}>
                 <h3 className="font-semibold mb-4">Need Help?</h3>
                 <div className="space-y-3 text-sm">
                   <div>
