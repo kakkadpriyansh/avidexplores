@@ -123,7 +123,7 @@ const EventCard = ({ event }: EventCardProps) => {
           <img
             src={images[currentImageIndex]}
             alt={`${event.title} - Image ${currentImageIndex + 1}`}
-            className="w-full h-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110 group-hover:rotate-[0.5deg]"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 group-hover:rotate-[0.5deg]"
           />
           {/* Vignette + glow overlay */}
           <div
@@ -187,7 +187,7 @@ const EventCard = ({ event }: EventCardProps) => {
             </Badge>
           </div>
           {/* Sheen sweep */}
-          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-[1200ms] bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
+          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
         </div>
 
         {/* Content */}

@@ -75,7 +75,23 @@ export async function generateSEOMetadata({
                   priceCurrency: 'INR'
                 },
                 startDate: event.dates[0],
-                endDate: new Date(event.dates[0].getTime() + (event.duration * 24 * 60 * 60 * 1000)),
+                // Compute endDate from duration which may be a free-text string
+                // Extract the first numeric day count and default to 1 day if missing
+                endDate: (() => {
+                  const start = event.dates?.[0];
+                  if (!start) return undefined as any;
+                  const raw = (event as any).duration;
+                  let days = 1;
+                  if (typeof raw === 'number' && Number.isFinite(raw)) {
+                    days = Math.max(1, Math.floor(raw));
+                  } else if (typeof raw === 'string') {
+                    const match = raw.match(/(\d+(?:\.\d+)?)/);
+                    if (match) {
+                      days = Math.max(1, Math.floor(Number(match[1])));
+                    }
+                  }
+                  return new Date(start.getTime() + days * 24 * 60 * 60 * 1000);
+                })(),
                 location: {
                   '@type': 'Place',
                   name: event.location.name,
@@ -85,7 +101,15 @@ export async function generateSEOMetadata({
                     addressCountry: event.location.country
                   }
                 },
-                duration: `P${event.duration}D`
+                // Represent ISO 8601 duration in days if we could parse a number
+                duration: (() => {
+                  const raw = (event as any).duration;
+                  const match = typeof raw === 'string' ? raw.match(/(\d+(?:\.\d+)?)/) : null;
+                  const days = typeof raw === 'number' && Number.isFinite(raw)
+                    ? Math.floor(raw)
+                    : match ? Math.floor(Number(match[1])) : 1;
+                  return `P${days}D`;
+                })()
               })
             }
           };
