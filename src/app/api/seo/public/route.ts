@@ -83,7 +83,22 @@ export async function GET(request: NextRequest) {
                 description: event.description,
                 image: event.images,
                 startDate: event.dates?.[0] || null,
-                endDate: event.dates?.[0] ? new Date(new Date(event.dates[0]).getTime() + ((event.duration || 1) * 24 * 60 * 60 * 1000)) : null,
+                // Compute endDate based on duration which may be free-text (e.g., "5 Days 4 Nights")
+                endDate: (() => {
+                  const start = event.dates?.[0];
+                  if (!start) return null;
+                  const raw = (event as any).duration;
+                  let days = 1;
+                  if (typeof raw === 'number' && Number.isFinite(raw)) {
+                    days = Math.max(1, Math.floor(raw));
+                  } else if (typeof raw === 'string') {
+                    const match = raw.match(/(\d+(?:\.\d+)?)/);
+                    if (match) {
+                      days = Math.max(1, Math.floor(Number(match[1])));
+                    }
+                  }
+                  return new Date(new Date(start).getTime() + days * 24 * 60 * 60 * 1000);
+                })(),
                 location: {
                   '@type': 'Place',
                   name: event.location?.name || 'Adventure Location',
@@ -104,7 +119,15 @@ export async function GET(request: NextRequest) {
                   name: 'Avid Explores',
                   url: process.env.NEXT_PUBLIC_BASE_URL
                 },
-                duration: `P${event.duration || 1}D`
+                // ISO 8601 duration in days (parse numeric value from free-text)
+                duration: (() => {
+                  const raw = (event as any).duration;
+                  const match = typeof raw === 'string' ? raw.match(/(\d+(?:\.\d+)?)/) : null;
+                  const days = typeof raw === 'number' && Number.isFinite(raw)
+                    ? Math.floor(raw)
+                    : match ? Math.floor(Number(match[1])) : 1;
+                  return `P${days}D`;
+                })()
               }
             },
             {

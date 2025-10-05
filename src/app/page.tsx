@@ -214,7 +214,13 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.length > 0 ? (
               testimonials.map((testimonial) => (
-                <TestimonialCard key={testimonial._id} testimonial={testimonial} />
+                <TestimonialCard
+                  key={testimonial._id}
+                  name={testimonial.customerName || testimonial?.userId?.name || 'Happy Traveler'}
+                  avatar={testimonial.customerPhoto || (testimonial.images?.[0] || '/default-avatar.png')}
+                  rating={testimonial.rating || 5}
+                  review={testimonial.review || ''}
+                />
               ))
             ) : (
               <div className="col-span-full text-center py-8">
