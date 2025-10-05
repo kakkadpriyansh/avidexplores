@@ -203,7 +203,7 @@ const EventCard = ({ event }: EventCardProps) => {
                       : event.duration
                     }
                   </span>
-                  <span className="text-gray-300">•</span>
+                  <span aria-hidden className="inline-block w-px h-3 bg-gray-300" />
                   <Users className="h-3 w-3 text-primary" />
                   <span className="font-medium">{event.maxParticipants}</span>
                 </div>
