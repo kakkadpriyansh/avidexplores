@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { MapPin, Clock, Users, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Flexible Event interface that handles both mock data and database data
 interface FlexibleEvent {
@@ -44,13 +44,28 @@ const EventCard = ({ event }: EventCardProps) => {
 
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
+
+  // Auto-rotate and swipe handling
+  const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (images.length <= 1 || isPaused) return;
+    const id = window.setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => window.clearInterval(id);
+  }, [images.length, isPaused]);
 
   const getDifficultyColor = (difficulty: string) => {
     const normalizedDifficulty = difficulty.toLowerCase();
@@ -76,14 +91,56 @@ const EventCard = ({ event }: EventCardProps) => {
 
   return (
     <Link href={`/events/${event.slug}`} className="block">
-      <div className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 transform hover:-translate-y-1">
+      <div className="bg-white rounded-2xl shadow-xl hover:shadow-[0_20px_50px_-10px_rgba(59,130,246,0.35)] transition-all duration-500 overflow-hidden group border border-white/60 transform hover:-translate-y-2 w-full max-w-[520px] mx-auto">
         {/* Image Gallery */}
-        <div className="relative overflow-hidden h-44">
+        <div
+          className="relative overflow-hidden aspect-[4/3]"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={(e) => {
+            if (e.touches && e.touches[0]) {
+              touchStartX.current = e.touches[0].clientX;
+              touchStartY.current = e.touches[0].clientY;
+            }
+          }}
+          onTouchEnd={(e) => {
+            const endX = e.changedTouches[0]?.clientX ?? 0;
+            const endY = e.changedTouches[0]?.clientY ?? 0;
+            const dx = endX - (touchStartX.current ?? 0);
+            const dy = endY - (touchStartY.current ?? 0);
+            // Only act on horizontal swipes
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+              if (dx < 0) {
+                setCurrentImageIndex((prev) => (prev + 1) % images.length);
+              } else {
+                setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+              }
+            }
+            touchStartX.current = null;
+            touchStartY.current = null;
+          }}
+        >
           <img
             src={images[currentImageIndex]}
             alt={`${event.title} - Image ${currentImageIndex + 1}`}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110 group-hover:rotate-[0.5deg]"
           />
+          {/* Vignette + glow overlay */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                'radial-gradient(60% 60% at 50% 40%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.18) 100%), linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.15), transparent)'
+            }}
+          />
+          {/* Hover CTA */}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+            <Button
+              className="opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-500 rounded-full px-2 py-1 text-[0.7rem] bg-white/80 text-gray-900 backdrop-blur-md hover:bg-white shadow-sm border border-white/60"
+            >
+              View Details
+            </Button>
+          </div>
           {images.length > 1 && (
             <>
               <button
@@ -104,45 +161,64 @@ const EventCard = ({ event }: EventCardProps) => {
                     key={index}
                     onClick={(e) => {
                       e.preventDefault();
+                      e.stopPropagation();
                       setCurrentImageIndex(index);
                     }}
                     className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                      index === currentImageIndex ? 'bg-white scale-125' : 'bg-white/60 hover:bg-white/80'
+                      index === currentImageIndex ? 'bg-white shadow ring-1 ring-white/70 scale-125' : 'bg-white/60 hover:bg-white/80'
                     }`}
                   />
                 ))}
               </div>
             </>
           )}
+          {/* Accent sparkles */}
+          <div className="absolute -top-8 -right-8 w-40 h-40 bg-fuchsia-400/20 blur-3xl rounded-full group-hover:opacity-80 opacity-0 transition-opacity"></div>
+          <div className="absolute -bottom-10 -left-10 w-44 h-44 bg-blue-400/20 blur-3xl rounded-full group-hover:opacity-80 opacity-0 transition-opacity"></div>
+
           <div className="absolute top-2 left-2">
-            <Badge className={`${getDifficultyColor(event.difficulty)} font-medium px-2 py-0.5 text-xs`}>
+            <Badge className={`${getDifficultyColor(event.difficulty)} font-medium px-2 py-0.5 text-xs backdrop-blur-md border border-white/30 shadow-sm`}>
               {formatDifficulty(event.difficulty)}
             </Badge>
           </div>
           <div className="absolute top-2 right-2">
-            <Badge variant="secondary" className="bg-background/90 text-foreground font-medium px-2 py-0.5 text-xs">
+            <Badge variant="secondary" className="bg-white/70 backdrop-blur-xl text-foreground font-medium px-2 py-0.5 text-xs border border-white/60 shadow-sm">
               {event.category}
             </Badge>
           </div>
+          {/* Sheen sweep */}
+          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-[1200ms] bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
         </div>
 
         {/* Content */}
-        <div className="p-4">
+        <div className="p-2.5 md:p-3">
           <div className="mb-3">
-            <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
-              {event.title}
-            </h3>
-            
-            <p className="text-gray-600 text-xs leading-relaxed line-clamp-2 mb-3">
+            <div className="relative">
+              <h3 className="text-sm md:text-base font-semibold tracking-tight text-gray-900 group-hover:text-red-700 transition-colors line-clamp-1 pr-20">
+                {event.title}
+              </h3>
+              <div className="absolute top-0 right-0 flex flex-col items-end leading-tight">
+                {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
+                  <>
+                    <span className="text-[0.7rem] text-gray-500 line-through">₹{event.price}</span>
+                    <span className="text-base md:text-lg font-semibold text-green-600">₹{event.discountedPrice}</span>
+                  </>
+                ) : (
+                  <span className="text-base md:text-lg font-semibold text-gray-900">₹{event.price}</span>
+                )}
+                <span className="text-[0.7rem] text-gray-500">per person</span>
+              </div>
+            </div>
+            <p className="text-gray-600 text-[0.8rem] md:text-[0.9rem] leading-relaxed line-clamp-2 mb-2">
               {event.shortDescription}
             </p>
           </div>
 
           {/* Details */}
-          <div className="flex flex-col space-y-1.5 mb-3 text-xs text-muted-foreground">
+          <div className="flex flex-col space-y-1.5 mb-2.5 text-[0.75rem] md:text-[0.85rem] text-gray-600">
             <div className="flex items-center space-x-1.5">
               <MapPin className="h-3 w-3 text-primary flex-shrink-0" />
-              <span className="truncate">
+              <span className="truncate font-medium">
                 {typeof event.location === 'string' 
                   ? event.location 
                   : `${event.location?.name || 'Location TBD'}, ${event.location?.state || ''}`
@@ -152,7 +228,7 @@ const EventCard = ({ event }: EventCardProps) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-1.5">
                 <Clock className="h-3 w-3 text-primary" />
-                <span>
+                <span className="font-medium">
                   {typeof event.duration === 'number' 
                     ? `${event.duration}d`
                     : event.duration
@@ -161,7 +237,7 @@ const EventCard = ({ event }: EventCardProps) => {
               </div>
               <div className="flex items-center space-x-1.5">
                 <Users className="h-3 w-3 text-primary" />
-                <span>{event.maxParticipants}</span>
+                <span className="font-medium">{event.maxParticipants}</span>
               </div>
             </div>
           </div>
@@ -169,34 +245,13 @@ const EventCard = ({ event }: EventCardProps) => {
           {/* Tags */}
           <div className="flex flex-wrap gap-1 mb-3">
             {event.tags?.slice(0, 2).map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0.5">
+              <Badge key={tag} variant="outline" className="text-[0.7rem] md:text-[0.75rem] px-2 py-0.5 bg-white/60 backdrop-blur-sm border-gray-200">
                 {tag}
               </Badge>
             )) || null}
           </div>
 
-          {/* Price Section */}
-          <div className="pt-3 border-t border-gray-100">
-            <div>
-              {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-500 line-through">
-                    ₹{event.price}
-                  </span>
-                  <span className="text-lg font-bold text-green-600">
-                    ₹{event.discountedPrice}
-                  </span>
-                </div>
-              ) : (
-                <span className="text-lg font-bold text-gray-900">
-                  ₹{event.price}
-                </span>
-              )}
-              <span className="text-gray-500 text-xs block">
-                per person
-              </span>
-            </div>
-          </div>
+          
         </div>
       </div>
     </Link>
