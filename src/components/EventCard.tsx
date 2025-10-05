@@ -229,11 +229,12 @@ const EventCard = ({ event }: EventCardProps) => {
                 }
               </span>
             </div>
+            <div className="h-px bg-gray-200" />
             <div className="flex items-baseline gap-2 md:gap-3">
               {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
                 <span className="text-xs md:text-sm text-gray-500 line-through">₹{event.price}</span>
               ) : null}
-              <span className="text-lg md:text-xl font-bold text-gray-900">₹{event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? event.discountedPrice : event.price}</span>
+              <span className="text-lg md:text-xl font-bold text-red-600">₹{event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? event.discountedPrice : event.price}</span>
               <span className="text-[0.7rem] md:text-xs text-gray-500">per person</span>
             </div>
           </div>
