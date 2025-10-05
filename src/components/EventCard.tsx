@@ -195,7 +195,7 @@ const EventCard = ({ event }: EventCardProps) => {
           <div className="mb-3">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <div className="flex items-center space-x-1.5 text-xs text-gray-600 mb-0.5">
+                <div className="flex items-center space-x-2 text-xs text-gray-600 mb-0.5">
                   <Clock className="h-3 w-3 text-primary" />
                   <span className="font-medium">
                     {typeof event.duration === 'number' 
@@ -203,14 +203,13 @@ const EventCard = ({ event }: EventCardProps) => {
                       : event.duration
                     }
                   </span>
+                  <span className="text-gray-300">•</span>
+                  <Users className="h-3 w-3 text-primary" />
+                  <span className="font-medium">{event.maxParticipants}</span>
                 </div>
                 <h3 className="text-lg md:text-xl font-semibold tracking-tight text-gray-900 group-hover:text-red-700 transition-colors line-clamp-1">
                   {event.title}
                 </h3>
-              </div>
-              <div className="flex items-center text-xs md:text-sm text-gray-600">
-                <Users className="h-3 w-3 text-primary mr-1" />
-                <span className="font-medium">{event.maxParticipants}</span>
               </div>
             </div>
             <p className="text-gray-600 text-sm md:text-base leading-relaxed line-clamp-2 mb-2">
