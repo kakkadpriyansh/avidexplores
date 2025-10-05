@@ -49,7 +49,7 @@ export interface IEvent extends Document {
     };
   };
   region?: string;
-  duration: number; // in days
+  duration: string; // free text, e.g., "5 Days 4 Nights"
   maxParticipants: number;
   minParticipants: number;
   ageLimit: {
@@ -229,9 +229,10 @@ const EventSchema = new Schema<IEvent>({
     trim: true
   },
   duration: {
-    type: Number,
+    type: String,
     required: [true, 'Duration is required'],
-    min: [1, 'Duration must be at least 1 day']
+    trim: true,
+    maxlength: [100, 'Duration cannot exceed 100 characters']
   },
   maxParticipants: {
     type: Number,

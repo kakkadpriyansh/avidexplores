@@ -94,7 +94,7 @@ const EventCard = ({ event }: EventCardProps) => {
       <div className="bg-white rounded-2xl shadow-xl hover:shadow-[0_20px_50px_-10px_rgba(59,130,246,0.35)] transition-all duration-500 overflow-hidden group border border-white/60 transform hover:-translate-y-2 w-full max-w-[520px] mx-auto">
         {/* Image Gallery */}
         <div
-          className="relative overflow-hidden aspect-[4/3]"
+          className="relative overflow-hidden aspect-[5/3]"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           onTouchStart={(e) => {
@@ -193,29 +193,33 @@ const EventCard = ({ event }: EventCardProps) => {
         {/* Content */}
         <div className="p-2.5 md:p-3">
           <div className="mb-3">
-            <div className="relative">
-              <h3 className="text-sm md:text-base font-semibold tracking-tight text-gray-900 group-hover:text-red-700 transition-colors line-clamp-1 pr-20">
-                {event.title}
-              </h3>
-              <div className="absolute top-0 right-0 flex flex-col items-end leading-tight">
-                {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
-                  <>
-                    <span className="text-[0.7rem] text-gray-500 line-through">₹{event.price}</span>
-                    <span className="text-base md:text-lg font-semibold text-green-600">₹{event.discountedPrice}</span>
-                  </>
-                ) : (
-                  <span className="text-base md:text-lg font-semibold text-gray-900">₹{event.price}</span>
-                )}
-                <span className="text-[0.7rem] text-gray-500">per person</span>
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center space-x-1.5 text-xs text-gray-600 mb-0.5">
+                  <Clock className="h-3 w-3 text-primary" />
+                  <span className="font-medium">
+                    {typeof event.duration === 'number' 
+                      ? `${event.duration}d`
+                      : event.duration
+                    }
+                  </span>
+                </div>
+                <h3 className="text-lg md:text-xl font-semibold tracking-tight text-gray-900 group-hover:text-red-700 transition-colors line-clamp-1">
+                  {event.title}
+                </h3>
+              </div>
+              <div className="flex items-center text-xs md:text-sm text-gray-600">
+                <Users className="h-3 w-3 text-primary mr-1" />
+                <span className="font-medium">{event.maxParticipants}</span>
               </div>
             </div>
-            <p className="text-gray-600 text-[0.8rem] md:text-[0.9rem] leading-relaxed line-clamp-2 mb-2">
+            <p className="text-gray-600 text-sm md:text-base leading-relaxed line-clamp-2 mb-2">
               {event.shortDescription}
             </p>
           </div>
 
           {/* Details */}
-          <div className="flex flex-col space-y-1.5 mb-2.5 text-[0.75rem] md:text-[0.85rem] text-gray-600">
+          <div className="flex flex-col space-y-1.5 mb-2.5 text-sm md:text-base text-gray-600">
             <div className="flex items-center space-x-1.5">
               <MapPin className="h-3 w-3 text-primary flex-shrink-0" />
               <span className="truncate font-medium">
@@ -225,31 +229,23 @@ const EventCard = ({ event }: EventCardProps) => {
                 }
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-1.5">
-                <Clock className="h-3 w-3 text-primary" />
-                <span className="font-medium">
-                  {typeof event.duration === 'number' 
-                    ? `${event.duration}d`
-                    : event.duration
-                  }
-                </span>
-              </div>
-              <div className="flex items-center space-x-1.5">
-                <Users className="h-3 w-3 text-primary" />
-                <span className="font-medium">{event.maxParticipants}</span>
+            <div className="flex items-center justify-between gap-2 md:gap-3">
+              <div className="flex items-center gap-1.5 bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white rounded-full px-3 py-1.5 shadow-md ring-1 ring-white/20 transition-transform duration-300 hover:scale-[1.03]">
+                <Star className="h-3 w-3 opacity-90" />
+                {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
+                  <>
+                    <span className="text-xs text-white/70 line-through mr-1">₹{event.price}</span>
+                    <span className="text-sm md:text-base font-bold">₹{event.discountedPrice}</span>
+                  </>
+                ) : (
+                  <span className="text-sm md:text-base font-bold">₹{event.price}</span>
+                )}
+                <span className="text-[0.7rem] text-white/80 ml-2">per person</span>
               </div>
             </div>
           </div>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1 mb-3">
-            {event.tags?.slice(0, 2).map((tag) => (
-              <Badge key={tag} variant="outline" className="text-[0.7rem] md:text-[0.75rem] px-2 py-0.5 bg-white/60 backdrop-blur-sm border-gray-200">
-                {tag}
-              </Badge>
-            )) || null}
-          </div>
+          
 
           
         </div>
