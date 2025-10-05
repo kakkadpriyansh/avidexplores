@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
       difficulty,
       images: images?.filter((item: string) => item.trim() !== '') || [],
       location: locationObj,
-      duration: parseInt(duration) || 1,
+      duration: duration || '1 Day',
       maxParticipants: parseInt(maxParticipants) || 10,
       minParticipants: parseInt(minParticipants) || 1,
       ageLimit: ageLimit || { min: 18, max: 65 },

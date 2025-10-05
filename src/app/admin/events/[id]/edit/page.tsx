@@ -65,7 +65,7 @@ interface Event {
     };
   };
   region?: string;
-  duration: number;
+  duration: string;
   maxParticipants: number;
   minParticipants: number;
   ageLimit: {
@@ -112,6 +112,8 @@ export default function EditEventPage() {
       console.log('Discounted price from API:', data.discountedPrice);
       setEvent({
         ...data,
+        // Normalize duration to string for free-text edit
+        duration: (data.duration !== undefined && data.duration !== null) ? String(data.duration) : '',
         discountedPrice: data.discountedPrice || undefined,
         availableMonths: data.availableMonths || [],
         availableDates: Array.isArray(data.availableDates) && data.availableDates.length > 0
@@ -139,12 +141,34 @@ export default function EditEventPage() {
 
     setSaving(true);
     try {
-      const payload = {
-        ...event,
+      // Sanitize availableDates: include only fully valid entries
+      const validAvailableDates = (event.availableDates || [])
+        .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
+          && entry.year !== undefined && entry.year !== null
+          && Array.isArray(entry.dates) && entry.dates.length > 0
+          && entry.dates.every((d: any) => Number.isFinite(Number(d))))
+        .map((entry: any) => ({
+          month: String(entry.month).trim(),
+          year: Number(entry.year),
+          dates: entry.dates.map((d: any) => Number(d)),
+          location: entry.location ? String(entry.location) : undefined,
+          availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
+          totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
+        }))
+        .filter((e: any) => e.dates.length > 0);
+
+      // Minimal payload: update only fields changed on this form section
+      const payload: any = {
+        title: event.title,
+        price: Number(event.price),
+        discountedPrice: (typeof event.discountedPrice === 'number')
+          ? event.discountedPrice
+          : undefined,
+        duration: String(event.duration).trim(),
         updatedAt: new Date().toISOString()
       };
 
-      console.log('Sending payload:', { title: payload.title, price: payload.price, discountedPrice: payload.discountedPrice });
+      console.log('Sending payload:', { title: payload.title, price: payload.price, discountedPrice: payload.discountedPrice, duration: payload.duration });
       const response = await fetch(`/api/admin/events/${params.id}`, {
         method: 'PUT',
         headers: {
@@ -153,23 +177,32 @@ export default function EditEventPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update event');
+      let responseData: any = null;
+      try {
+        responseData = await response.json();
+      } catch (e) {
+        // Non-JSON error response
       }
 
-      const responseData = await response.json();
-      console.log('API Response:', { title: responseData.title, price: responseData.price, discountedPrice: responseData.discountedPrice });
+      if (!response.ok) {
+        const details =
+          (responseData && (responseData.details || responseData.error)) ||
+          `HTTP ${response.status} ${response.statusText}`;
+        throw new Error(typeof details === 'string' ? details : JSON.stringify(details));
+      }
+
+      console.log('API Response:', responseData);
 
       toast({
         title: 'Success',
         description: 'Event updated successfully',
       });
       router.push('/admin/events');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating event:', error);
       toast({
         title: 'Error',
-        description: 'Failed to update event',
+        description: error?.message || 'Failed to update event',
         variant: 'destructive',
       });
     } finally {
@@ -411,13 +444,12 @@ export default function EditEventPage() {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="duration">Duration (days)</Label>
+                    <Label htmlFor="duration">Duration</Label>
                     <Input
                       id="duration"
-                      type="number"
                       value={event.duration}
-                      onChange={(e) => updateEvent('duration', parseInt(e.target.value))}
-                      min="1"
+                      onChange={(e) => updateEvent('duration', e.target.value)}
+                      placeholder="e.g., 5 Days 4 Nights, 1 Week, 3 days 2 nights"
                       required
                     />
                   </div>
