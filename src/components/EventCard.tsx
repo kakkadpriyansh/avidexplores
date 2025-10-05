@@ -229,19 +229,12 @@ const EventCard = ({ event }: EventCardProps) => {
                 }
               </span>
             </div>
-            <div className="flex items-center justify-between gap-2 md:gap-3">
-              <div className="flex items-center gap-1.5 bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white rounded-full px-3 py-1.5 shadow-md ring-1 ring-white/20 transition-transform duration-300 hover:scale-[1.03]">
-                <Star className="h-3 w-3 opacity-90" />
-                {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
-                  <>
-                    <span className="text-xs text-white/70 line-through mr-1">₹{event.price}</span>
-                    <span className="text-sm md:text-base font-bold">₹{event.discountedPrice}</span>
-                  </>
-                ) : (
-                  <span className="text-sm md:text-base font-bold">₹{event.price}</span>
-                )}
-                <span className="text-[0.7rem] text-white/80 ml-2">per person</span>
-              </div>
+            <div className="flex items-baseline gap-2 md:gap-3">
+              {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
+                <span className="text-xs md:text-sm text-gray-500 line-through">₹{event.price}</span>
+              ) : null}
+              <span className="text-lg md:text-xl font-bold text-gray-900">₹{event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? event.discountedPrice : event.price}</span>
+              <span className="text-[0.7rem] md:text-xs text-gray-500">per person</span>
             </div>
           </div>
 
