@@ -94,12 +94,12 @@ export default async function HomePage() {
       <Hero />
 
       {/* Destinations Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
+      <section className="py-16 bg-muted/30" style={{ overflow: 'visible' }}>
+        <div className="container mx-auto px-4" style={{ overflow: 'visible' }}>
           {/* Destination Cards */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">Popular Destinations</h2>
-            <div className="flex gap-6 overflow-x-auto overflow-y-visible pb-4">
+            <div className="flex gap-6 overflow-x-auto pb-4 pt-2" style={{ overflowY: 'visible' }}>
               {destinations.length > 0 ? (
                 destinations.map((card) => (
                   <DestinationCard 

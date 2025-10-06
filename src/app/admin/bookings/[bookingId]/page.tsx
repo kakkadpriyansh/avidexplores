@@ -330,7 +330,12 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
                           </div>
                           <div>
                             <Label className="text-sm font-medium text-muted-foreground">Emergency Contact</Label>
-                            <p className="text-foreground">{participant.emergencyContact}</p>
+                            <p className="text-foreground">
+                              {typeof participant.emergencyContact === 'string' 
+                                ? participant.emergencyContact 
+                                : `${participant.emergencyContact?.name || ''} - ${participant.emergencyContact?.phone || ''}`
+                              }
+                            </p>
                           </div>
                         </div>
                       </div>

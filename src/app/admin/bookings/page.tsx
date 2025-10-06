@@ -251,7 +251,7 @@ export default function AdminBookingsPage() {
             </CardContent>
           </Card>
 
-          {/* Bookings List */}
+          {/* Bookings Table */}
           {filteredBookings.length === 0 ? (
             <Card className="card-adventure">
               <CardContent className="p-12 text-center">
@@ -267,105 +267,111 @@ export default function AdminBookingsPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
-              {filteredBookings.map((booking) => (
-                <Card key={booking._id} className="card-adventure">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
-                      <div className="flex-1 space-y-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                          <div>
-                            <h3 className="text-lg font-semibold text-foreground">
-                              {booking.eventId.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Booking ID: {booking.bookingId}
-                            </p>
-                          </div>
-                          <div className="flex space-x-2 mt-2 sm:mt-0">
-                            <Badge className={getStatusColor(booking.status)}>
-                              {booking.status}
-                            </Badge>
-                            <Badge className={getPaymentStatusColor(booking.paymentInfo.paymentStatus)}>
-                              {booking.paymentInfo.paymentStatus}
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                          <div className="flex items-center text-muted-foreground">
-                            <User className="h-4 w-4 mr-2" />
-                            <div>
-                              <div className="font-medium text-foreground">{booking.userId.name}</div>
-                              <div>{booking.userId.email}</div>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center text-muted-foreground">
-                            <MapPin className="h-4 w-4 mr-2" />
-                            {booking.eventId.location}
-                          </div>
-                          
-                          <div className="flex items-center text-muted-foreground">
-                            <User className="h-4 w-4 mr-2" />
-                            {booking.participants.length} participant{booking.participants.length !== 1 ? 's' : ''}
-                          </div>
-                          
-                          <div className="flex items-center text-muted-foreground">
-                            <Clock className="h-4 w-4 mr-2" />
-                            {new Date(booking.createdAt).toLocaleDateString()}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center font-semibold text-primary">
-                              <DollarSign className="h-4 w-4 mr-1" />
-                              ₹{booking.totalAmount.toLocaleString()}
-                            </div>
+            <Card className="card-adventure">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="text-left p-4 font-semibold">Booking ID</th>
+                        <th className="text-left p-4 font-semibold">Customer</th>
+                        <th className="text-left p-4 font-semibold">Event</th>
+                        <th className="text-left p-4 font-semibold">Participants</th>
+                        <th className="text-left p-4 font-semibold">Amount</th>
+                        <th className="text-left p-4 font-semibold">Status</th>
+                        <th className="text-left p-4 font-semibold">Payment</th>
+                        <th className="text-left p-4 font-semibold">Date</th>
+                        <th className="text-left p-4 font-semibold">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredBookings.map((booking) => (
+                        <tr key={booking._id} className="border-b border-border/50 hover:bg-muted/20">
+                          <td className="p-4">
+                            <div className="font-medium">{booking.bookingId}</div>
                             {booking.paymentInfo.transactionId && (
                               <div className="text-xs text-muted-foreground">
                                 TXN: {booking.paymentInfo.transactionId}
                               </div>
                             )}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-col space-y-2 lg:ml-6">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => router.push(`/admin/bookings/${booking._id}`)}
-                        >
-                          <Eye className="h-3 w-3 mr-1" />
-                          View Details
-                        </Button>
-                        
-                        {booking.status === 'PENDING' && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleStatusChange(booking._id, 'CONFIRMED')}
-                          >
-                            Confirm
-                          </Button>
-                        )}
-                        
-                        {booking.status === 'CONFIRMED' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleStatusChange(booking._id, 'COMPLETED')}
-                          >
-                            Mark Complete
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                          </td>
+                          <td className="p-4">
+                            <div className="font-medium">{booking.userId.name}</div>
+                            <div className="text-sm text-muted-foreground">{booking.userId.email}</div>
+                            {booking.userId.phone && (
+                              <div className="text-xs text-muted-foreground">{booking.userId.phone}</div>
+                            )}
+                          </td>
+                          <td className="p-4">
+                            <div className="font-medium">{booking.eventId.title}</div>
+                            <div className="text-sm text-muted-foreground flex items-center">
+                              <MapPin className="h-3 w-3 mr-1" />
+                              {booking.eventId.location}
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <div className="font-medium">{booking.participants.length}</div>
+                            <div className="text-sm text-muted-foreground">
+                              participant{booking.participants.length !== 1 ? 's' : ''}
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <div className="font-semibold text-primary">₹{booking.totalAmount.toLocaleString()}</div>
+                          </td>
+                          <td className="p-4">
+                            <Badge className={getStatusColor(booking.status)}>
+                              {booking.status}
+                            </Badge>
+                          </td>
+                          <td className="p-4">
+                            <Badge className={getPaymentStatusColor(booking.paymentInfo.paymentStatus)}>
+                              {booking.paymentInfo.paymentStatus}
+                            </Badge>
+                          </td>
+                          <td className="p-4">
+                            <div className="text-sm">{new Date(booking.createdAt).toLocaleDateString()}</div>
+                          </td>
+                          <td className="p-4">
+                            <div className="flex flex-col space-y-1">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => router.push(`/admin/bookings/${booking._id}`)}
+                                className="text-xs"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                View
+                              </Button>
+                              
+                              {booking.status === 'PENDING' && (
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleStatusChange(booking._id, 'CONFIRMED')}
+                                  className="text-xs"
+                                >
+                                  Confirm
+                                </Button>
+                              )}
+                              
+                              {booking.status === 'CONFIRMED' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleStatusChange(booking._id, 'COMPLETED')}
+                                  className="text-xs"
+                                >
+                                  Complete
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>

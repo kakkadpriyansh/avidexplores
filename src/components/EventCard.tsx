@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { MapPin, Clock, Users, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -39,18 +40,21 @@ interface EventCardProps {
 }
 
 const EventCard = ({ event }: EventCardProps) => {
+  const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const images = event.images || (event.image ? [event.image] : ['/placeholder-event.jpg']);
 
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
@@ -90,36 +94,36 @@ const EventCard = ({ event }: EventCardProps) => {
   };
 
   return (
-    <Link href={`/events/${event.slug}`} className="block">
-      <div className="bg-white rounded-2xl shadow-xl hover:shadow-[0_20px_50px_-10px_rgba(59,130,246,0.35)] transition-all duration-500 overflow-hidden group border border-white/60 transform hover:-translate-y-2 w-full max-w-[520px] mx-auto">
-        {/* Image Gallery */}
-        <div
-          className="relative overflow-hidden aspect-[5/3]"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onTouchStart={(e) => {
-            if (e.touches && e.touches[0]) {
-              touchStartX.current = e.touches[0].clientX;
-              touchStartY.current = e.touches[0].clientY;
+    <div className="bg-white rounded-2xl shadow-xl hover:shadow-[0_20px_50px_-10px_rgba(59,130,246,0.35)] transition-all duration-500 overflow-hidden group border border-white/60 transform hover:-translate-y-2 w-full max-w-[520px] mx-auto">
+      {/* Image Gallery */}
+      <div
+        className="relative overflow-hidden aspect-[5/3] cursor-pointer"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onClick={() => router.push(`/events/${event.slug}`)}
+        onTouchStart={(e) => {
+          if (e.touches && e.touches[0]) {
+            touchStartX.current = e.touches[0].clientX;
+            touchStartY.current = e.touches[0].clientY;
+          }
+        }}
+        onTouchEnd={(e) => {
+          const endX = e.changedTouches[0]?.clientX ?? 0;
+          const endY = e.changedTouches[0]?.clientY ?? 0;
+          const dx = endX - (touchStartX.current ?? 0);
+          const dy = endY - (touchStartY.current ?? 0);
+          // Only act on horizontal swipes
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+            if (dx < 0) {
+              setCurrentImageIndex((prev) => (prev + 1) % images.length);
+            } else {
+              setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
             }
-          }}
-          onTouchEnd={(e) => {
-            const endX = e.changedTouches[0]?.clientX ?? 0;
-            const endY = e.changedTouches[0]?.clientY ?? 0;
-            const dx = endX - (touchStartX.current ?? 0);
-            const dy = endY - (touchStartY.current ?? 0);
-            // Only act on horizontal swipes
-            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-              if (dx < 0) {
-                setCurrentImageIndex((prev) => (prev + 1) % images.length);
-              } else {
-                setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-              }
-            }
-            touchStartX.current = null;
-            touchStartY.current = null;
-          }}
-        >
+          }
+          touchStartX.current = null;
+          touchStartY.current = null;
+        }}
+      >
           <img
             src={images[currentImageIndex]}
             alt={`${event.title} - Image ${currentImageIndex + 1}`}
@@ -133,40 +137,37 @@ const EventCard = ({ event }: EventCardProps) => {
                 'radial-gradient(60% 60% at 50% 40%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.18) 100%), linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.15), transparent)'
             }}
           />
-          {/* Hover CTA */}
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
-            <Button
-              className="opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-500 rounded-full px-2 py-1 text-[0.7rem] bg-white/80 text-gray-900 backdrop-blur-md hover:bg-white shadow-sm border border-white/60"
-            >
-              View Details
-            </Button>
-          </div>
+
           {images.length > 1 && (
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                className="hidden md:block absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50"
+                style={{ pointerEvents: 'auto' }}
               >
                 <ChevronLeft className="h-3 w-3" />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                className="hidden md:block absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50"
+                style={{ pointerEvents: 'auto' }}
               >
                 <ChevronRight className="h-3 w-3" />
               </button>
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-1 z-50">
                 {images.map((_, index) => (
                   <button
                     key={index}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
+                      e.nativeEvent.stopImmediatePropagation();
                       setCurrentImageIndex(index);
                     }}
                     className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                       index === currentImageIndex ? 'bg-white shadow ring-1 ring-white/70 scale-125' : 'bg-white/60 hover:bg-white/80'
                     }`}
+                    style={{ pointerEvents: 'auto' }}
                   />
                 ))}
               </div>
@@ -191,7 +192,8 @@ const EventCard = ({ event }: EventCardProps) => {
         </div>
 
         {/* Content */}
-        <div className="p-2.5 md:p-3">
+        <Link href={`/events/${event.slug}`} className="block">
+          <div className="p-2.5 md:p-3">
           <div className="mb-3">
             <div className="flex items-center justify-between">
               <div className="flex-1">
@@ -241,9 +243,9 @@ const EventCard = ({ event }: EventCardProps) => {
           
 
           
-        </div>
+          </div>
+        </Link>
       </div>
-    </Link>
   );
 };
 

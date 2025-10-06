@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import EventCarousel from '@/components/EventCarousel';
+import EventCard from '@/components/EventCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Loader2, Mountain, MapPin, Trees, Waves, Building2, Globe } from 'lucide-react';
@@ -221,18 +221,11 @@ export default function EventsPage() {
               </button>
             </div>
           ) : filteredEvents.length > 0 ? (
-            <>
-
-              
-              {sortedRegions.map((region) => (
-                <EventCarousel
-                  key={region}
-                  events={groupedEvents[region]}
-                  title={region}
-                  icon={getRegionIcon(region)}
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredEvents.map((event) => (
+                <EventCard key={event._id} event={event} />
               ))}
-            </>
+            </div>
           ) : (
             <div className="text-center py-16">
               <p className="text-lg text-muted-foreground mb-4">
