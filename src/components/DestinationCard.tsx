@@ -11,7 +11,7 @@ interface DestinationCardProps {
 const DestinationCard = ({ name, image, subtitle, slug, link }: DestinationCardProps) => {
   const content = (
     <div
-      className="group relative w-64 aspect-[3/5] rounded-3xl overflow-hidden flex-shrink-0 shadow-xl hover:shadow-2xl transform-gpu transition-transform duration-500 hover:-translate-y-2"
+      className="group relative z-0 w-64 md:w-72 aspect-[3/5] rounded-3xl overflow-hidden flex-shrink-0 ring-1 ring-black/5 transition-all duration-500 hover:-translate-y-2 hover:z-20 hover:ring-black/10"
       style={{ willChange: 'transform' }}
     >
       {/* Image */}
@@ -20,12 +20,12 @@ const DestinationCard = ({ name, image, subtitle, slug, link }: DestinationCardP
         alt={name}
         className="absolute inset-0 w-full h-full object-cover transform-gpu transition-transform duration-700 ease-out group-hover:scale-110"
       />
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+      {/* Overlay: subtle at top, stronger at bottom for depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/60" />
 
-      {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-        <h2 className="text-xl md:text-2xl font-bold leading-tight">
+      {/* Title at top like the reference card */}
+      <div className="absolute top-0 left-0 right-0 p-5 text-white pointer-events-none">
+        <h2 className="text-2xl md:text-3xl font-bold tracking-wide drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
           {name}
         </h2>
         {subtitle && (
@@ -34,6 +34,9 @@ const DestinationCard = ({ name, image, subtitle, slug, link }: DestinationCardP
           </p>
         )}
       </div>
+
+      {/* Bottom shine bar for nicer hover accent */}
+      <div className="absolute bottom-0 left-0 right-0 h-2 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     </div>
   );
 
