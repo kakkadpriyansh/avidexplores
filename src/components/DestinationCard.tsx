@@ -11,7 +11,7 @@ interface DestinationCardProps {
 const DestinationCard = ({ name, image, subtitle, slug, link }: DestinationCardProps) => {
   const content = (
     <div
-      className="group relative z-0 w-64 md:w-72 aspect-[3/5] rounded-3xl overflow-hidden flex-shrink-0 ring-1 ring-black/5 transition-all duration-500 hover:-translate-y-2 hover:z-20 hover:ring-black/10"
+      className="group relative z-0 w-48 md:w-56 aspect-[257.5/391.4] rounded-2xl overflow-hidden flex-shrink-0 ring-1 ring-black/5 transition-all duration-500 hover:-translate-y-2 hover:z-20 hover:ring-black/10"
       style={{ willChange: 'transform' }}
     >
       {/* Image */}
@@ -24,12 +24,12 @@ const DestinationCard = ({ name, image, subtitle, slug, link }: DestinationCardP
       <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/60" />
 
       {/* Title at top like the reference card */}
-      <div className="absolute top-0 left-0 right-0 p-5 text-white pointer-events-none">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-wide drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
+      <div className="absolute top-0 left-0 right-0 p-3 text-white pointer-events-none">
+        <h2 className="text-lg md:text-xl font-bold tracking-wide drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
           {name}
         </h2>
         {subtitle && (
-          <p className="text-xs md:text-sm text-white/80 mt-1">
+          <p className="text-xs text-white/80 mt-1">
             {subtitle}
           </p>
         )}
