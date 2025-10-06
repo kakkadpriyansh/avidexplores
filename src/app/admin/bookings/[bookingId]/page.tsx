@@ -50,7 +50,7 @@ interface BookingDetails {
     name: string;
     age: number;
     gender: string;
-    emergencyContact: string;
+    emergencyContact: string | { name?: string; phone?: string };
   }>;
   totalAmount: number;
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
