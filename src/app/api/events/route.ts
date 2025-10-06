@@ -113,6 +113,7 @@ export async function POST(request: NextRequest) {
       dates,
       availableMonths,
       availableDates,
+      departures,
       itinerary,
       inclusions,
       exclusions,
@@ -181,6 +182,61 @@ export async function POST(request: NextRequest) {
       accommodation: item.accommodation || ''
     })) || [];
 
+    // Sanitize availableDates: include only valid entries, coerce types
+    const sanitizedAvailableDates = Array.isArray(availableDates)
+      ? availableDates
+          .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
+            && entry.year !== undefined && entry.year !== null
+            && Array.isArray(entry.dates) && entry.dates.length > 0
+            && entry.dates.every((d: any) => Number.isFinite(Number(d))))
+          .map((entry: any) => ({
+            month: String(entry.month).trim(),
+            year: Number(entry.year),
+            dates: entry.dates.map((d: any) => Number(d)),
+            location: entry.location ? String(entry.location) : undefined,
+            availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
+            totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
+          }))
+          .filter((e: any) => e.dates.length > 0)
+      : [];
+
+    // Sanitize departures: label, origin, destination, transport options, and nested availableDates
+    const sanitizedDepartures = Array.isArray(departures)
+      ? departures
+          .filter((dep: any) => dep && typeof dep.label === 'string' && dep.label.trim() !== ''
+            && typeof dep.origin === 'string' && dep.origin.trim() !== ''
+            && typeof dep.destination === 'string' && dep.destination.trim() !== '')
+          .map((dep: any) => ({
+            label: String(dep.label).trim(),
+            origin: String(dep.origin).trim(),
+            destination: String(dep.destination).trim(),
+            transportOptions: Array.isArray(dep.transportOptions) ? dep.transportOptions
+              .filter((opt: any) => opt && typeof opt.mode === 'string' && ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(opt.mode)
+                && opt.price !== undefined && opt.price !== null)
+              .map((opt: any) => ({
+                mode: String(opt.mode),
+                price: Number(opt.price)
+              })) : [],
+            availableDates: Array.isArray(dep.availableDates) ? dep.availableDates
+              .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
+                && entry.year !== undefined && entry.year !== null
+                && Array.isArray(entry.dates) && entry.dates.length > 0
+                && entry.dates.every((d: any) => Number.isFinite(Number(d))))
+              .map((entry: any) => ({
+                month: String(entry.month).trim(),
+                year: Number(entry.year),
+                dates: entry.dates.map((d: any) => Number(d)),
+                availableTransportModes: Array.isArray(entry.availableTransportModes)
+                  ? entry.availableTransportModes
+                      .map((m: any) => String(m))
+                      .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                  : undefined,
+                availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
+                totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
+              })) : []
+          }))
+      : [];
+
     // Set default values for required fields
     const eventData = {
       title,
@@ -192,7 +248,8 @@ export async function POST(request: NextRequest) {
       discountedPrice: typeof discountedPrice === 'number' && discountedPrice >= 0 ? discountedPrice : undefined,
       dates: dates || [],
       availableMonths: availableMonths || [],
-      availableDates: availableDates || [],
+      availableDates: sanitizedAvailableDates,
+      departures: sanitizedDepartures,
       itinerary: processedItinerary,
       inclusions: inclusions?.filter((item: string) => item.trim() !== '') || [],
       exclusions: exclusions?.filter((item: string) => item.trim() !== '') || [],

@@ -33,6 +33,23 @@ interface Event {
     availableSeats?: number;
     totalSeats?: number;
   }[];
+  departures?: {
+    label: string;
+    origin: string;
+    destination: string;
+    transportOptions: {
+      mode: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS';
+      price: number;
+    }[];
+    availableDates: {
+      month: string;
+      year: number;
+      dates: number[];
+      availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[];
+      availableSeats?: number;
+      totalSeats?: number;
+    }[];
+  }[];
   itinerary: {
     day: number;
     title: string;
@@ -116,9 +133,10 @@ export default function EditEventPage() {
         duration: (data.duration !== undefined && data.duration !== null) ? String(data.duration) : '',
         discountedPrice: data.discountedPrice || undefined,
         availableMonths: data.availableMonths || [],
-        availableDates: Array.isArray(data.availableDates) && data.availableDates.length > 0
+        availableDates: Array.isArray(data.availableDates)
           ? data.availableDates
-          : [{ month: '', year: new Date().getFullYear(), dates: [], location: '' }],
+          : [],
+        departures: Array.isArray((data as any).departures) ? (data as any).departures : []
       });
     } catch (error) {
       console.error('Error fetching event:', error);
@@ -131,6 +149,95 @@ export default function EditEventPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Departures & Transport options handlers
+  const addDeparture = () => {
+    setEvent(prev => prev ? {
+      ...prev,
+      departures: [...(prev.departures || []), {
+        label: '',
+        origin: '',
+        destination: '',
+        transportOptions: [{ mode: 'BUS', price: 0 }],
+        availableDates: []
+      }]
+    } : prev);
+  };
+
+  const updateDepartureField = (index: number, field: keyof NonNullable<Event['departures']>[number], value: any) => {
+    setEvent(prev => {
+      if (!prev) return prev;
+      const newDepartures = [...(prev.departures || [])];
+      (newDepartures[index] as any)[field] = value;
+      return { ...prev, departures: newDepartures };
+    });
+  };
+
+  const removeDeparture = (index: number) => {
+    setEvent(prev => prev ? {
+      ...prev,
+      departures: (prev.departures || []).filter((_, i) => i !== index)
+    } : prev);
+  };
+
+  const addTransportOption = (depIndex: number) => {
+    setEvent(prev => {
+      if (!prev) return prev;
+      const newDepartures = [...(prev.departures || [])];
+      newDepartures[depIndex].transportOptions.push({ mode: 'BUS', price: 0 });
+      return { ...prev, departures: newDepartures };
+    });
+  };
+
+  const updateTransportOption = (depIndex: number, optIndex: number, field: 'mode' | 'price', value: any) => {
+    setEvent(prev => {
+      if (!prev) return prev;
+      const newDepartures = [...(prev.departures || [])];
+      (newDepartures[depIndex].transportOptions[optIndex] as any)[field] = value;
+      return { ...prev, departures: newDepartures };
+    });
+  };
+
+  const removeTransportOption = (depIndex: number, optIndex: number) => {
+    setEvent(prev => {
+      if (!prev) return prev;
+      const newDepartures = [...(prev.departures || [])];
+      newDepartures[depIndex].transportOptions = newDepartures[depIndex].transportOptions.filter((_, i) => i !== optIndex);
+      return { ...prev, departures: newDepartures };
+    });
+  };
+
+  const addDepartureDateEntry = (depIndex: number) => {
+    setEvent(prev => {
+      if (!prev) return prev;
+      const newDepartures = [...(prev.departures || [])];
+      newDepartures[depIndex].availableDates.push({ month: '', year: new Date().getFullYear(), dates: [], availableTransportModes: [] });
+      return { ...prev, departures: newDepartures };
+    });
+  };
+
+  const updateDepartureDateEntry = (
+    depIndex: number,
+    dateIndex: number,
+    field: keyof NonNullable<Event['departures']>[number]['availableDates'][number],
+    value: any
+  ) => {
+    setEvent(prev => {
+      if (!prev) return prev;
+      const newDepartures = [...(prev.departures || [])];
+      (newDepartures[depIndex].availableDates[dateIndex] as any)[field] = value;
+      return { ...prev, departures: newDepartures };
+    });
+  };
+
+  const removeDepartureDateEntry = (depIndex: number, dateIndex: number) => {
+    setEvent(prev => {
+      if (!prev) return prev;
+      const newDepartures = [...(prev.departures || [])];
+      newDepartures[depIndex].availableDates = newDepartures[depIndex].availableDates.filter((_, i) => i !== dateIndex);
+      return { ...prev, departures: newDepartures };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -165,6 +272,8 @@ export default function EditEventPage() {
           ? event.discountedPrice
           : undefined,
         duration: String(event.duration).trim(),
+        availableDates: validAvailableDates,
+        departures: event.departures || [],
         updatedAt: new Date().toISOString()
       };
 
@@ -795,7 +904,7 @@ export default function EditEventPage() {
                               availableDates: (prev.availableDates || []).filter((_, i) => i !== index)
                             } : prev);
                           }}
-                          disabled={(event?.availableDates || []).length === 1}
+                          
                         >
                           Remove
                         </Button>
@@ -993,6 +1102,251 @@ export default function EditEventPage() {
                     }}
                   >
                     Add Date Entry
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Departures & Transport Options */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Departures & Transport Options</CardTitle>
+                  <CardDescription>Configure origins, transport pricing, and date availability per departure</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {(event?.departures || []).map((departure, depIndex) => (
+                    <div key={depIndex} className="border rounded-lg p-4 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                          <Label>Label</Label>
+                          <Input
+                            value={departure.label}
+                            onChange={(e) => updateDepartureField(depIndex, 'label', e.target.value)}
+                            placeholder="e.g., Rajkot to Rajkot"
+                          />
+                        </div>
+                        <div>
+                          <Label>Origin</Label>
+                          <Input
+                            value={departure.origin}
+                            onChange={(e) => updateDepartureField(depIndex, 'origin', e.target.value)}
+                            placeholder="e.g., Rajkot"
+                          />
+                        </div>
+                        <div>
+                          <Label>Destination</Label>
+                          <Input
+                            value={departure.destination}
+                            onChange={(e) => updateDepartureField(depIndex, 'destination', e.target.value)}
+                            placeholder="e.g., Spiti"
+                          />
+                        </div>
+                        <div className="flex items-end">
+                          <Button type="button" variant="outline" onClick={() => removeDeparture(depIndex)}>
+                            Remove Departure
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-base font-semibold">Departures: Dates + Transport Options</Label>
+                        <div className="grid md:grid-cols-2 gap-6 mt-2">
+                          <div>
+                            <Label className="text-sm font-medium">Transport Options</Label>
+                            <div className="space-y-3 mt-2">
+                          {departure.transportOptions.map((opt, optIndex) => (
+                            <div key={optIndex} className="flex flex-col md:flex-row gap-2 items-end">
+                              <div className="md:w-1/3">
+                                <Label>Mode</Label>
+                                <select
+                                  value={opt.mode}
+                                  onChange={(e) => updateTransportOption(depIndex, optIndex, 'mode', e.target.value)}
+                                  className="w-full border rounded px-3 py-2"
+                                >
+                                  <option value="AC_TRAIN">AC Train</option>
+                                  <option value="NON_AC_TRAIN">Non-AC Train</option>
+                                  <option value="FLIGHT">Flight</option>
+                                  <option value="BUS">Bus</option>
+                                </select>
+                              </div>
+                              <div className="md:w-1/3">
+                                <Label>Price (per person)</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  value={opt.price}
+                                  onChange={(e) => updateTransportOption(depIndex, optIndex, 'price', parseInt(e.target.value) || 0)}
+                                  placeholder="Enter price"
+                                />
+                              </div>
+                              <div>
+                                <Button type="button" variant="outline" onClick={() => removeTransportOption(depIndex, optIndex)}>Remove</Button>
+                              </div>
+                            </div>
+                          ))}
+                          <Button type="button" variant="outline" onClick={() => addTransportOption(depIndex)}>
+                            Add Transport Option
+                          </Button>
+                            </div>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-medium">Departure-specific Available Dates</Label>
+                            <div className="space-y-4 mt-2">
+                          {departure.availableDates.map((dateEntry, dateIndex) => (
+                            <div key={dateIndex} className="border rounded p-3 space-y-3">
+                              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                <div>
+                                  <Label>Month</Label>
+                                  <Input
+                                    value={dateEntry.month}
+                                    onChange={(e) => updateDepartureDateEntry(depIndex, dateIndex, 'month', e.target.value)}
+                                    placeholder="e.g., December"
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Year</Label>
+                                  <Input
+                                    type="number"
+                                    value={dateEntry.year}
+                                    onChange={(e) => updateDepartureDateEntry(depIndex, dateIndex, 'year', parseInt(e.target.value) || new Date().getFullYear())}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Total Seats</Label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    value={dateEntry.totalSeats || 20}
+                                    onChange={(e) => updateDepartureDateEntry(depIndex, dateIndex, 'totalSeats', parseInt(e.target.value) || 1)}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Available Seats</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    value={dateEntry.availableSeats || dateEntry.totalSeats || 20}
+                                    onChange={(e) => updateDepartureDateEntry(depIndex, dateIndex, 'availableSeats', parseInt(e.target.value) || 0)}
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <Label>Dates in {dateEntry.month || 'Selected Month'}</Label>
+                                <div className="mt-2">
+                                  <div className="flex flex-wrap gap-2 mb-2">
+                                    {dateEntry.dates.map((d, dIndex) => (
+                                      <span key={dIndex} className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                                        {d}
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            if (!event) return;
+                                            const newDepartures = [...(event.departures || [])];
+                                            newDepartures[depIndex].availableDates[dateIndex].dates = newDepartures[depIndex].availableDates[dateIndex].dates.filter((_, i) => i !== dIndex);
+                                            setEvent({ ...event, departures: newDepartures });
+                                          }}
+                                          className="text-blue-600 hover:text-blue-800"
+                                        >
+                                          ×
+                                        </button>
+                                      </span>
+                                    ))}
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <Input
+                                      type="number"
+                                      placeholder="Add date (1-31)"
+                                      min="1"
+                                      max="31"
+                                      onKeyPress={(e) => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          const input = e.target as HTMLInputElement;
+                                          const date = parseInt(input.value);
+                                          if (!event) return;
+                                          if (date >= 1 && date <= 31 && !dateEntry.dates.includes(date)) {
+                                            const newDepartures = [...(event.departures || [])];
+                                            newDepartures[depIndex].availableDates[dateIndex].dates = [...newDepartures[depIndex].availableDates[dateIndex].dates, date].sort((a, b) => a - b);
+                                            setEvent({ ...event, departures: newDepartures });
+                                            input.value = '';
+                                          }
+                                        }
+                                      }}
+                                      className="flex-1"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      onClick={(e) => {
+                                        const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
+                                        const date = parseInt(input?.value || '');
+                                        if (!event || !input) return;
+                                        if (date >= 1 && date <= 31 && !dateEntry.dates.includes(date)) {
+                                          const newDepartures = [...(event.departures || [])];
+                                          newDepartures[depIndex].availableDates[dateIndex].dates = [...newDepartures[depIndex].availableDates[dateIndex].dates, date].sort((a, b) => a - b);
+                                          setEvent({ ...event, departures: newDepartures });
+                                          input.value = '';
+                                        }
+                                      }}
+                                    >
+                                      Add Date
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      onClick={() => removeDepartureDateEntry(depIndex, dateIndex)}
+                                    >
+                                      Remove Date Entry
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="mt-4">
+                                <Label>Transport modes available on these dates</Label>
+                                <div className="flex flex-wrap gap-3 mt-2">
+                                  {['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].map((mode) => {
+                                    const checked = Array.isArray(dateEntry.availableTransportModes) ? dateEntry.availableTransportModes.includes(mode as any) : false;
+                                    return (
+                                      <label key={mode} className="inline-flex items-center gap-2 border rounded px-3 py-2 cursor-pointer">
+                                        <input
+                                          type="checkbox"
+                                          checked={checked}
+                                          onChange={(e) => {
+                                            if (!event) return;
+                                            const newDepartures = [...(event.departures || [])];
+                                            const arr = Array.isArray(newDepartures[depIndex].availableDates[dateIndex].availableTransportModes)
+                                              ? [...(newDepartures[depIndex].availableDates[dateIndex].availableTransportModes as any[])]
+                                              : [];
+                                            if (e.target.checked) {
+                                              if (!arr.includes(mode)) arr.push(mode as any);
+                                            } else {
+                                              const idx = arr.indexOf(mode as any);
+                                              if (idx !== -1) arr.splice(idx, 1);
+                                            }
+                                            newDepartures[depIndex].availableDates[dateIndex].availableTransportModes = arr as any;
+                                            setEvent({ ...event, departures: newDepartures });
+                                          }}
+                                        />
+                                        <span>{mode.replace('_',' ').replace('AC','AC')}</span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">If none selected, all transport options are considered available.</p>
+                              </div>
+                            </div>
+                          ))}
+                          <Button type="button" variant="outline" onClick={() => addDepartureDateEntry(depIndex)}>
+                            Add Departure Date Entry
+                          </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <Button type="button" variant="outline" onClick={addDeparture}>
+                    Add Departure
                   </Button>
                 </CardContent>
               </Card>

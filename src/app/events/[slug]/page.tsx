@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingRing } from '@/components/ui/loading-ring';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 // Database Event interface
 interface DatabaseEvent {
@@ -89,6 +90,20 @@ interface DatabaseEvent {
     availableSeats?: number;
     totalSeats?: number;
   }[];
+  departures?: {
+    label: string;
+    origin: string;
+    destination: string;
+    transportOptions: { mode: string; price: number }[];
+    availableDates: {
+      month: string;
+      year: number;
+      dates: number[];
+      availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[];
+      availableSeats?: number;
+      totalSeats?: number;
+    }[];
+  }[];
   availableMonths?: string[];
   thingsToCarry: string[];
   ageLimit: {
@@ -113,6 +128,11 @@ export default function EventDetailPage() {
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set());
   const carouselApiRef = useRef<any>(null);
+  const [selectedDepartureIndex, setSelectedDepartureIndex] = useState<number | null>(null);
+  const [selectedTransportIndex, setSelectedTransportIndex] = useState<number | null>(null);
+  const [selectedDepartureMonth, setSelectedDepartureMonth] = useState<string | null>(null);
+  const [selectedDepartureDate, setSelectedDepartureDate] = useState<number | null>(null);
+  const [transportDialogOpen, setTransportDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -397,6 +417,160 @@ export default function EventDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
+              {/* Departures & Transport Options */}
+              {(event.departures && event.departures.length > 0) && (
+                <div className="mb-6 p-4 bg-muted/30 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-3">Departures & Transport Options</h3>
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    {event.departures.map((dep, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setSelectedDepartureIndex(idx);
+                          setSelectedTransportIndex(null);
+                          setSelectedDepartureMonth(null);
+                          setSelectedDepartureDate(null);
+                        }}
+                        className={`px-6 py-3 rounded-full text-sm font-medium border-2 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg ${
+                          selectedDepartureIndex === idx
+                            ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                            : 'bg-background hover:bg-primary/10 border-border hover:border-primary/50 hover:text-primary'
+                        }`}
+                      >
+                        {dep.label?.trim() ? dep.label : `${dep.origin} → ${dep.destination}`}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Transport selection modal */}
+                  <Dialog open={transportDialogOpen} onOpenChange={setTransportDialogOpen}>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Select Transport</DialogTitle>
+                        <DialogDescription>
+                          {selectedDepartureIndex !== null && event.departures[selectedDepartureIndex]
+                            ? `Choose a mode for ${event.departures[selectedDepartureIndex].label?.trim() ? event.departures[selectedDepartureIndex].label : `${event.departures[selectedDepartureIndex].origin} → ${event.departures[selectedDepartureIndex].destination}`}` +
+                              (selectedDepartureMonth && selectedDepartureDate !== null
+                                ? ` on ${selectedDepartureDate} ${selectedDepartureMonth.split('-')[0]} ${selectedDepartureMonth.split('-')[1]}`
+                                : '')
+                            : 'Choose a transport mode'}
+                        </DialogDescription>
+                      </DialogHeader>
+                      {selectedDepartureIndex !== null && event.departures[selectedDepartureIndex] && (
+                        (() => {
+                          const dep = event.departures[selectedDepartureIndex];
+                          let filteredOptions = dep.transportOptions || [];
+                          if (selectedDepartureMonth && selectedDepartureDate !== null) {
+                            const dateGroup = dep.availableDates?.find(g => `${g.month}-${g.year}` === selectedDepartureMonth);
+                            const modes = (dateGroup as any)?.availableTransportModes as string[] | undefined;
+                            if (Array.isArray(modes) && modes.length > 0) {
+                              filteredOptions = filteredOptions.filter(opt => modes.includes(opt.mode));
+                            }
+                          }
+                          if (!filteredOptions || filteredOptions.length === 0) {
+                            return (
+                              <p className="text-sm text-muted-foreground">No transport options available for the selected date.</p>
+                            );
+                          }
+                          return (
+                            <div className="flex flex-wrap gap-2">
+                              {filteredOptions.map((opt, tIdx) => (
+                                <button
+                                  key={tIdx}
+                                  onClick={() => {
+                                    const idx = dep.transportOptions.findIndex(o => o.mode === opt.mode && o.price === opt.price);
+                                    setSelectedTransportIndex(idx >= 0 ? idx : tIdx);
+                                    setTransportDialogOpen(false);
+                                  }}
+                                  className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${
+                                    dep.transportOptions[selectedTransportIndex || -1]?.mode === opt.mode && dep.transportOptions[selectedTransportIndex || -1]?.price === opt.price
+                                      ? 'bg-primary text-primary-foreground border-primary'
+                                      : 'bg-background text-muted-foreground hover:text-foreground border-border hover:border-primary/50'
+                                  }`}
+                                >
+                                  {opt.mode} · ₹{Number(opt.price || 0).toLocaleString()}
+                                </button>
+                              ))}
+                            </div>
+                          );
+                        })()
+                      )}
+                    </DialogContent>
+                  </Dialog>
+
+                  {selectedDepartureIndex !== null && event.departures[selectedDepartureIndex] && (
+                    <div className="space-y-4">
+                      {selectedTransportIndex !== null && (
+                        <p className="text-xs text-muted-foreground">
+                          Selected transport: {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.mode}
+                          {' '}(+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.price || 0).toLocaleString()})
+                        </p>
+                      )}
+
+                      <div>
+                        <h4 className="text-sm font-medium mb-2 flex items-center">
+                          <Calendar className="h-4 w-4 mr-2 text-primary" />
+                          Departure Dates
+                        </h4>
+                        <div className="flex flex-wrap gap-3 mb-4">
+                          {event.departures[selectedDepartureIndex].availableDates?.map((dateGroup, dIdx) => {
+                            const monthKey = `${dateGroup.month}-${dateGroup.year}`;
+                            return (
+                              <button
+                                key={dIdx}
+                                onClick={() => {
+                                  const next = selectedDepartureMonth === monthKey ? null : monthKey;
+                                  setSelectedDepartureMonth(next);
+                                  setSelectedDepartureDate(null);
+                                }}
+                                className={`px-6 py-3 rounded-full text-sm font-medium border-2 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg ${
+                                  selectedDepartureMonth === monthKey
+                                    ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                                    : 'bg-background hover:bg-primary/10 border-border hover:border-primary/50 hover:text-primary'
+                                }`}
+                              >
+                                {dateGroup.month} {dateGroup.year}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {selectedDepartureMonth ? (
+                          <div className="mt-4 p-3 bg-background rounded-xl border border-border/50 shadow-sm">
+                            {event.departures[selectedDepartureIndex].availableDates
+                              .filter(dateGroup => `${dateGroup.month}-${dateGroup.year}` === selectedDepartureMonth)
+                              .map((dateGroup, index) => (
+                                <div key={index}>
+                                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1">
+                                    {dateGroup.dates.map((date, dateIndex) => (
+                                    <button
+                                      key={dateIndex}
+                                      onClick={() => {
+                                        setSelectedDepartureDate(date);
+                                        setTransportDialogOpen(true);
+                                      }}
+                                      className={`h-11 w-11 flex items-center justify-center text-center border-2 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-md text-sm font-medium ${
+                                        selectedDepartureDate === date
+                                          ? 'bg-primary text-primary-foreground border-primary'
+                                          : 'bg-background text-foreground hover:bg-primary hover:text-primary-foreground border-border hover:border-primary/50'
+                                      }`}
+                                    >
+                                      {date}
+                                    </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-muted-foreground text-center py-2">
+                            Click on a month to view departure dates
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Available Dates Section - Above Tabs */}
               {(event.availableDates && event.availableDates.length > 0) && (
                 <div className="mb-6 p-4 bg-muted/30 rounded-lg">
@@ -827,26 +1001,40 @@ export default function EventDetailPage() {
               {/* Booking Card - Hidden on mobile, shown on desktop */}
               <div className={`card-adventure p-6 hidden lg:block ${activeTab === 'itinerary' ? 'sticky top-24 z-10' : ''}`}>
                 <div className="text-center mb-4">
-                  {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
-                    <div>
-                      <div className="flex items-center justify-center space-x-2 mb-1">
-                        <span className="text-lg text-muted-foreground line-through">
-                          ₹{event.price.toLocaleString()}
-                        </span>
-                        <div className="text-3xl font-bold text-green-600">
-                          ₹{event.discountedPrice.toLocaleString()}
+                  {(() => {
+                    const baseHasDiscount = event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price;
+                    const transportPrice = (selectedDepartureIndex !== null && selectedTransportIndex !== null)
+                      ? Number(event.departures?.[selectedDepartureIndex]?.transportOptions?.[selectedTransportIndex]?.price || 0)
+                      : 0;
+                    const displayOriginal = Number(event.price || 0) + transportPrice;
+                    const displayDiscounted = (baseHasDiscount ? Number(event.discountedPrice || 0) : Number(event.price || 0)) + transportPrice;
+                    return baseHasDiscount ? (
+                      <div>
+                        <div className="flex items-center justify-center space-x-2 mb-1">
+                          <span className="text-lg text-muted-foreground line-through">
+                            ₹{displayOriginal.toLocaleString()}
+                          </span>
+                          <div className="text-3xl font-bold text-green-600">
+                            ₹{displayDiscounted.toLocaleString()}
+                          </div>
                         </div>
+                        <div className="text-sm text-muted-foreground">per person</div>
+                        {transportPrice > 0 && (
+                          <div className="text-xs text-muted-foreground mt-1">Includes transport (+₹{transportPrice.toLocaleString()})</div>
+                        )}
                       </div>
-                      <div className="text-sm text-muted-foreground">per person</div>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="text-3xl font-bold text-primary mb-1">
-                        ₹{event.price.toLocaleString()}
+                    ) : (
+                      <div>
+                        <div className="text-3xl font-bold text-primary mb-1">
+                          ₹{displayDiscounted.toLocaleString()}
+                        </div>
+                        <div className="text-sm text-muted-foreground">per person</div>
+                        {transportPrice > 0 && (
+                          <div className="text-xs text-muted-foreground mt-1">Includes transport (+₹{transportPrice.toLocaleString()})</div>
+                        )}
                       </div>
-                      <div className="text-sm text-muted-foreground">per person</div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </div>
                 
                 <div className="space-y-3 mb-6">
@@ -925,24 +1113,32 @@ export default function EventDetailPage() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 z-50">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1">
-            {event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price ? (
-              <div className="flex items-baseline gap-2 flex-wrap">
-                <span className="text-sm text-muted-foreground line-through">
-                  ₹{event.price.toLocaleString()}
-                </span>
-                <span className="text-xl font-bold text-green-600">
-                  ₹{event.discountedPrice.toLocaleString()}
-                </span>
-                <span className="text-sm text-muted-foreground">per person</span>
-              </div>
-            ) : (
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl font-bold text-primary">
-                  ₹{event.price.toLocaleString()}
-                </span>
-                <span className="text-sm text-muted-foreground">per person</span>
-              </div>
-            )}
+            {(() => {
+              const baseHasDiscount = event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price;
+              const transportPrice = (selectedDepartureIndex !== null && selectedTransportIndex !== null)
+                ? Number(event.departures?.[selectedDepartureIndex]?.transportOptions?.[selectedTransportIndex]?.price || 0)
+                : 0;
+              const displayOriginal = Number(event.price || 0) + transportPrice;
+              const displayDiscounted = (baseHasDiscount ? Number(event.discountedPrice || 0) : Number(event.price || 0)) + transportPrice;
+              return baseHasDiscount ? (
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="text-sm text-muted-foreground line-through">
+                    ₹{displayOriginal.toLocaleString()}
+                  </span>
+                  <span className="text-xl font-bold text-green-600">
+                    ₹{displayDiscounted.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-muted-foreground">per person</span>
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-bold text-primary">
+                    ₹{displayDiscounted.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-muted-foreground">per person</span>
+                </div>
+              );
+            })()}
           </div>
           <Button 
             className="btn-hero px-8"

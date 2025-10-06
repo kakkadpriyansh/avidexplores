@@ -17,6 +17,23 @@ export interface IEvent extends Document {
     availableSeats?: number;
     totalSeats?: number;
   }[]; // Specific available dates with month, year and day numbers
+  departures?: {
+    label: string; // e.g., "Rajkot to Rajkot"
+    origin: string;
+    destination: string;
+    transportOptions: {
+      mode: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS';
+      price: number; // per person additional price for transport
+    }[];
+    availableDates: {
+      month: string;
+      year: number;
+      dates: number[];
+      availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[];
+      availableSeats?: number;
+      totalSeats?: number;
+    }[];
+  }[];
   itinerary: {
     day: number;
     title: string;
@@ -137,6 +154,64 @@ const EventSchema = new Schema<IEvent>({
       required: false,
       min: [1, 'Total seats must be at least 1']
     }
+  }],
+  departures: [{
+    label: {
+      type: String,
+      required: [true, 'Departure label is required'],
+      trim: true
+    },
+    origin: {
+      type: String,
+      required: [true, 'Origin is required'],
+      trim: true
+    },
+    destination: {
+      type: String,
+      required: [true, 'Destination is required'],
+      trim: true
+    },
+    transportOptions: [{
+      mode: {
+        type: String,
+        enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS'],
+        required: [true, 'Transport mode is required']
+      },
+      price: {
+        type: Number,
+        required: [true, 'Transport price is required'],
+        min: [0, 'Price cannot be negative']
+      }
+    }],
+    availableDates: [{
+      month: {
+        type: String,
+        required: true
+      },
+      year: {
+        type: Number,
+        required: true
+      },
+      dates: [{
+        type: Number,
+        required: true
+      }],
+      availableTransportModes: [{
+        type: String,
+        enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS'],
+        required: false
+      }],
+      availableSeats: {
+        type: Number,
+        required: false,
+        min: [0, 'Available seats cannot be negative']
+      },
+      totalSeats: {
+        type: Number,
+        required: false,
+        min: [1, 'Total seats must be at least 1']
+      }
+    }]
   }],
   itinerary: [{
     day: {

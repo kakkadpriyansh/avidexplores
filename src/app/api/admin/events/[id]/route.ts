@@ -94,6 +94,7 @@ export async function PUT(
     }
 
     // Sanitize availableDates: include only valid entries, coerce types
+    // IMPORTANT: Preserve explicit clearing when an empty array is sent
     if (Array.isArray(updateData.availableDates)) {
       const validAvailableDates = updateData.availableDates
         .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
@@ -109,11 +110,46 @@ export async function PUT(
           totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
         }))
         .filter((e: any) => e.dates.length > 0);
-      if (validAvailableDates.length > 0) {
-        updateData.availableDates = validAvailableDates;
-      } else {
-        delete updateData.availableDates;
-      }
+      // If client provided availableDates, always set it (even empty) to allow clearing
+      updateData.availableDates = validAvailableDates;
+    }
+
+    // Sanitize departures: label, origin, destination, transport options, and nested availableDates
+    if (Array.isArray(updateData.departures)) {
+      const validDepartures = updateData.departures
+        .filter((dep: any) => dep && typeof dep.label === 'string' && dep.label.trim() !== ''
+          && typeof dep.origin === 'string' && dep.origin.trim() !== ''
+          && typeof dep.destination === 'string' && dep.destination.trim() !== '')
+        .map((dep: any) => ({
+          label: String(dep.label).trim(),
+          origin: String(dep.origin).trim(),
+          destination: String(dep.destination).trim(),
+          transportOptions: Array.isArray(dep.transportOptions) ? dep.transportOptions
+            .filter((opt: any) => opt && typeof opt.mode === 'string' && ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(opt.mode)
+              && opt.price !== undefined && opt.price !== null)
+            .map((opt: any) => ({
+              mode: String(opt.mode),
+              price: Number(opt.price)
+            })) : [],
+          availableDates: Array.isArray(dep.availableDates) ? dep.availableDates
+            .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
+              && entry.year !== undefined && entry.year !== null
+              && Array.isArray(entry.dates) && entry.dates.length > 0
+              && entry.dates.every((d: any) => Number.isFinite(Number(d))))
+            .map((entry: any) => ({
+              month: String(entry.month).trim(),
+              year: Number(entry.year),
+              dates: entry.dates.map((d: any) => Number(d)),
+              availableTransportModes: Array.isArray(entry.availableTransportModes)
+                ? entry.availableTransportModes
+                    .map((m: any) => String(m))
+                    .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                : undefined,
+              availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
+              totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
+            })) : []
+        }));
+      updateData.departures = validDepartures;
     }
 
     // Handle discountedPrice explicitly: allow clearing by sending null
@@ -138,6 +174,8 @@ export async function PUT(
     if (updateData.price !== undefined) safeUpdate.price = Number(updateData.price);
     if (updateData.discountedPrice !== undefined) safeUpdate.discountedPrice = updateData.discountedPrice;
     if (updateData.duration !== undefined) safeUpdate.duration = String(updateData.duration).trim();
+    if (updateData.availableDates !== undefined) safeUpdate.availableDates = updateData.availableDates;
+    if (updateData.departures !== undefined) safeUpdate.departures = updateData.departures;
 
     // Set updatedAt to current time
     safeUpdate.updatedAt = new Date();
