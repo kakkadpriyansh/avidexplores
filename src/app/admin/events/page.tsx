@@ -16,8 +16,10 @@ import {
   Filter,
   MapPin,
   Calendar,
-  Users
+  Users,
+  CheckCircle
 } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 interface EventItem {
   _id: string;
@@ -216,7 +218,7 @@ export default function AdminEventsPage() {
             </CardContent>
           </Card>
 
-          {/* Events Grid */}
+          {/* Events Table */}
           {filteredEvents.length === 0 ? (
             <Card className="card-adventure">
               <CardContent className="p-12 text-center">
@@ -236,93 +238,141 @@ export default function AdminEventsPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredEvents.map((event) => (
-                <Card key={event._id} className="card-adventure">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg font-semibold line-clamp-2">
-                        {event.title}
-                      </CardTitle>
-                      <Badge className={getStatusColor(event.status)}>
-                        {event.status}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 mr-2" />
-                        {event.locationStr}
-                      </div>
-                      
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        {event.durationStr}
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center text-muted-foreground">
-                          <Users className="h-4 w-4 mr-2" />
-                          {event.currentBookings || 0}/{event.maxParticipants}
-                        </div>
-                        <div className="flex items-center font-semibold text-primary">
-                          {event.discountedPrice ? (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-sm text-muted-foreground line-through">
-                                ₹{event.price.toLocaleString()}
-                              </span>
-                              <span>₹{event.discountedPrice.toLocaleString()}</span>
+            <Card className="card-adventure">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="text-left p-4 font-semibold">Title</th>
+                        <th className="text-left p-4 font-semibold">Location</th>
+                        <th className="text-left p-4 font-semibold">Duration</th>
+                        <th className="text-left p-4 font-semibold">Participants</th>
+                        <th className="text-left p-4 font-semibold">Price</th>
+                        <th className="text-left p-4 font-semibold">Status</th>
+                        <th className="text-left p-4 font-semibold">Created</th>
+                        <th className="text-left p-4 font-semibold">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredEvents.map((event) => (
+                        <tr key={event._id} className="border-b border-border/50 hover:bg-muted/20">
+                          <td className="p-4">
+                            <div className="font-medium line-clamp-2">{event.title}</div>
+                          </td>
+                          <td className="p-4">
+                            <div className="text-sm text-muted-foreground flex items-center">
+                              <MapPin className="h-3 w-3 mr-1" />
+                              {event.locationStr}
                             </div>
-                          ) : (
-                            <span>₹{event.price.toLocaleString()}</span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="pt-4 flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => router.push(`/events/${event.slug}`)}
-                          className="flex-1"
-                        >
-                          <Eye className="h-3 w-3 mr-1" />
-                          View
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => router.push(`/admin/events/${event._id}/edit`)}
-                          className="flex-1"
-                        >
-                          <Edit className="h-3 w-3 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDeleteEvent(event._id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      
-                      {event.status === 'DRAFT' && (
-                        <Button
-                          size="sm"
-                          onClick={() => handleStatusChange(event._id, 'PUBLISHED')}
-                          className="w-full mt-2"
-                        >
-                          Publish Event
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                          </td>
+                          <td className="p-4">
+                            <div className="text-sm text-muted-foreground flex items-center">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              {event.durationStr}
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <div className="font-medium">
+                              {(event.currentBookings || 0)}/{event.maxParticipants}
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <div className="font-semibold text-primary">
+                              {event.discountedPrice ? (
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm text-muted-foreground line-through">
+                                    ₹{event.price.toLocaleString()}
+                                  </span>
+                                  <span>₹{event.discountedPrice.toLocaleString()}</span>
+                                </div>
+                              ) : (
+                                <span>₹{event.price.toLocaleString()}</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <Badge className={getStatusColor(event.status)}>
+                              {event.status}
+                            </Badge>
+                          </td>
+                          <td className="p-4">
+                            <div className="text-sm">{new Date(event.createdAt).toLocaleDateString()}</div>
+                          </td>
+                          <td className="p-4">
+                            <TooltipProvider>
+                              <div className="flex items-center gap-2">
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-8 w-8 [&_svg]:size-3"
+                                      aria-label="View"
+                                      onClick={() => router.push(`/events/${event.slug}`)}
+                                    >
+                                      <Eye />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>View</TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-8 w-8 [&_svg]:size-3"
+                                      aria-label="Edit"
+                                      onClick={() => router.push(`/admin/events/${event._id}/edit`)}
+                                    >
+                                      <Edit />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Edit</TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-8 w-8 [&_svg]:size-3 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      aria-label="Delete"
+                                      onClick={() => handleDeleteEvent(event._id)}
+                                    >
+                                      <Trash2 />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Delete</TooltipContent>
+                                </Tooltip>
+
+                                {event.status === 'DRAFT' && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 [&_svg]:size-3"
+                                        aria-label="Publish"
+                                        onClick={() => handleStatusChange(event._id, 'PUBLISHED')}
+                                      >
+                                        <CheckCircle />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Publish</TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            </TooltipProvider>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
