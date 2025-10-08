@@ -51,4 +51,8 @@ const InquirySchema = new Schema<IInquiry>({
   timestamps: true
 });
 
-export default mongoose.models.Inquiry || mongoose.model<IInquiry>('Inquiry', InquirySchema);
+// Ensure consistent typing to avoid union-callable issues in TypeScript
+const InquiryModel: mongoose.Model<IInquiry> =
+  (mongoose.models.Inquiry as mongoose.Model<IInquiry>) || mongoose.model<IInquiry>('Inquiry', InquirySchema);
+
+export default InquiryModel;
