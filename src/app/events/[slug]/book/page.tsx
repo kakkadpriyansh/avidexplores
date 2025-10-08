@@ -728,7 +728,7 @@ export default function BookEventPage() {
                     {selectedDate && (
                       <div className="flex justify-between">
                         <span>Selected Date:</span>
-                        <span className="font-medium">{selectedDate.toLocaleDateString()}</span>
+                        <span className="font-medium">{new Date(selectedDate).toLocaleDateString()}</span>
                       </div>
                     )}
                     
