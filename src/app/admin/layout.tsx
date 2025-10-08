@@ -7,13 +7,14 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
-import { Mountain, LayoutDashboard, Calendar, BookOpen, Users, Menu, LogOut, MapPin, Image, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Mountain, LayoutDashboard, Calendar, BookOpen, Users, Menu, LogOut, MapPin, Image, Star, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/events', label: 'Events', icon: Calendar },
   { href: '/admin/bookings', label: 'Bookings', icon: BookOpen },
+  { href: '/admin/inquiries', label: 'Inquiries', icon: MessageSquare },
   // { href: '/admin/stories', label: 'Stories', icon: PenSquare }, // temporarily hidden
   { href: '/admin/testimonials', label: 'Testimonials', icon: Star },
   { href: '/admin/hero', label: 'Hero Section', icon: Image },

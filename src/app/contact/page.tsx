@@ -12,20 +12,54 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    adventureInterest: '',
+    message: ''
+  });
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast({
-        title: "Message Sent!",
-        description: "Thank you for contacting us. We'll get back to you within 24 hours.",
+    try {
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
       });
-    }, 1000);
+
+      if (response.ok) {
+        toast({
+          title: "Message Sent!",
+          description: "Thank you for contacting us. We'll get back to you within 24 hours.",
+        });
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          adventureInterest: '',
+          message: ''
+        });
+      } else {
+        throw new Error('Failed to submit inquiry');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -95,6 +129,8 @@ export default function ContactPage() {
                       type="text"
                       required
                       placeholder="Enter your first name"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                     />
                   </div>
                   <div>
@@ -105,6 +141,8 @@ export default function ContactPage() {
                       type="text"
                       required
                       placeholder="Enter your last name"
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                     />
                   </div>
                 </div>
@@ -117,6 +155,8 @@ export default function ContactPage() {
                     type="email"
                     required
                     placeholder="Enter your email address"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
                 </div>
 
@@ -127,6 +167,8 @@ export default function ContactPage() {
                   <Input
                     type="tel"
                     placeholder="Enter your phone number"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   />
                 </div>
 
@@ -137,6 +179,8 @@ export default function ContactPage() {
                   <Input
                     type="text"
                     placeholder="Which adventure are you interested in?"
+                    value={formData.adventureInterest}
+                    onChange={(e) => setFormData({...formData, adventureInterest: e.target.value})}
                   />
                 </div>
 
@@ -148,6 +192,8 @@ export default function ContactPage() {
                     required
                     rows={6}
                     placeholder="Tell us about your adventure preferences, questions, or special requirements..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
                   />
                 </div>
 
