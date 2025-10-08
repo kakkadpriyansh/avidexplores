@@ -14,7 +14,6 @@ import {
   User,
   MapPin,
   Calendar,
-  DollarSign,
   Phone,
   Mail,
   Clock,
@@ -24,7 +23,8 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
-  Edit3
+  Edit3,
+  IndianRupee
 } from 'lucide-react';
 
 interface BookingDetails {
@@ -46,20 +46,32 @@ interface BookingDetails {
     difficulty: string;
     maxParticipants: number;
   };
+  date: string;
+  selectedMonth?: string;
+  selectedYear?: number;
+  selectedDeparture?: string;
+  selectedTransportMode?: string;
   participants: Array<{
     name: string;
     age: number;
     gender: string;
-    emergencyContact: string | { name?: string; phone?: string };
+    phone: string;
+    email: string;
+    emergencyContact: { name: string; phone: string; relationship: string };
+    medicalConditions?: string;
+    dietaryRestrictions?: string;
   }>;
   totalAmount: number;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'REFUNDED';
   paymentInfo: {
-    paymentStatus: 'PENDING' | 'SUCCESS' | 'FAILED';
+    paymentStatus: 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED';
     paymentMethod: string;
     transactionId?: string;
     razorpayOrderId?: string;
     razorpayPaymentId?: string;
+    refundId?: string;
+    refundAmount?: number;
+    refundedAt?: string;
   };
   specialRequests?: string;
   adminNotes?: string;
@@ -252,13 +264,24 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
                       <span>{booking.eventId.duration}</span>
                     </div>
                     <div className="flex items-center text-muted-foreground">
-                      <DollarSign className="h-4 w-4 mr-2" />
-                      <span>₹{booking.eventId.price.toLocaleString()} per person</span>
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span>{new Date(booking.date).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center text-muted-foreground">
-                      <Users className="h-4 w-4 mr-2" />
-                      <span>Max {booking.eventId.maxParticipants} participants</span>
+                      <IndianRupee className="h-4 w-4 mr-2" />
+                      <span>₹{booking.eventId.price.toLocaleString()} per person</span>
                     </div>
+                    {booking.selectedDeparture && (
+                      <div className="flex items-center text-muted-foreground">
+                        <MapPin className="h-4 w-4 mr-2" />
+                        <span>Departure: {booking.selectedDeparture}</span>
+                      </div>
+                    )}
+                    {booking.selectedTransportMode && (
+                      <div className="flex items-center text-muted-foreground">
+                        <span>Transport: {booking.selectedTransportMode.replace('_', ' ')}</span>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="pt-2">
@@ -314,7 +337,7 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
                 <CardContent>
                   <div className="space-y-4">
                     {booking.participants.map((participant, index) => (
-                      <div key={index} className="border border-border rounded-lg p-4">
+                      <div key={index} className="border border-border rounded-lg p-4 space-y-3">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div>
                             <Label className="text-sm font-medium text-muted-foreground">Name</Label>
@@ -329,15 +352,38 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
                             <p className="text-foreground">{participant.gender}</p>
                           </div>
                           <div>
+                            <Label className="text-sm font-medium text-muted-foreground">Phone</Label>
+                            <p className="text-foreground">{participant.phone}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-sm font-medium text-muted-foreground">Email</Label>
+                            <p className="text-foreground">{participant.email}</p>
+                          </div>
+                          <div>
                             <Label className="text-sm font-medium text-muted-foreground">Emergency Contact</Label>
                             <p className="text-foreground">
-                              {typeof participant.emergencyContact === 'string' 
-                                ? participant.emergencyContact 
-                                : `${participant.emergencyContact?.name || ''} - ${participant.emergencyContact?.phone || ''}`
-                              }
+                              {participant.emergencyContact.name} - {participant.emergencyContact.phone} ({participant.emergencyContact.relationship})
                             </p>
                           </div>
                         </div>
+                        {(participant.medicalConditions || participant.dietaryRestrictions) && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">
+                            {participant.medicalConditions && (
+                              <div>
+                                <Label className="text-sm font-medium text-muted-foreground">Medical Conditions</Label>
+                                <p className="text-foreground text-sm">{participant.medicalConditions}</p>
+                              </div>
+                            )}
+                            {participant.dietaryRestrictions && (
+                              <div>
+                                <Label className="text-sm font-medium text-muted-foreground">Dietary Restrictions</Label>
+                                <p className="text-foreground text-sm">{participant.dietaryRestrictions}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -418,6 +464,17 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
                         Cancel Booking
                       </Button>
                     )}
+                    
+                    {booking.paymentInfo.paymentStatus === 'SUCCESS' && booking.status !== 'REFUNDED' && (
+                      <Button
+                        onClick={() => handleStatusChange('REFUNDED')}
+                        disabled={updating}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        Process Refund
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -460,6 +517,24 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
                       </p>
                     </div>
                   )}
+                  
+                  {booking.paymentInfo.refundId && (
+                    <div className="space-y-1">
+                      <span className="text-sm text-muted-foreground">Refund ID</span>
+                      <p className="text-xs text-foreground font-mono bg-muted p-2 rounded">
+                        {booking.paymentInfo.refundId}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {booking.paymentInfo.refundAmount && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Refund Amount</span>
+                      <span className="text-sm font-semibold text-red-600">
+                        ₹{booking.paymentInfo.refundAmount.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -489,7 +564,7 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
               </Card>
 
               {/* Admin Notes */}
-              <Card className="card-adventure">
+              {/* <Card className="card-adventure">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Edit3 className="h-5 w-5 mr-2" />
@@ -512,7 +587,7 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
                     Update Notes
                   </Button>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
           </div>
         </div>

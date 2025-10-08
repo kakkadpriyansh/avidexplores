@@ -93,7 +93,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { status, paymentInfo, cancellationReason } = body;
+    const { status, paymentInfo, cancellationReason, adminNotes } = body;
 
     const idParam = params.bookingId;
     const orConditions: any[] = [{ bookingId: idParam }];
@@ -126,6 +126,7 @@ export async function PUT(
       updateData.cancelledAt = new Date();
       updateData.cancelledBy = session.user.id;
     }
+    if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
 
     const updatedBooking = await (Booking as Model<IBooking>).findOneAndUpdate(
       { $or: orConditions },

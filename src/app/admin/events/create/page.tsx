@@ -64,10 +64,21 @@ interface EventFormData {
       mode: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS';
       price: number;
     }[];
+    itinerary?: {
+      day: number;
+      title: string;
+      location: string;
+      description: string;
+      activities: string[];
+      meals: string[];
+      accommodation?: string;
+      images?: string[];
+    }[];
     availableDates: {
       month: string;
       year: number;
       dates: number[];
+      dateTransportModes?: Record<number, ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[]>;
       availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[];
       availableSeats?: number;
       totalSeats?: number;
@@ -256,6 +267,7 @@ export default function CreateEventPage() {
           origin: '',
           destination: '',
           transportOptions: [{ mode: 'BUS', price: 0 }],
+          itinerary: [],
           availableDates: []
         }
       ]
@@ -295,7 +307,7 @@ export default function CreateEventPage() {
 
   const addDepartureDateEntry = (depIndex: number) => {
     const newDepartures = [...formData.departures];
-    newDepartures[depIndex].availableDates.push({ month: '', year: new Date().getFullYear(), dates: [], availableTransportModes: [] });
+    newDepartures[depIndex].availableDates.push({ month: '', year: new Date().getFullYear(), dates: [], dateTransportModes: {}, availableTransportModes: [] });
     setFormData(prev => ({ ...prev, departures: newDepartures }));
   };
 
@@ -308,6 +320,125 @@ export default function CreateEventPage() {
   const removeDepartureDateEntry = (depIndex: number, dateIndex: number) => {
     const newDepartures = [...formData.departures];
     newDepartures[depIndex].availableDates = newDepartures[depIndex].availableDates.filter((_, i) => i !== dateIndex);
+    setFormData(prev => ({ ...prev, departures: newDepartures }));
+  };
+
+  // Departure-specific itinerary handlers
+  const handleDepartureItineraryChange = (
+    depIndex: number,
+    dayIndex: number,
+    field: keyof NonNullable<EventFormData['departures'][number]['itinerary']>[number],
+    value: any
+  ) => {
+    const newDepartures = [...formData.departures];
+    const dep = newDepartures[depIndex];
+    const itin = dep.itinerary || [];
+    const newItin = [...itin];
+    newItin[dayIndex] = { ...newItin[dayIndex], [field]: value } as any;
+    newDepartures[depIndex] = { ...dep, itinerary: newItin };
+    setFormData(prev => ({ ...prev, departures: newDepartures }));
+  };
+
+  const addDepartureItineraryDay = (depIndex: number) => {
+    const newDepartures = [...formData.departures];
+    const dep = newDepartures[depIndex];
+    const itin = dep.itinerary || [];
+    const nextDayNumber = itin.length === 0 ? 1 : Math.max(...itin.map(d => d.day)) + 1;
+    const newItin = [
+      ...itin,
+      {
+        day: nextDayNumber,
+        title: '',
+        location: '',
+        description: '',
+        activities: [''],
+        meals: [''],
+        accommodation: '',
+        images: ['']
+      }
+    ];
+    newDepartures[depIndex] = { ...dep, itinerary: newItin };
+    setFormData(prev => ({ ...prev, departures: newDepartures }));
+  };
+
+  const addDepartureDay0 = (depIndex: number) => {
+    const newDepartures = [...formData.departures];
+    const dep = newDepartures[depIndex];
+    const itin = dep.itinerary || [];
+    if (itin.some(d => d.day === 0)) return;
+    const newItin = [
+      {
+        day: 0,
+        title: '',
+        location: '',
+        description: '',
+        activities: [''],
+        meals: [''],
+        accommodation: '',
+        images: ['']
+      },
+      ...itin
+    ];
+    newDepartures[depIndex] = { ...dep, itinerary: newItin };
+    setFormData(prev => ({ ...prev, departures: newDepartures }));
+  };
+
+  const removeDepartureItineraryDay = (depIndex: number, dayIndex: number) => {
+    const newDepartures = [...formData.departures];
+    const dep = newDepartures[depIndex];
+    const itin = dep.itinerary || [];
+    const newItin = itin.filter((_, i) => i !== dayIndex);
+    newDepartures[depIndex] = { ...dep, itinerary: newItin };
+    setFormData(prev => ({ ...prev, departures: newDepartures }));
+  };
+
+  const handleDepartureItineraryArrayChange = (
+    depIndex: number,
+    dayIndex: number,
+    field: 'activities' | 'meals' | 'images',
+    itemIndex: number,
+    value: string
+  ) => {
+    const newDepartures = [...formData.departures];
+    const dep = newDepartures[depIndex];
+    const itin = dep.itinerary || [];
+    const newItin = [...itin];
+    const arr = [...(newItin[dayIndex][field] || [])];
+    arr[itemIndex] = value;
+    newItin[dayIndex] = { ...newItin[dayIndex], [field]: arr } as any;
+    newDepartures[depIndex] = { ...dep, itinerary: newItin };
+    setFormData(prev => ({ ...prev, departures: newDepartures }));
+  };
+
+  const addDepartureItineraryArrayItem = (
+    depIndex: number,
+    dayIndex: number,
+    field: 'activities' | 'meals' | 'images'
+  ) => {
+    const newDepartures = [...formData.departures];
+    const dep = newDepartures[depIndex];
+    const itin = dep.itinerary || [];
+    const newItin = [...itin];
+    const arr = [...(newItin[dayIndex][field] || [])];
+    arr.push('');
+    newItin[dayIndex] = { ...newItin[dayIndex], [field]: arr } as any;
+    newDepartures[depIndex] = { ...dep, itinerary: newItin };
+    setFormData(prev => ({ ...prev, departures: newDepartures }));
+  };
+
+  const removeDepartureItineraryArrayItem = (
+    depIndex: number,
+    dayIndex: number,
+    field: 'activities' | 'meals' | 'images',
+    itemIndex: number
+  ) => {
+    const newDepartures = [...formData.departures];
+    const dep = newDepartures[depIndex];
+    const itin = dep.itinerary || [];
+    const newItin = [...itin];
+    const arr = (newItin[dayIndex][field] || []).filter((_, i) => i !== itemIndex);
+    newItin[dayIndex] = { ...newItin[dayIndex], [field]: arr } as any;
+    newDepartures[depIndex] = { ...dep, itinerary: newItin };
     setFormData(prev => ({ ...prev, departures: newDepartures }));
   };
 
@@ -325,16 +456,75 @@ export default function CreateEventPage() {
     
     try {
       const slug = generateSlug(formData.title);
+      // Sanitize departures data including dateTransportModes
+      const sanitizedDepartures = (formData.departures || []).map((dep: any) => ({
+        label: String(dep.label || '').trim(),
+        origin: String(dep.origin || '').trim(),
+        destination: String(dep.destination || '').trim(),
+        transportOptions: Array.isArray(dep.transportOptions) 
+          ? dep.transportOptions.filter((opt: any) => opt && opt.mode && opt.price !== undefined)
+              .map((opt: any) => ({
+                mode: String(opt.mode),
+                price: Number(opt.price)
+              }))
+          : [],
+        availableDates: Array.isArray(dep.availableDates)
+          ? dep.availableDates
+              .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
+                && entry.year !== undefined && entry.year !== null
+                && Array.isArray(entry.dates) && entry.dates.length > 0
+                && entry.dates.every((d: any) => Number.isFinite(Number(d))))
+              .map((entry: any) => ({
+                month: String(entry.month).trim(),
+                year: Number(entry.year),
+                dates: entry.dates.map((d: any) => Number(d)),
+                dateTransportModes: entry.dateTransportModes && typeof entry.dateTransportModes === 'object'
+                  ? Object.fromEntries(
+                      Object.entries(entry.dateTransportModes)
+                        .filter(([k, v]: any) => Number.isFinite(Number(k)) && Array.isArray(v))
+                        .map(([k, v]: any) => [
+                          Number(k),
+                          (v as any[])
+                            .map((m: any) => String(m))
+                            .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                        ])
+                    )
+                  : undefined,
+                availableTransportModes: Array.isArray(entry.availableTransportModes)
+                  ? entry.availableTransportModes
+                      .map((m: any) => String(m))
+                      .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                  : undefined,
+                availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
+                totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
+              }))
+          : [],
+        itinerary: Array.isArray(dep.itinerary)
+          ? dep.itinerary
+              .filter((item: any) => item && typeof item.title === 'string' && item.title.trim() !== '')
+              .map((item: any, index: number) => ({
+                day: Number(item.day ?? index + 1),
+                title: String(item.title || `Day ${index + 1}`),
+                location: item.location ? String(item.location) : undefined,
+                description: String(item.description || 'No description provided'),
+                activities: Array.isArray(item.activities) ? item.activities.map((a: any) => String(a)) : [],
+                meals: Array.isArray(item.meals) ? item.meals.map((m: any) => String(m)) : [],
+                accommodation: item.accommodation ? String(item.accommodation) : undefined,
+                images: Array.isArray(item.images) ? item.images.map((img: any) => String(img)) : []
+              }))
+          : []
+      }));
+
       const eventData = {
         ...formData,
         slug,
         status: isDraft ? 'DRAFT' : 'PUBLISHED',
         inclusions: formData.inclusions.filter(item => item.trim() !== ''),
         exclusions: formData.exclusions.filter(item => item.trim() !== ''),
-      images: formData.images.filter(item => item.trim() !== ''),
-      departures: formData.departures || [],
-      createdBy: session?.user.id
-    };
+        images: formData.images.filter(item => item.trim() !== ''),
+        departures: sanitizedDepartures,
+        createdBy: session?.user.id
+      };
 
       const response = await fetch('/api/events', {
         method: 'POST',
@@ -480,7 +670,7 @@ export default function CreateEventPage() {
                       id="price"
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       value={formData.price}
                       onChange={(e) => {
                         const value = parseFloat(e.target.value);
@@ -499,7 +689,7 @@ export default function CreateEventPage() {
                       id="discountedPrice"
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       value={formData.discountedPrice || ''}
                       onChange={(e) => {
                         const value = parseFloat(e.target.value);
@@ -632,21 +822,13 @@ export default function CreateEventPage() {
                       <div className="space-y-4 mt-2">
                         {departure.availableDates.map((dateEntry, dateIndex) => (
                           <div key={dateIndex} className="border rounded p-3 space-y-3">
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                               <div>
                                 <Label>Month</Label>
                                 <Input
                                   value={dateEntry.month}
                                   onChange={(e) => updateDepartureDateEntry(depIndex, dateIndex, 'month', e.target.value)}
                                   placeholder="e.g., December"
-                                />
-                              </div>
-                              <div>
-                                <Label>Year</Label>
-                                <Input
-                                  type="number"
-                                  value={dateEntry.year}
-                                  onChange={(e) => updateDepartureDateEntry(depIndex, dateIndex, 'year', parseInt(e.target.value) || new Date().getFullYear())}
                                 />
                               </div>
                               <div>
@@ -679,7 +861,12 @@ export default function CreateEventPage() {
                                         type="button"
                                         onClick={() => {
                                           const newDepartures = [...formData.departures];
+                                          const dtm = newDepartures[depIndex].availableDates[dateIndex].dateTransportModes || {} as Record<number, any[]>;
                                           newDepartures[depIndex].availableDates[dateIndex].dates = newDepartures[depIndex].availableDates[dateIndex].dates.filter((_, i) => i !== dIndex);
+                                          if (dtm && dtm[d] !== undefined) {
+                                            delete dtm[d as any];
+                                            newDepartures[depIndex].availableDates[dateIndex].dateTransportModes = dtm as any;
+                                          }
                                           setFormData(prev => ({ ...prev, departures: newDepartures }));
                                         }}
                                         className="text-blue-600 hover:text-blue-800"
@@ -703,6 +890,12 @@ export default function CreateEventPage() {
                                         if (date >= 1 && date <= 31 && !dateEntry.dates.includes(date)) {
                                           const newDepartures = [...formData.departures];
                                           newDepartures[depIndex].availableDates[dateIndex].dates = [...newDepartures[depIndex].availableDates[dateIndex].dates, date].sort((a, b) => a - b);
+                                          // initialize dateTransportModes entry for this date
+                                          const dtm = newDepartures[depIndex].availableDates[dateIndex].dateTransportModes || {} as Record<number, any[]>;
+                                          if (dtm[date as any] === undefined) {
+                                            dtm[date as any] = [] as any[];
+                                          }
+                                          newDepartures[depIndex].availableDates[dateIndex].dateTransportModes = dtm as any;
                                           setFormData(prev => ({ ...prev, departures: newDepartures }));
                                           input.value = '';
                                         }
@@ -719,6 +912,11 @@ export default function CreateEventPage() {
                                       if (date >= 1 && date <= 31 && !dateEntry.dates.includes(date)) {
                                         const newDepartures = [...formData.departures];
                                         newDepartures[depIndex].availableDates[dateIndex].dates = [...newDepartures[depIndex].availableDates[dateIndex].dates, date].sort((a, b) => a - b);
+                                        const dtm = newDepartures[depIndex].availableDates[dateIndex].dateTransportModes || {} as Record<number, any[]>;
+                                        if (dtm[date as any] === undefined) {
+                                          dtm[date as any] = [] as any[];
+                                        }
+                                        newDepartures[depIndex].availableDates[dateIndex].dateTransportModes = dtm as any;
                                         setFormData(prev => ({ ...prev, departures: newDepartures }));
                                         input.value = '';
                                       }
@@ -736,36 +934,50 @@ export default function CreateEventPage() {
                                 </div>
                               </div>
                               <div className="mt-4">
-                                <Label>Transport modes available on these dates</Label>
-                                <div className="flex flex-wrap gap-3 mt-2">
-                                  {['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].map((mode) => {
-                                    const checked = Array.isArray(dateEntry.availableTransportModes) ? dateEntry.availableTransportModes.includes(mode as any) : false;
+                                <Label>Transport modes per date</Label>
+                                <div className="space-y-3 mt-2">
+                                  {dateEntry.dates.length === 0 && (
+                                    <p className="text-xs text-muted-foreground">Add dates above to configure transport availability day-wise.</p>
+                                  )}
+                                  {dateEntry.dates.map((d) => {
+                                    const dtm = (dateEntry.dateTransportModes || {}) as Record<number, any[]>;
+                                    const selected = Array.isArray(dtm[d]) ? dtm[d] as any[] : [];
                                     return (
-                                      <label key={mode} className="inline-flex items-center gap-2 border rounded px-3 py-2 cursor-pointer">
-                                        <input
-                                          type="checkbox"
-                                          checked={checked}
-                                          onChange={(e) => {
-                                            const newDepartures = [...formData.departures];
-                                            const arr = Array.isArray(newDepartures[depIndex].availableDates[dateIndex].availableTransportModes)
-                                              ? [...(newDepartures[depIndex].availableDates[dateIndex].availableTransportModes as any[])]
-                                              : [];
-                                            if (e.target.checked) {
-                                              if (!arr.includes(mode)) arr.push(mode as any);
-                                            } else {
-                                              const idx = arr.indexOf(mode as any);
-                                              if (idx !== -1) arr.splice(idx, 1);
-                                            }
-                                            newDepartures[depIndex].availableDates[dateIndex].availableTransportModes = arr as any;
-                                            setFormData(prev => ({ ...prev, departures: newDepartures }));
-                                          }}
-                                        />
-                                        <span>{mode.replace('_',' ').replace('AC','AC')}</span>
-                                      </label>
+                                      <div key={d} className="flex flex-wrap items-center gap-3">
+                                        <span className="text-sm font-medium w-16">{d}</span>
+                                        {['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].map((mode) => {
+                                          const checked = selected.includes(mode as any);
+                                          return (
+                                            <label key={mode} className="inline-flex items-center gap-2 border rounded px-3 py-2 cursor-pointer">
+                                              <input
+                                                type="checkbox"
+                                                checked={checked}
+                                                onChange={(e) => {
+                                                  const newDepartures = [...formData.departures];
+                                                  const entry = newDepartures[depIndex].availableDates[dateIndex];
+                                                  const cur = (entry.dateTransportModes || {}) as Record<number, any[]>;
+                                                  const arr = Array.isArray(cur[d]) ? [...cur[d] as any[]] : [];
+                                                  if (e.target.checked) {
+                                                    if (!arr.includes(mode)) arr.push(mode as any);
+                                                  } else {
+                                                    const idx = arr.indexOf(mode as any);
+                                                    if (idx !== -1) arr.splice(idx, 1);
+                                                  }
+                                                  cur[d as any] = arr as any[];
+                                                  entry.dateTransportModes = cur as any;
+                                                  newDepartures[depIndex].availableDates[dateIndex] = entry;
+                                                  setFormData(prev => ({ ...prev, departures: newDepartures }));
+                                                }}
+                                              />
+                                              <span>{mode.replace('_',' ').replace('AC','AC')}</span>
+                                            </label>
+                                          );
+                                        })}
+                                      </div>
                                     );
                                   })}
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-1">If none selected, all transport options are considered available.</p>
+                                <p className="text-xs text-muted-foreground mt-1">If none selected for a date, all transport options are considered available.</p>
                               </div>
                             </div>
                           </div>
@@ -773,6 +985,186 @@ export default function CreateEventPage() {
                         <Button type="button" variant="outline" onClick={() => addDepartureDateEntry(depIndex)}>
                           Add Departure Date Entry
                         </Button>
+
+                        {/* Route-specific Itinerary (optional) */}
+                        <div className="mt-6 space-y-4">
+                          <Label className="text-base font-semibold">Route-specific Itinerary (optional)</Label>
+                          {(departure.itinerary || []).map((day, dayIndex) => (
+                            <div key={dayIndex} className="border rounded-lg p-4 space-y-4">
+                              <div className="flex justify-between items-center">
+                                <h4 className="font-semibold">
+                                  {day.day === 0 ? 'Day 0 (Pre-arrival)' : `Day ${day.day}`}
+                                </h4>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => removeDepartureItineraryDay(depIndex, dayIndex)}
+                                  disabled={(departure.itinerary || []).length <= 1}
+                                >
+                                  Remove Day
+                                </Button>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <Label>Title</Label>
+                                  <Input
+                                    value={day.title}
+                                    onChange={(e) => handleDepartureItineraryChange(depIndex, dayIndex, 'title', e.target.value)}
+                                    placeholder="Day title"
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Location</Label>
+                                  <Input
+                                    value={day.location}
+                                    onChange={(e) => handleDepartureItineraryChange(depIndex, dayIndex, 'location', e.target.value)}
+                                    placeholder="Location for this day"
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <Label>Description</Label>
+                                <Textarea
+                                  value={day.description}
+                                  onChange={(e) => handleDepartureItineraryChange(depIndex, dayIndex, 'description', e.target.value)}
+                                  placeholder="Describe the day's activities"
+                                  rows={3}
+                                />
+                              </div>
+
+                              <div>
+                                <Label>Activities</Label>
+                                {(day.activities || []).map((activity, actIndex) => (
+                                  <div key={actIndex} className="flex gap-2 mt-2">
+                                    <Input
+                                      value={activity}
+                                      onChange={(e) => handleDepartureItineraryArrayChange(depIndex, dayIndex, 'activities', actIndex, e.target.value)}
+                                      placeholder="Activity description"
+                                      className="flex-1"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => removeDepartureItineraryArrayItem(depIndex, dayIndex, 'activities', actIndex)}
+                                      disabled={(day.activities || []).length <= 1}
+                                    >
+                                      Remove
+                                    </Button>
+                                  </div>
+                                ))}
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => addDepartureItineraryArrayItem(depIndex, dayIndex, 'activities')}
+                                  className="mt-2"
+                                  size="sm"
+                                >
+                                  Add Activity
+                                </Button>
+                              </div>
+
+                              <div>
+                                <Label>Meals</Label>
+                                {(day.meals || []).map((meal, mealIndex) => (
+                                  <div key={mealIndex} className="flex gap-2 mt-2">
+                                    <Input
+                                      value={meal}
+                                      onChange={(e) => handleDepartureItineraryArrayChange(depIndex, dayIndex, 'meals', mealIndex, e.target.value)}
+                                      placeholder="Meal description (e.g., Breakfast: Continental)"
+                                      className="flex-1"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => removeDepartureItineraryArrayItem(depIndex, dayIndex, 'meals', mealIndex)}
+                                      disabled={(day.meals || []).length <= 1}
+                                    >
+                                      Remove
+                                    </Button>
+                                  </div>
+                                ))}
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => addDepartureItineraryArrayItem(depIndex, dayIndex, 'meals')}
+                                  className="mt-2"
+                                  size="sm"
+                                >
+                                  Add Meal
+                                </Button>
+                              </div>
+
+                              <div>
+                                <Label>Accommodation (Optional)</Label>
+                                <Input
+                                  value={day.accommodation || ''}
+                                  onChange={(e) => handleDepartureItineraryChange(depIndex, dayIndex, 'accommodation', e.target.value)}
+                                  placeholder="Accommodation details for this day"
+                                />
+                              </div>
+
+                              <div>
+                                <Label>Day Images (Optional)</Label>
+                                <p className="text-sm text-gray-600 mb-2">Add images for this specific day</p>
+                                {(day.images || []).map((image, imgIndex) => (
+                                  <div key={imgIndex} className="space-y-2 mt-4 p-4 border rounded-lg">
+                                    <div className="flex justify-between items-center">
+                                      <Label>Image {imgIndex + 1}</Label>
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => removeDepartureItineraryArrayItem(depIndex, dayIndex, 'images', imgIndex)}
+                                        disabled={(day.images || []).length <= 1}
+                                      >
+                                        Remove
+                                      </Button>
+                                    </div>
+                                    <ImageUpload
+                                      value={image}
+                                      onChange={(url) => handleDepartureItineraryArrayChange(depIndex, dayIndex, 'images', imgIndex, url)}
+                                      placeholder="https://example.com/day-image.jpg"
+                                    />
+                                  </div>
+                                ))}
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => addDepartureItineraryArrayItem(depIndex, dayIndex, 'images')}
+                                  className="mt-2"
+                                  size="sm"
+                                >
+                                  Add Day Image
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => addDepartureDay0(depIndex)}
+                              className="flex-1"
+                              disabled={(departure.itinerary || []).some(day => day.day === 0)}
+                            >
+                              Add Day 0 (Pre-arrival)
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => addDepartureItineraryDay(depIndex)}
+                              className="flex-1"
+                            >
+                              Add New Day
+                            </Button>
+                          </div>
+                        </div>
                           </div>
                         </div>
                       </div>

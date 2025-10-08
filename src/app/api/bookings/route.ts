@@ -109,13 +109,15 @@ export async function POST(request: NextRequest) {
       selectedDate,
       selectedMonth,
       selectedYear,
+      selectedDeparture,
+      selectedTransportMode,
       participants,
       totalAmount,
       specialRequests
     } = body;
 
     // Validate required fields
-    if (!eventId || !selectedDate || !selectedMonth || !selectedYear || !participants || participants.length === 0) {
+    if (!eventId || !selectedDate || !participants || participants.length === 0) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
@@ -132,61 +134,71 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the specific date entry for seat availability
-    const dateEntry = event.availableDates?.find(
-      (entry: any) => entry.month === selectedMonth && entry.year === selectedYear
-    );
+    let dateEntry: any = null;
+    let availableSeats = event.maxParticipants;
 
-    if (!dateEntry) {
-      return NextResponse.json(
-        { success: false, error: 'Selected date is not available for this event' },
-        { status: 400 }
+    // Check departure dates if using departure system
+    if (selectedMonth && selectedYear && event.departures && event.departures.length > 0) {
+      const departure = event.departures.find((d: any) => d.label === selectedDeparture);
+      if (departure) {
+        dateEntry = departure.availableDates?.find(
+          (entry: any) => entry.month === selectedMonth && entry.year === selectedYear
+        );
+      }
+    } else if (selectedMonth && selectedYear && event.availableDates) {
+      // Fallback to event-level dates
+      dateEntry = event.availableDates.find(
+        (entry: any) => entry.month === selectedMonth && entry.year === selectedYear
       );
     }
 
-    // Check if the specific date is available
-    const selectedDay = new Date(selectedDate).getDate();
-    if (!dateEntry.dates.includes(selectedDay)) {
-      return NextResponse.json(
-        { success: false, error: 'Selected date is not available' },
-        { status: 400 }
-      );
+    if (dateEntry) {
+      const selectedDay = new Date(selectedDate).getDate();
+      if (!dateEntry.dates.includes(selectedDay)) {
+        return NextResponse.json(
+          { success: false, error: 'Selected date is not available' },
+          { status: 400 }
+        );
+      }
+      availableSeats = dateEntry.availableSeats || dateEntry.totalSeats || event.maxParticipants;
     }
 
     // Calculate amounts
     const computedTotal = totalAmount || event.price * participants.length;
-    const discountAmount = 0; // apply promo/discounts here if any
+    const discountAmount = 0;
     const finalAmount = computedTotal - discountAmount;
 
-    // Check seat availability for the specific month/year
-    const existingBookingsCount = await (Booking as Model<IBooking>).aggregate([
-      {
-        $match: {
-          eventId: event._id,
-          selectedMonth,
-          selectedYear,
-          status: { $in: ['CONFIRMED', 'PENDING'] }
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          totalParticipants: { $sum: { $size: '$participants' } }
-        }
-      }
-    ]);
-
-    const currentBookedSeats = existingBookingsCount.length > 0 ? existingBookingsCount[0].totalParticipants : 0;
-    const availableSeats = dateEntry.availableSeats || dateEntry.totalSeats || event.maxParticipants;
-    const requestedSeats = participants.length;
-
-    if (currentBookedSeats + requestedSeats > availableSeats) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: `Only ${availableSeats - currentBookedSeats} seats available for ${selectedMonth} ${selectedYear}. You requested ${requestedSeats} seats.` 
+    // Check seat availability if month/year provided
+    if (selectedMonth && selectedYear && dateEntry) {
+      const existingBookingsCount = await (Booking as Model<IBooking>).aggregate([
+        {
+          $match: {
+            eventId: event._id,
+            selectedMonth,
+            selectedYear,
+            status: { $in: ['CONFIRMED', 'PENDING'] }
+          }
         },
-        { status: 400 }
-      );
+        {
+          $group: {
+            _id: null,
+            totalParticipants: { $sum: { $size: '$participants' } }
+          }
+        }
+      ]);
+
+      const currentBookedSeats = existingBookingsCount.length > 0 ? existingBookingsCount[0].totalParticipants : 0;
+      const requestedSeats = participants.length;
+
+      if (currentBookedSeats + requestedSeats > availableSeats) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: `Only ${availableSeats - currentBookedSeats} seats available for ${selectedMonth} ${selectedYear}. You requested ${requestedSeats} seats.` 
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Generate unique booking ID
@@ -202,6 +214,8 @@ export async function POST(request: NextRequest) {
       date: new Date(selectedDate),
       selectedMonth,
       selectedYear,
+      selectedDeparture,
+      selectedTransportMode,
       participants,
       totalAmount: computedTotal,
       discountAmount,

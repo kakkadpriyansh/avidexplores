@@ -36,12 +36,14 @@ import {
   Mail,
   AlertCircle
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface Event {
   _id: string;
   title: string;
   slug: string;
   price: number;
+  discountedPrice?: number;
   location: {
     name: string;
     state: string;
@@ -58,6 +60,21 @@ interface Event {
     location?: string;
     availableSeats?: number;
     totalSeats?: number;
+  }[];
+  departures?: {
+    label: string;
+    origin: string;
+    destination: string;
+    transportOptions: { mode: string; price: number }[];
+    availableDates: {
+      month: string;
+      year: number;
+      dates: number[];
+      dateTransportModes?: Record<number, ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[]>;
+      availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[];
+      availableSeats?: number;
+      totalSeats?: number;
+    }[];
   }[];
   images: string[];
   description: string;
@@ -108,6 +125,13 @@ export default function BookEventPage() {
     dietaryRestrictions: ''
   }]);
   const [specialRequests, setSpecialRequests] = useState('');
+  
+  // Departure and transport state
+  const [selectedDepartureIndex, setSelectedDepartureIndex] = useState<number | null>(null);
+  const [selectedTransportIndex, setSelectedTransportIndex] = useState<number | null>(null);
+  const [selectedDepartureMonth, setSelectedDepartureMonth] = useState<string | null>(null);
+  const [selectedDepartureDate, setSelectedDepartureDate] = useState<number | null>(null);
+  const [transportDialogOpen, setTransportDialogOpen] = useState(false);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -198,24 +222,18 @@ export default function BookEventPage() {
 
   const calculateTotal = () => {
     if (!event) return 0;
-    return event.price * participants.length;
+    const basePrice = event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price 
+      ? event.discountedPrice 
+      : event.price;
+    const transportPrice = (selectedDepartureIndex !== null && selectedTransportIndex !== null)
+      ? Number(event.departures?.[selectedDepartureIndex]?.transportOptions?.[selectedTransportIndex]?.price || 0)
+      : 0;
+    return (basePrice + transportPrice) * participants.length;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!event || !selectedDate) return;
-    
-    // Check if using new availableDates structure and validate accordingly
-    if (event.availableDates && event.availableDates.length > 0) {
-      if (!selectedMonth || !selectedYear || !selectedDay) {
-        toast({
-          title: "Validation Error",
-          description: "Please select a complete date (month, year, and day)",
-          variant: "destructive"
-        });
-        return;
-      }
-    }
+    if (!event || selectedDepartureIndex === null || !selectedDepartureDate || selectedTransportIndex === null) return;
 
     // Validation
     const isValid = participants.every(p => 
@@ -235,6 +253,11 @@ export default function BookEventPage() {
     setSubmitting(true);
 
     try {
+      const departure = event.departures[selectedDepartureIndex];
+      const dateGroup = departure.availableDates?.find(d => d.month === selectedDepartureMonth);
+      const year = dateGroup?.year || new Date().getFullYear();
+      const bookingDate = new Date(`${selectedDepartureMonth} ${selectedDepartureDate}, ${year}`);
+
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: {
@@ -242,9 +265,11 @@ export default function BookEventPage() {
         },
         body: JSON.stringify({
           eventId: event._id,
-          selectedDate,
-          selectedMonth,
-          selectedYear,
+          selectedDate: bookingDate.toISOString(),
+          selectedMonth: selectedDepartureMonth,
+          selectedYear: year,
+          selectedDeparture: departure.label,
+          selectedTransportMode: departure.transportOptions[selectedTransportIndex].mode,
           participants,
           totalAmount: calculateTotal(),
           specialRequests
@@ -252,10 +277,12 @@ export default function BookEventPage() {
       });
 
       const data = await response.json();
+      console.log('Booking response:', data);
 
       if (response.ok) {
         setShowSuccessDialog(true);
       } else {
+        console.error('Booking error:', data);
         toast({
           title: "Booking Failed",
           description: data.error || "Failed to create booking",
@@ -290,7 +317,7 @@ export default function BookEventPage() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-24">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -324,100 +351,172 @@ export default function BookEventPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="event-title">Event</Label>
-                        <Input id="event-title" value={event.title} disabled />
-                      </div>
-                      <div>
-                        <Label htmlFor="selected-date">Select Date *</Label>
-                        {event.availableDates && event.availableDates.length > 0 ? (
-                          <div className="space-y-4">
-                            {/* Month/Year Selection */}
-                            <Select 
-                              value={selectedMonth ? `${selectedMonth}-${selectedYear}` : ''} 
-                              onValueChange={(value) => {
-                                const [month, year] = value.split('-');
-                                setSelectedMonth(month);
-                                setSelectedYear(parseInt(year));
-                                setSelectedDay(0);
-                                setSelectedDate('');
-                              }}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Choose month and year" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {event.availableDates.map((dateEntry, index) => (
-                                  <SelectItem key={`${dateEntry.month}-${dateEntry.year}-${index}`} value={`${dateEntry.month}-${dateEntry.year}`}>
-                                    {dateEntry.month} {dateEntry.year}
-                                    {dateEntry.availableSeats !== undefined && (
-                                      <span className="ml-2 text-sm text-muted-foreground">
-                                        ({dateEntry.availableSeats}/{dateEntry.totalSeats || dateEntry.availableSeats} seats)
-                                      </span>
-                                    )}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                    <div>
+                      <Label htmlFor="event-title">Event</Label>
+                      <Input id="event-title" value={event.title} disabled />
+                    </div>
+                  </CardContent>
+                </Card>
 
-                            {/* Day Selection */}
-                            {selectedMonth && selectedYear && (
-                              <Select 
-                                value={selectedDay.toString()} 
-                                onValueChange={(value) => {
-                                  const day = parseInt(value);
-                                  setSelectedDay(day);
-                                  const selectedDateEntry = event.availableDates?.find(
-                                    d => d.month === selectedMonth && d.year === selectedYear
-                                  );
-                                  if (selectedDateEntry) {
-                                    const date = new Date(selectedYear, 
-                                      new Date(`${selectedMonth} 1, ${selectedYear}`).getMonth(), 
-                                      day
-                                    );
-                                    setSelectedDate(date.toISOString());
-                                  }
-                                }}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Choose day" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {event.availableDates
-                                    .find(d => d.month === selectedMonth && d.year === selectedYear)
-                                    ?.dates.map((day) => (
-                                      <SelectItem key={day} value={day.toString()}>
-                                        {day}
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                          </div>
-                        ) : (
-                          <Select value={selectedDate} onValueChange={setSelectedDate}>
+                {/* Departures & Transport Options */}
+                {(event.departures && event.departures.length > 0) && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Departures & Transport Options</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Select Departure *</Label>
+                          <Select
+                            value={selectedDepartureIndex !== null ? selectedDepartureIndex.toString() : ''}
+                            onValueChange={(value) => {
+                              setSelectedDepartureIndex(parseInt(value));
+                              setSelectedTransportIndex(null);
+                              setSelectedDepartureMonth(null);
+                              setSelectedDepartureDate(null);
+                            }}
+                          >
                             <SelectTrigger>
-                              <SelectValue placeholder="Choose your preferred date" />
+                              <SelectValue placeholder="Choose departure city" />
                             </SelectTrigger>
                             <SelectContent>
-                              {event.dates.map((date, index) => (
-                                <SelectItem key={index} value={new Date(date).toISOString()}>
-                                  {new Date(date).toLocaleDateString('en-IN', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                  })}
+                              {event.departures.map((dep, idx) => (
+                                <SelectItem key={idx} value={idx.toString()}>
+                                  {dep.label?.trim() ? dep.label : `${dep.origin} → ${dep.destination}`}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                        )}
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+
+                      {/* Transport selection modal */}
+                      <Dialog open={transportDialogOpen} onOpenChange={setTransportDialogOpen}>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Select Transport</DialogTitle>
+                            <DialogDescription>
+                              {selectedDepartureIndex !== null && event.departures[selectedDepartureIndex]
+                                ? `Choose a mode for ${event.departures[selectedDepartureIndex].label?.trim() ? event.departures[selectedDepartureIndex].label : `${event.departures[selectedDepartureIndex].origin} → ${event.departures[selectedDepartureIndex].destination}`}` +
+                                  (selectedDepartureMonth && selectedDepartureDate !== null
+                                    ? ` on ${selectedDepartureDate} ${selectedDepartureMonth.split('-')[0]} ${selectedDepartureMonth.split('-')[1]}`
+                                    : '')
+                                : 'Choose a transport mode'}
+                            </DialogDescription>
+                          </DialogHeader>
+                          {selectedDepartureIndex !== null && event.departures[selectedDepartureIndex] && (
+                            (() => {
+                              const dep = event.departures[selectedDepartureIndex];
+                              let filteredOptions = dep.transportOptions || [];
+                              if (selectedDepartureMonth && selectedDepartureDate !== null) {
+                                const dateGroup = dep.availableDates?.find(g => g.month === selectedDepartureMonth);
+                                const perDateModes = (dateGroup as any)?.dateTransportModes?.[selectedDepartureDate] as string[] | undefined;
+                                const monthModes = (dateGroup as any)?.availableTransportModes as string[] | undefined;
+                                const modes = Array.isArray(perDateModes) && perDateModes.length > 0
+                                  ? perDateModes
+                                  : (Array.isArray(monthModes) && monthModes.length > 0 ? monthModes : undefined);
+                                if (Array.isArray(modes) && modes.length > 0) {
+                                  const filtered = filteredOptions.filter(opt => modes.includes(opt.mode));
+                                  // If no transport options match the configured modes, show all available options
+                                  // This handles cases where dateTransportModes are configured but don't match transportOptions
+                                  filteredOptions = filtered.length > 0 ? filtered : filteredOptions;
+                                }
+                              }
+                              if (!filteredOptions || filteredOptions.length === 0) {
+                                return (
+                                  <p className="text-sm text-muted-foreground">No transport options available for the selected date.</p>
+                                );
+                              }
+                              return (
+                                <div className="flex flex-wrap gap-2">
+                                  {filteredOptions.map((opt, tIdx) => (
+                                    <button
+                                      key={tIdx}
+                                      type="button"
+                                      onClick={() => {
+                                        const idx = dep.transportOptions.findIndex(o => o.mode === opt.mode && o.price === opt.price);
+                                        setSelectedTransportIndex(idx >= 0 ? idx : tIdx);
+                                        setTransportDialogOpen(false);
+                                      }}
+                                      className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${
+                                        dep.transportOptions[selectedTransportIndex || -1]?.mode === opt.mode && dep.transportOptions[selectedTransportIndex || -1]?.price === opt.price
+                                          ? 'bg-primary text-primary-foreground border-primary'
+                                          : 'bg-background text-muted-foreground hover:text-foreground border-border hover:border-primary/50'
+                                      }`}
+                                    >
+                                      {opt.mode} · ₹{Number(opt.price || 0).toLocaleString()}
+                                    </button>
+                                  ))}
+                                </div>
+                              );
+                            })()
+                          )}
+                        </DialogContent>
+                      </Dialog>
+
+                      {selectedDepartureIndex !== null && event.departures[selectedDepartureIndex] && (
+                        <div className="space-y-4">
+                          {selectedTransportIndex !== null && (
+                            <p className="text-xs text-muted-foreground">
+                              Selected transport: {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.mode}
+                              {' '}(+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.price || 0).toLocaleString()})
+                            </p>
+                          )}
+
+                          <div className="space-y-4">
+                            <div>
+                              <Label>Select Month *</Label>
+                              <Select
+                                value={selectedDepartureMonth || ''}
+                                onValueChange={(value) => {
+                                  setSelectedDepartureMonth(value);
+                                  setSelectedDepartureDate(null);
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Choose month" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {event.departures[selectedDepartureIndex].availableDates?.map((dateGroup, dIdx) => (
+                                    <SelectItem key={dIdx} value={dateGroup.month}>
+                                      {dateGroup.month}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            {selectedDepartureMonth && (
+                              <div>
+                                <Label>Select Date *</Label>
+                                <Select
+                                  value={selectedDepartureDate?.toString() || ''}
+                                  onValueChange={(value) => {
+                                    setSelectedDepartureDate(parseInt(value));
+                                    setTransportDialogOpen(true);
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Choose date" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {event.departures[selectedDepartureIndex].availableDates
+                                      ?.find(d => d.month === selectedDepartureMonth)
+                                      ?.dates.map((date) => (
+                                        <SelectItem key={date} value={date.toString()}>
+                                          {date}
+                                        </SelectItem>
+                                      ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Participants */}
                 <Card>
@@ -624,10 +723,57 @@ export default function BookEventPage() {
                       <span>Participants:</span>
                       <span className="font-medium">{participants.length}</span>
                     </div>
+                    
+                    {/* Selected Date */}
+                    {selectedDate && (
+                      <div className="flex justify-between">
+                        <span>Selected Date:</span>
+                        <span className="font-medium">{selectedDate.toLocaleDateString()}</span>
+                      </div>
+                    )}
+                    
+                    {/* Selected Departure & Transport */}
+                    {event.departures && selectedDepartureIndex !== null && (
+                      <>
+                        <div className="flex justify-between">
+                          <span>Departure:</span>
+                          <span className="font-medium">{event.departures[selectedDepartureIndex].label}</span>
+                        </div>
+                        {selectedTransportIndex !== null && (
+                          <div className="flex justify-between">
+                            <span>Transport:</span>
+                            <span className="font-medium">
+                              {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].mode.replace('_', ' ')}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    
+                    <Separator />
+                    
                     <div className="flex justify-between">
-                      <span>Price per person:</span>
-                      <span className="font-medium">₹{event.price.toLocaleString()}</span>
+                      <span>Base price per person:</span>
+                      <span className="font-medium">
+                        ₹{(event.discountedPrice || event.price).toLocaleString()}
+                        {event.discountedPrice && (
+                          <span className="text-sm text-muted-foreground line-through ml-2">
+                            ₹{event.price.toLocaleString()}
+                          </span>
+                        )}
+                      </span>
                     </div>
+                    
+                    {/* Transport cost breakdown */}
+                    {event.departures && selectedDepartureIndex !== null && selectedTransportIndex !== null && (
+                      <div className="flex justify-between">
+                        <span>Transport cost per person:</span>
+                        <span className="font-medium">
+                          ₹{event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].price.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                    
                     <Separator />
                     <div className="flex justify-between text-lg font-bold">
                       <span>Total Amount:</span>
@@ -650,7 +796,7 @@ export default function BookEventPage() {
 
                     <Button 
                       onClick={handleSubmit}
-                      disabled={!selectedDate || submitting}
+                      disabled={selectedDepartureIndex === null || !selectedDepartureDate || !selectedTransportIndex || submitting}
                       className="w-full"
                       size="lg"
                     >

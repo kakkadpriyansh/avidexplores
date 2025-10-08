@@ -13,6 +13,7 @@ import { Upload, Save, Eye, Image as ImageIcon } from 'lucide-react';
 
 interface HeroSettings {
   backgroundImage: string;
+  backgroundImages: string[];
   title: string;
   subtitle: string;
   ctaText: string;
@@ -24,6 +25,7 @@ export default function HeroManagement() {
   const router = useRouter();
   const [heroSettings, setHeroSettings] = useState<HeroSettings>({
     backgroundImage: '',
+    backgroundImages: [],
     title: '',
     subtitle: '',
     ctaText: '',
@@ -209,15 +211,35 @@ export default function HeroManagement() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {heroSettings.backgroundImage && (
-                <div className="relative aspect-video rounded-lg overflow-hidden border">
-                  <img
-                    src={heroSettings.backgroundImage}
-                    alt="Hero background"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              <div className="space-y-2">
+                {heroSettings.backgroundImages.map((img, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <div className="relative w-24 h-16 rounded overflow-hidden border">
+                      <img src={img} alt={`Background ${idx + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                    <Input
+                      value={img}
+                      onChange={(e) => {
+                        const newImages = [...heroSettings.backgroundImages];
+                        newImages[idx] = e.target.value;
+                        setHeroSettings(prev => ({ ...prev, backgroundImages: newImages }));
+                      }}
+                      placeholder="Image URL"
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newImages = heroSettings.backgroundImages.filter((_, i) => i !== idx);
+                        setHeroSettings(prev => ({ ...prev, backgroundImages: newImages }));
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+              </div>
               
               <div className="flex items-center gap-4">
                 <Label htmlFor="hero-image" className="cursor-pointer">
@@ -240,16 +262,15 @@ export default function HeroManagement() {
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="image-url">Or enter image URL</Label>
-                <Input
-                  id="image-url"
-                  value={heroSettings.backgroundImage}
-                  onChange={(e) => handleInputChange('backgroundImage', e.target.value)}
-                  placeholder="https://example.com/image.jpg"
-                  className="mt-1"
-                />
-              </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setHeroSettings(prev => ({ ...prev, backgroundImages: [...prev.backgroundImages, ''] }));
+                }}
+                className="w-full"
+              >
+                Add Image URL
+              </Button>
             </CardContent>
           </Card>
 

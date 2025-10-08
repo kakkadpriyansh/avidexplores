@@ -99,10 +99,21 @@ interface DatabaseEvent {
       month: string;
       year: number;
       dates: number[];
+      dateTransportModes?: Record<number, ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[]>;
       availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[];
       availableSeats?: number;
       totalSeats?: number;
     }[];
+    itinerary?: Array<{
+      day: number;
+      title: string;
+      location?: string;
+      description: string;
+      activities?: string[];
+      meals?: string[];
+      accommodation?: string;
+      images?: string[];
+    }>;
   }[];
   availableMonths?: string[];
   thingsToCarry: string[];
@@ -196,9 +207,18 @@ export default function EventDetailPage() {
     return () => clearInterval(interval);
   }, [event?.images]);
 
-  // Compute itinerary helpers
-  const hasDeparture = event?.itinerary?.some((d) => d.day === 0) ?? false;
-  const totalDays = event ? Math.max(...event.itinerary.map((d) => d.day)) : 0;
+  // Compute itinerary helpers (prefer selected departure itinerary if available)
+  const currentItinerary: DatabaseEvent['itinerary'] = (
+    event?.departures &&
+    event.departures[selectedDepartureIndex]?.itinerary &&
+    event.departures[selectedDepartureIndex].itinerary!.length > 0
+  )
+    ? (event.departures[selectedDepartureIndex].itinerary as DatabaseEvent['itinerary'])
+    : ((event?.itinerary || []) as DatabaseEvent['itinerary']);
+  const hasDeparture = currentItinerary.some((d) => d.day === 0);
+  const totalDays = currentItinerary.length
+    ? Math.max(...currentItinerary.map((d) => d.day))
+    : 0;
 
   const toggleDayExpansion = (dayNumber: number) => {
     const newExpanded = new Set(expandedDays);
@@ -460,10 +480,17 @@ export default function EventDetailPage() {
                           const dep = event.departures[selectedDepartureIndex];
                           let filteredOptions = dep.transportOptions || [];
                           if (selectedDepartureMonth && selectedDepartureDate !== null) {
-                            const dateGroup = dep.availableDates?.find(g => `${g.month}-${g.year}` === selectedDepartureMonth);
-                            const modes = (dateGroup as any)?.availableTransportModes as string[] | undefined;
+                            const dateGroup = dep.availableDates?.find(g => g.month === selectedDepartureMonth);
+                            const perDateModes = (dateGroup as any)?.dateTransportModes?.[selectedDepartureDate] as string[] | undefined;
+                            const monthModes = (dateGroup as any)?.availableTransportModes as string[] | undefined;
+                            const modes = Array.isArray(perDateModes) && perDateModes.length > 0
+                              ? perDateModes
+                              : (Array.isArray(monthModes) && monthModes.length > 0 ? monthModes : undefined);
                             if (Array.isArray(modes) && modes.length > 0) {
-                              filteredOptions = filteredOptions.filter(opt => modes.includes(opt.mode));
+                              const filtered = filteredOptions.filter(opt => modes.includes(opt.mode));
+                              // If no transport options match the configured modes, show all available options
+                              // This handles cases where dateTransportModes are configured but don't match transportOptions
+                              filteredOptions = filtered.length > 0 ? filtered : filteredOptions;
                             }
                           }
                           if (!filteredOptions || filteredOptions.length === 0) {
@@ -513,7 +540,7 @@ export default function EventDetailPage() {
                         </h4>
                         <div className="flex flex-wrap gap-3 mb-4">
                           {event.departures[selectedDepartureIndex].availableDates?.map((dateGroup, dIdx) => {
-                            const monthKey = `${dateGroup.month}-${dateGroup.year}`;
+                            const monthKey = dateGroup.month;
                             return (
                               <button
                                 key={dIdx}
@@ -528,7 +555,7 @@ export default function EventDetailPage() {
                                     : 'bg-background hover:bg-primary/10 border-border hover:border-primary/50 hover:text-primary'
                                 }`}
                               >
-                                {dateGroup.month} {dateGroup.year}
+                                {dateGroup.month}
                               </button>
                             );
                           })}
@@ -536,7 +563,7 @@ export default function EventDetailPage() {
                         {selectedDepartureMonth ? (
                           <div className="mt-4 p-3 bg-background rounded-xl border border-border/50 shadow-sm">
                             {event.departures[selectedDepartureIndex].availableDates
-                              .filter(dateGroup => `${dateGroup.month}-${dateGroup.year}` === selectedDepartureMonth)
+                              .filter(dateGroup => dateGroup.month === selectedDepartureMonth)
                               .map((dateGroup, index) => (
                                 <div key={index}>
                                   <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1">
@@ -580,7 +607,7 @@ export default function EventDetailPage() {
                   </h3>
                   <div className="flex flex-wrap gap-3 mb-4">
                     {event.availableDates.map((dateGroup, index) => {
-                      const monthKey = `${dateGroup.month}-${dateGroup.year}`;
+                      const monthKey = dateGroup.month;
                       return (
                         <button
                           key={index}
@@ -591,7 +618,7 @@ export default function EventDetailPage() {
                               : 'bg-background hover:bg-primary/10 border-border hover:border-primary/50 hover:text-primary'
                           }`}
                         >
-                          {dateGroup.month} {dateGroup.year}
+                          {dateGroup.month}
                         </button>
                       );
                     })}
@@ -600,7 +627,7 @@ export default function EventDetailPage() {
                   {selectedMonth && (
                     <div className="mt-4 p-3 bg-background rounded-xl border border-border/50 shadow-sm">
                       {event.availableDates
-                        .filter(dateGroup => `${dateGroup.month}-${dateGroup.year}` === selectedMonth)
+                        .filter(dateGroup => dateGroup.month === selectedMonth)
                         .map((dateGroup, index) => (
                           <div key={index}>
                             <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1">
@@ -724,7 +751,7 @@ export default function EventDetailPage() {
                 <div className="space-y-6">
                   <h2 className="text-2xl font-product-sans font-bold mb-4">Day by Day Itinerary</h2>
                   <div className="space-y-3">
-                    {event.itinerary?.map((day, index) => {
+                    {currentItinerary?.map((day, index) => {
                       const isExpanded = expandedDays.has(day.day);
                       const hasAdditionalInfo = (day.images && day.images.length > 0) || 
                                                (day.activities && day.activities.length > 0) || 

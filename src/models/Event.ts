@@ -33,6 +33,16 @@ export interface IEvent extends Document {
       availableSeats?: number;
       totalSeats?: number;
     }[];
+    itinerary?: {
+      day: number;
+      title: string;
+      location?: string;
+      description: string;
+      activities: string[];
+      meals: string[];
+      accommodation?: string;
+      images?: string[];
+    }[];
   }[];
   itinerary: {
     day: number;
@@ -211,6 +221,29 @@ const EventSchema = new Schema<IEvent>({
         required: false,
         min: [1, 'Total seats must be at least 1']
       }
+    }],
+    itinerary: [{
+      day: {
+        type: Number,
+        required: true
+      },
+      title: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      location: {
+        type: String,
+        required: false
+      },
+      description: {
+        type: String,
+        required: true
+      },
+      activities: [String],
+      meals: [String],
+      accommodation: String,
+      images: [String]
     }]
   }],
   itinerary: [{

@@ -41,6 +41,11 @@ export async function GET(
       );
     }
 
+    // Log dateTransportModes when fetching
+    if (event.departures && event.departures.length > 0) {
+      console.log('GET /api/admin/events/[id] - Retrieved dateTransportModes:', JSON.stringify(event.departures[0]?.availableDates?.[0]?.dateTransportModes, null, 2));
+    }
+
     return NextResponse.json(event);
   } catch (error) {
     console.error('Error fetching event:', error);
@@ -140,6 +145,23 @@ export async function PUT(
               month: String(entry.month).trim(),
               year: Number(entry.year),
               dates: entry.dates.map((d: any) => Number(d)),
+              dateTransportModes: entry.dateTransportModes && typeof entry.dateTransportModes === 'object'
+                ? (() => {
+                    const result: Record<string, string[]> = {};
+                    for (const [key, value] of Object.entries(entry.dateTransportModes)) {
+                      if (Array.isArray(value) && value.length > 0) {
+                        const validModes = value
+                          .map((m: any) => String(m))
+                          .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m));
+                        if (validModes.length > 0) {
+                          result[String(key)] = validModes;
+                        }
+                      }
+                    }
+                    console.log('Processing dateTransportModes:', { original: entry.dateTransportModes, processed: result });
+                    return Object.keys(result).length > 0 ? result : undefined;
+                  })()
+                : undefined,
               availableTransportModes: Array.isArray(entry.availableTransportModes)
                 ? entry.availableTransportModes
                     .map((m: any) => String(m))
@@ -147,7 +169,21 @@ export async function PUT(
                 : undefined,
               availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
               totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
-            })) : []
+            })) : [],
+          itinerary: Array.isArray(dep.itinerary)
+            ? dep.itinerary
+                .filter((item: any) => item && typeof item.title === 'string' && item.title.trim() !== '')
+                .map((item: any, index: number) => ({
+                  day: Number(item.day ?? index + 1),
+                  title: String(item.title || `Day ${index + 1}`),
+                  location: item.location ? String(item.location) : undefined,
+                  description: String(item.description || 'No description provided'),
+                  activities: Array.isArray(item.activities) ? item.activities.map((a: any) => String(a)) : [],
+                  meals: Array.isArray(item.meals) ? item.meals.map((m: any) => String(m)) : [],
+                  accommodation: item.accommodation ? String(item.accommodation) : undefined,
+                  images: Array.isArray(item.images) ? item.images.map((img: any) => String(img)) : []
+                }))
+            : []
         }));
       updateData.departures = validDepartures;
     }
@@ -185,6 +221,9 @@ export async function PUT(
     console.log('PUT /api/admin/events/[id] - Final safeUpdate payload:', JSON.stringify(safeUpdate, null, 2));
     console.log('PUT /api/admin/events/[id] - Duration field type:', typeof safeUpdate.duration);
     console.log('PUT /api/admin/events/[id] - Duration field value:', safeUpdate.duration);
+    if (safeUpdate.departures && safeUpdate.departures.length > 0) {
+      console.log('PUT /api/admin/events/[id] - Departures dateTransportModes:', JSON.stringify(safeUpdate.departures[0]?.availableDates?.[0]?.dateTransportModes, null, 2));
+    }
 
     try {
       console.log('PUT /api/admin/events/[id] - About to call findByIdAndUpdate with ID:', params.id);
@@ -196,7 +235,8 @@ export async function PUT(
         { 
           new: true, 
           runValidators: false, // Disable validators to prevent casting
-          strict: false // Allow fields not in schema
+          strict: false, // Allow fields not in schema
+          overwrite: false // Don't overwrite, just update specified fields
         }
       );
 
@@ -215,6 +255,11 @@ export async function PUT(
         duration: event.duration,
         updatedAt: event.updatedAt
       });
+      
+      // Verify dateTransportModes was saved
+      if (event.departures && event.departures.length > 0) {
+        console.log('PUT /api/admin/events/[id] - Saved departures dateTransportModes:', JSON.stringify(event.departures[0]?.availableDates?.[0]?.dateTransportModes, null, 2));
+      }
 
       return NextResponse.json({
         success: true,

@@ -226,6 +226,18 @@ export async function POST(request: NextRequest) {
                 month: String(entry.month).trim(),
                 year: Number(entry.year),
                 dates: entry.dates.map((d: any) => Number(d)),
+                dateTransportModes: entry.dateTransportModes && typeof entry.dateTransportModes === 'object'
+                  ? Object.fromEntries(
+                      Object.entries(entry.dateTransportModes)
+                        .filter(([k, v]: any) => Number.isFinite(Number(k)) && Array.isArray(v))
+                        .map(([k, v]: any) => [
+                          Number(k),
+                          (v as any[])
+                            .map((m: any) => String(m))
+                            .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                        ])
+                    )
+                  : undefined,
                 availableTransportModes: Array.isArray(entry.availableTransportModes)
                   ? entry.availableTransportModes
                       .map((m: any) => String(m))
@@ -233,7 +245,21 @@ export async function POST(request: NextRequest) {
                   : undefined,
                 availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
                 totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
-              })) : []
+              })) : [],
+            itinerary: Array.isArray(dep.itinerary)
+              ? dep.itinerary
+                  .filter((item: any) => item && typeof item.title === 'string' && item.title.trim() !== '')
+                  .map((item: any, index: number) => ({
+                    day: Number(item.day ?? index + 1),
+                    title: String(item.title || `Day ${index + 1}`),
+                    location: item.location ? String(item.location) : undefined,
+                    description: String(item.description || 'No description provided'),
+                    activities: Array.isArray(item.activities) ? item.activities.map((a: any) => String(a)) : [],
+                    meals: Array.isArray(item.meals) ? item.meals.map((m: any) => String(m)) : [],
+                    accommodation: item.accommodation ? String(item.accommodation) : undefined,
+                    images: Array.isArray(item.images) ? item.images.map((img: any) => String(img)) : []
+                  }))
+              : []
           }))
       : [];
 

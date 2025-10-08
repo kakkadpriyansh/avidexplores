@@ -7,6 +7,8 @@ export interface IBooking extends Document {
   date: Date; // Selected event date
   selectedMonth?: string; // Selected month for seat tracking
   selectedYear?: number; // Selected year for seat tracking
+  selectedDeparture?: string; // Selected departure label (e.g., "Rajkot to Rajkot")
+  selectedTransportMode?: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS'; // Selected transport mode
   participants: {
     name: string;
     age: number;
@@ -45,6 +47,7 @@ export interface IBooking extends Document {
     };
   };
   specialRequests?: string;
+  adminNotes?: string;
   cancellationReason?: string;
   cancelledAt?: Date;
   cancelledBy?: mongoose.Types.ObjectId;
@@ -83,6 +86,14 @@ const BookingSchema = new Schema<IBooking>({
   selectedYear: {
     type: Number,
     min: [2024, 'Year must be at least 2024']
+  },
+  selectedDeparture: {
+    type: String,
+    trim: true
+  },
+  selectedTransportMode: {
+    type: String,
+    enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS']
   },
   participants: [{
     name: {
@@ -182,6 +193,10 @@ const BookingSchema = new Schema<IBooking>({
   specialRequests: {
     type: String,
     maxlength: [500, 'Special requests cannot exceed 500 characters']
+  },
+  adminNotes: {
+    type: String,
+    maxlength: [1000, 'Admin notes cannot exceed 1000 characters']
   },
   cancellationReason: {
     type: String,
