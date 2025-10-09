@@ -14,7 +14,7 @@ interface DestinationCardProps {
 const DestinationCard = ({ name, image, subtitle, slug, link, order }: DestinationCardProps) => {
   const content = (
     <div
-      className="group relative w-48 md:w-56 aspect-[257.5/391.4] rounded-2xl overflow-hidden flex-shrink-0 ring-1 ring-black/5 transition-all duration-500 hover:-translate-y-2 hover:z-10 hover:ring-black/10"
+      className="group relative w-48 md:w-56 aspect-[257.5/391.4] rounded-2xl overflow-hidden flex-shrink-0 ring-1 ring-black/5 transition-all duration-500 hover:scale-105 hover:z-10 hover:ring-black/10"
       style={{ willChange: 'transform' }}
     >
       {/* Image */}
