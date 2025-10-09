@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 
 interface HeroSettings {
   backgroundImage: string;
+  backgroundImages: string[];
   title: string;
   subtitle: string;
   ctaText: string;
@@ -15,12 +16,13 @@ interface HeroSettings {
 export default function Hero() {
   const [heroSettings, setHeroSettings] = useState<HeroSettings>({
     backgroundImage: '/hero-adventure.jpg',
+    backgroundImages: [],
     title: 'Discover Your Next Adventure',
     subtitle: 'From challenging mountain treks to peaceful camping escapes, embark on unforgettable journeys with expert guides and fellow adventurers.',
     ctaText: 'Explore Adventures',
     ctaLink: '/events'
   });
-  const [loading, setLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchHeroSettings = async () => {
@@ -29,29 +31,59 @@ export default function Hero() {
         if (response.ok) {
           const data = await response.json();
           setHeroSettings(data.data);
-        } else {
-          console.error('Failed to fetch hero settings, using defaults');
-        }
+        }``
       } catch (error) {
         console.error('Error fetching hero settings:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchHeroSettings();
   }, []);
 
+  useEffect(() => {
+    const images = heroSettings.backgroundImages.length > 0 ? heroSettings.backgroundImages : [heroSettings.backgroundImage];
+    if (images.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [heroSettings.backgroundImages, heroSettings.backgroundImage]);
+
+  const images = heroSettings.backgroundImages.length > 0 ? heroSettings.backgroundImages : [heroSettings.backgroundImage];
+
   return (
-    <section 
-      className="relative min-h-[40vh] md:min-h-[40vh] lg:min-h-[40vh] xl:min-h-[50vh] flex items-end justify-center text-white"
-      style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${heroSettings.backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      <div className="text-center max-w-4xl px-4 sm:px-6 pb-4 sm:pb-8 md:pb-12 lg:pb-16">
+    <section className="relative min-h-[40vh] md:min-h-[40vh] lg:min-h-[40vh] xl:min-h-[50vh] flex items-end justify-center text-white overflow-hidden">
+      {images.map((img, idx) => (
+        <div
+          key={idx}
+          className="absolute inset-0 transition-opacity duration-1000"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${img})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: idx === currentImageIndex ? 1 : 0,
+            zIndex: idx === currentImageIndex ? 1 : 0
+          }}
+        />
+      ))}
+
+      {images.length > 1 && (
+        <div className="hidden sm:flex absolute bottom-6 left-1/2 -translate-x-1/2 z-20 gap-3">
+          {images.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentImageIndex(idx)}
+              className={`w-3 h-3 rounded-full transition-all ${
+                idx === currentImageIndex ? 'bg-white scale-110' : 'bg-white/60'
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="relative z-10 text-center max-w-4xl px-4 sm:px-6 pb-4 sm:pb-8 md:pb-12 lg:pb-16">
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
           {heroSettings.title}
         </h1>
@@ -59,7 +91,7 @@ export default function Hero() {
           {heroSettings.subtitle}
         </p>
         <Link href={heroSettings.ctaLink}>
-          <Button size="lg" className="text-lg px-8 py-3">
+          <Button size="default" className="text-base px-6 py-2">
             {heroSettings.ctaText}
           </Button>
         </Link>

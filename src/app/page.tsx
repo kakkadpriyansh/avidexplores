@@ -1,7 +1,7 @@
 import Hero from '@/components/Hero';
 import EventCard from '@/components/EventCard';
 import DestinationCard from '@/components/DestinationCard';
-import TestimonialCard from '@/components/TestimonialCard';
+import TestimonialCarousel from '@/components/TestimonialCarousel';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -211,23 +211,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.length > 0 ? (
-              testimonials.map((testimonial) => (
-                <TestimonialCard
-                  key={testimonial._id}
-                  name={testimonial.customerName || testimonial?.userId?.name || 'Happy Traveler'}
-                  avatar={testimonial.customerPhoto || (testimonial.images?.[0] || '/default-avatar.png')}
-                  rating={testimonial.rating || 5}
-                  review={testimonial.review || ''}
-                />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-8">
-                <p className="text-muted-foreground">No testimonials available at the moment.</p>
-              </div>
-            )}
-          </div>
+          <TestimonialCarousel testimonials={testimonials} />
         </div>
       </section>
 

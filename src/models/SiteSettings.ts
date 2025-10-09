@@ -17,6 +17,7 @@ export interface ISiteSettings extends Document {
   // Hero section
   hero: {
     backgroundImage: string; // URL to hero background image
+    backgroundImages: string[]; // Array of background images for carousel
     title: string; // Main hero title
     subtitle: string; // Hero subtitle/description
     ctaText: string; // Call-to-action button text
@@ -263,6 +264,10 @@ const SiteSettingsSchema = new Schema<ISiteSettings>({
       required: [true, 'Hero background image is required'],
       trim: true,
       default: '/hero-adventure.jpg'
+    },
+    backgroundImages: {
+      type: [String],
+      default: []
     },
     title: {
       type: String,
@@ -750,6 +755,7 @@ SiteSettingsSchema.statics.createDefaultSettings = function(userId: string) {
     },
     hero: {
       backgroundImage: '/hero-adventure.jpg',
+      backgroundImages: [],
       title: 'Discover Your Next Adventure',
       subtitle: 'From challenging mountain treks to peaceful camping escapes, embark on unforgettable journeys with expert guides and fellow adventurers.',
       ctaText: 'Explore Adventures',

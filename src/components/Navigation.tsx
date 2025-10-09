@@ -53,8 +53,8 @@ const Navigation = () => {
             />
           </Link>
 
-          {/* Desktop Navigation & Actions */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation - Centered */}
+          <div className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -66,7 +66,10 @@ const Navigation = () => {
                 {link.label}
               </Link>
             ))}
-            <div className="flex items-center space-x-4 ml-4">
+          </div>
+          
+          {/* Right side actions */}
+          <div className="hidden md:flex items-center space-x-4">
             {status === 'loading' ? (
               <div className="h-8 w-8 animate-pulse bg-muted rounded-full" />
             ) : session ? (
@@ -121,7 +124,6 @@ const Navigation = () => {
                 </Link>
               </>
             )}
-            </div>
           </div>
 
           {/* Mobile Menu */}

@@ -40,7 +40,7 @@ export default function HeroManagement() {
     if (status === 'loading') return;
     
     if (!session || !session.user) {
-      router.push('/auth/signin');
+      router.push('/login');
       return;
     }
 
@@ -57,7 +57,14 @@ export default function HeroManagement() {
         const response = await fetch('/api/settings/hero');
         if (response.ok) {
           const data = await response.json();
-          setHeroSettings(data.data);
+          setHeroSettings({
+            backgroundImage: data.data?.backgroundImage || '',
+            backgroundImages: data.data?.backgroundImages || [],
+            title: data.data?.title || '',
+            subtitle: data.data?.subtitle || '',
+            ctaText: data.data?.ctaText || '',
+            ctaLink: data.data?.ctaLink || ''
+          });
         } else {
           toast.error('Failed to load hero settings');
         }
@@ -71,6 +78,8 @@ export default function HeroManagement() {
 
     if (session?.user?.role === 'ADMIN') {
       fetchHeroSettings();
+    } else {
+      setLoading(false);
     }
   }, [session]);
 
@@ -85,13 +94,11 @@ export default function HeroManagement() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
       return;
     }
 
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast.error('Image size must be less than 10MB');
       return;
@@ -100,7 +107,6 @@ export default function HeroManagement() {
     setUploading(true);
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('folder', 'hero');
 
     try {
       const response = await fetch('/api/upload', {
@@ -112,7 +118,7 @@ export default function HeroManagement() {
         const data = await response.json();
         setHeroSettings(prev => ({
           ...prev,
-          backgroundImage: data.url
+          backgroundImages: [...prev.backgroundImages, data.url]
         }));
         toast.success('Image uploaded successfully');
       } else {
@@ -124,6 +130,7 @@ export default function HeroManagement() {
       toast.error('Failed to upload image');
     } finally {
       setUploading(false);
+      event.target.value = '';
     }
   };
 
@@ -158,7 +165,7 @@ export default function HeroManagement() {
     window.open('/', '_blank');
   };
 
-  if (status === 'loading' || loading) {
+  if (status === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -168,6 +175,14 @@ export default function HeroManagement() {
 
   if (!session || session.user.role !== 'ADMIN') {
     return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -212,10 +227,11 @@ export default function HeroManagement() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
+                <Label>Background Images (Carousel)</Label>
                 {heroSettings.backgroundImages.map((img, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <div className="relative w-24 h-16 rounded overflow-hidden border">
-                      <img src={img} alt={`Background ${idx + 1}`} className="w-full h-full object-cover" />
+                      <img src={img || '/placeholder.jpg'} alt={`Background ${idx + 1}`} className="w-full h-full object-cover" />
                     </div>
                     <Input
                       value={img}
@@ -343,7 +359,7 @@ export default function HeroManagement() {
             <div 
               className="relative h-48 rounded-lg overflow-hidden flex items-center justify-center text-white"
               style={{
-                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${heroSettings.backgroundImage})`,
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${heroSettings.backgroundImages[0] || heroSettings.backgroundImage || '/placeholder.jpg'})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
