@@ -230,8 +230,8 @@ export const defaultSEOSettings = {
   },
   about: {
     title: 'About Us - Avid Explores',
-    description: 'Learn about Avid Explores, your trusted partner for adventure tours and travel experiences across India.',
-    keywords: ['about avid explores', 'adventure travel company', 'tour operator', 'travel experiences']
+    description: 'Learn About Avid Explorers, your trusted partner for adventure tours and travel experiences across India.',
+    keywords: ['About Avid Explorers', 'adventure travel company', 'tour operator', 'travel experiences']
   },
   contact: {
     title: 'Contact Us - Avid Explores',

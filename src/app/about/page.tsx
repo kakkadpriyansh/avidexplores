@@ -54,7 +54,7 @@ export default async function AboutPage() {
         <div className="container mx-auto px-4">
           <div className="text-center text-white">
             <h1 className="text-4xl md:text-5xl font-product-sans font-bold mb-4">
-              About Avid Explores
+              About Avid Explorers
             </h1>
             <p className="text-lg text-white/80 max-w-2xl mx-auto">
               Passionate about creating unforgettable adventures and connecting people with nature
