@@ -7,14 +7,14 @@ interface TestimonialCardProps {
 
 const TestimonialCard = ({ name, avatar, rating, review }: TestimonialCardProps) => {
   return (
-    <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 transform transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10 hover:bg-white/90 relative overflow-hidden">
+    <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 transform transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-red-800/20 hover:bg-white/90 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-300">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-purple-500/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-red-800/20 via-transparent to-purple-500/20"></div>
       </div>
       
       {/* Quote Icon */}
-      <div className="absolute top-6 right-6 text-blue-200 group-hover:text-blue-300 transition-colors duration-300">
+      <div className="absolute top-6 right-6 text-red-400 group-hover:text-red-500 transition-colors duration-300">
         <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
           <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
         </svg>
@@ -57,7 +57,7 @@ const TestimonialCard = ({ name, avatar, rating, review }: TestimonialCardProps)
             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
           </div>
           <div>
-            <h4 className="font-bold text-gray-900 text-lg group-hover:text-blue-600 transition-colors duration-300">
+            <h4 className="font-bold text-gray-900 text-lg group-hover:text-red-800 transition-colors duration-300">
               {name}
             </h4>
             <p className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors duration-300">
