@@ -1008,7 +1008,7 @@ export default function EventDetailPage() {
                 <div className="space-y-3 text-sm">
                   <div>
                     <div className="font-medium">Call us</div>
-                    <div className="text-muted-foreground">+91 98765 43210</div>
+                    <div className="text-muted-foreground">+91 88665 52400</div>
                   </div>
                   <div>
                     <div className="font-medium">Email us</div>
@@ -1096,7 +1096,7 @@ export default function EventDetailPage() {
                     </div>
                     <div>
                       <div className="font-medium">Email us</div>
-                      <div className="text-muted-foreground">hello@avidexplorers.com</div>
+                      <div className="text-muted-foreground">info@avidexplorers.in</div>
                     </div>
                     <div>
                       <div className="font-medium">WhatsApp</div>
