@@ -53,7 +53,7 @@ const Navigation = () => {
             />
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation & Actions */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
@@ -66,10 +66,7 @@ const Navigation = () => {
                 {link.label}
               </Link>
             ))}
-          </div>
-
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+            <div className="flex items-center space-x-4 ml-4">
             {status === 'loading' ? (
               <div className="h-8 w-8 animate-pulse bg-muted rounded-full" />
             ) : session ? (
@@ -124,6 +121,7 @@ const Navigation = () => {
                 </Link>
               </>
             )}
+            </div>
           </div>
 
           {/* Mobile Menu */}

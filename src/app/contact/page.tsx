@@ -95,13 +95,13 @@ export default function ContactPage() {
       <Navigation />
       
       {/* Header */}
-      <section className="relative w-full pt-24 pb-12 px-4 md:px-8 lg:px-16 flex flex-col items-center justify-center bg-gradient-to-br from-[#FFE5E5] via-[#FFF5F5] to-[#F8F8F8]">
-        <h2 className="relative z-10 text-4xl md:text-5xl font-extrabold text-[#B71C1C] mb-2 text-center drop-shadow-sm">
+      <section className="relative w-full pt-20 pb-6 px-4 md:px-8 lg:px-16 flex flex-col items-center justify-center bg-gradient-to-br from-[#FFE5E5] via-[#FFF5F5] to-[#F8F8F8]">
+        <h2 className="relative z-10 text-3xl md:text-4xl font-extrabold text-[#B71C1C] mb-1 text-center drop-shadow-sm">
           Get In Touch
         </h2>
-        <div className="relative z-10 w-16 h-1 bg-[#B71C1C] rounded-full mb-4" />
-        <p className="relative z-10 text-lg md:text-xl text-[#333] mb-2 text-center max-w-2xl">
-          Have questions about our adventures? Ready to book your next trip? We're here to help you plan the perfect adventure.
+        <div className="relative z-10 w-16 h-1 bg-[#B71C1C] rounded-full mb-2" />
+        <p className="relative z-10 text-base md:text-lg text-[#333] text-center max-w-2xl">
+          Ready to book or have questions? We're here to help.
         </p>
       </section>
 
