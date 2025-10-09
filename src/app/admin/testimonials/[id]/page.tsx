@@ -101,7 +101,6 @@ export default function TestimonialDetailPage() {
 
       if (response.ok) {
         fetchTestimonial();
-        toast({ title: 'Update done' });
       }
     } catch (error) {
       console.error('Error updating testimonial status:', error);
@@ -120,7 +119,6 @@ export default function TestimonialDetailPage() {
 
       if (response.ok) {
         fetchTestimonial();
-        toast({ title: 'Update done' });
       }
     } catch (error) {
       console.error('Error updating testimonial feature status:', error);

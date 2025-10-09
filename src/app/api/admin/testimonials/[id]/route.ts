@@ -7,10 +7,11 @@ import mongoose from 'mongoose';
 // GET /api/admin/testimonials/[id] - Get single testimonial
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
 
     await connectDB();
 
@@ -54,12 +55,13 @@ export async function GET(
 // PUT /api/admin/testimonials/[id] - Update testimonial
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     await connectDB();
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
     const body = await request.json();
     const {
       rating,
@@ -148,12 +150,13 @@ export async function PUT(
 // DELETE /api/admin/testimonials/[id] - Delete testimonial
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     await connectDB();
 
-    const { id } = params;
+    const resolvedParams = await Promise.resolve(params);
+    const { id } = resolvedParams;
 
     // Use direct MongoDB delete
     const db = mongoose.connection.db;

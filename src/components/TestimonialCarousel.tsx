@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import TestimonialCard from './TestimonialCard';
 
 interface Testimonial {
@@ -18,17 +18,28 @@ interface TestimonialCarouselProps {
 }
 
 const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (testimonials.length <= 1) return;
-    
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-    }, 4000);
-    
-    return () => clearInterval(interval);
-  }, [testimonials.length]);
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer || testimonials.length === 0) return;
+
+    let scrollAmount = 0;
+    const scrollSpeed = 0.5;
+    const resetPoint = scrollContainer.scrollWidth / 3;
+
+    const scroll = () => {
+      scrollAmount += scrollSpeed;
+      if (scrollAmount >= resetPoint) {
+        scrollAmount = 0;
+      }
+      scrollContainer.style.transform = `translateX(-${scrollAmount}px)`;
+      requestAnimationFrame(scroll);
+    };
+
+    const animation = requestAnimationFrame(scroll);
+    return () => cancelAnimationFrame(animation);
+  }, [testimonials]);
 
   if (testimonials.length === 0) {
     return (
@@ -38,39 +49,22 @@ const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
     );
   }
 
+  const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials];
+
   return (
-    <div className="relative overflow-hidden">
-      <div 
-        className="flex transition-transform duration-700 ease-in-out"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-      >
-        {testimonials.map((testimonial) => (
-          <div key={testimonial._id} className="w-full flex-shrink-0 px-4">
-            <div className="max-w-4xl mx-auto">
-              <TestimonialCard
-                name={testimonial.customerName || testimonial?.userId?.name || 'Happy Traveler'}
-                avatar={testimonial.customerPhoto || (testimonial.images?.[0] || '/default-avatar.png')}
-                rating={testimonial.rating || 5}
-                review={testimonial.review || ''}
-              />
-            </div>
+    <div className="overflow-hidden">
+      <div ref={scrollRef} className="flex gap-4 px-4 will-change-transform">
+        {duplicatedTestimonials.map((testimonial, index) => (
+          <div key={`${testimonial._id}-${index}`} className="w-[300px] flex-shrink-0">
+            <TestimonialCard
+              name={testimonial.customerName || testimonial?.userId?.name || 'Happy Traveler'}
+              avatar={testimonial.customerPhoto || (testimonial.images?.[0] || '/default-avatar.png')}
+              rating={testimonial.rating || 5}
+              review={testimonial.review || ''}
+            />
           </div>
         ))}
       </div>
-      
-      {testimonials.length > 1 && (
-        <div className="flex justify-center mt-8 space-x-2">
-          {testimonials.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                index === currentIndex ? 'bg-primary' : 'bg-muted-foreground/30'
-              }`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 };

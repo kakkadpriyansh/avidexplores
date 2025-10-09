@@ -116,63 +116,75 @@ export default function AdminTestimonialsPage() {
 
   const handleStatusChange = async (id: string, approved: boolean) => {
     try {
-      const response = await fetch(`/api/admin/testimonials/${id}`, {
+      setTestimonials(prev => prev.map(t => t._id === id ? {...t, approved} : t));
+      await fetch(`/api/admin/testimonials/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ approved })
       });
-
-      if (response.ok) {
-        fetchTestimonials(activeTab);
-      }
     } catch (error) {
       console.error('Error updating testimonial status:', error);
+      fetchTestimonials(activeTab, pagination.page);
     }
   };
 
   const handleFeatureToggle = async (id: string, isFeatured: boolean) => {
     try {
-      const response = await fetch(`/api/admin/testimonials/${id}`, {
+      setTestimonials(prev => prev.map(t => t._id === id ? {...t, isFeatured} : t));
+      await fetch(`/api/admin/testimonials/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isFeatured })
       });
-
-      if (response.ok) {
-        fetchTestimonials(activeTab);
-      }
     } catch (error) {
       console.error('Error updating testimonial feature status:', error);
+      fetchTestimonials(activeTab, pagination.page);
     }
   };
 
   const handleDelete = async () => {
     if (!testimonialToDelete) return;
-
     try {
-      const response = await fetch(`/api/admin/testimonials/${testimonialToDelete}`, {
+      setTestimonials(prev => prev.filter(t => t._id !== testimonialToDelete));
+      setDeleteDialogOpen(false);
+      const id = testimonialToDelete;
+      setTestimonialToDelete(null);
+      await fetch(`/api/admin/testimonials/${id}`, {
         method: 'DELETE'
       });
-
-      if (response.ok) {
-        fetchTestimonials(activeTab);
-        setDeleteDialogOpen(false);
-        setTestimonialToDelete(null);
-      }
     } catch (error) {
       console.error('Error deleting testimonial:', error);
+      fetchTestimonials(activeTab, pagination.page);
     }
   };
 
   const renderStars = (rating: number) => {
-    return [...Array(5)].map((_, i) => (
-      <Star
-        key={i}
-        className={`h-4 w-4 ${
-          i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-        }`}
-      />
-    ));
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= Math.floor(rating)) {
+        stars.push(
+          <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+        );
+      } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+        stars.push(
+          <div key={i} className="relative w-4 h-4">
+            <svg className="absolute w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <div className="absolute overflow-hidden" style={{ width: '50%' }}>
+              <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
+          </div>
+        );
+      } else {
+        stars.push(
+          <Star key={i} className="h-4 w-4 text-gray-300" />
+        );
+      }
+    }
+    return stars;
   };
 
   const getStatusBadge = (testimonial: Testimonial) => {
@@ -312,7 +324,7 @@ export default function AdminTestimonialsPage() {
                           </>
                         )}
 
-                        <DropdownMenu>
+                        <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
                               <MoreHorizontal className="h-4 w-4" />
@@ -332,13 +344,17 @@ export default function AdminTestimonialsPage() {
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleFeatureToggle(testimonial._id, !testimonial.isFeatured)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleFeatureToggle(testimonial._id, !testimonial.isFeatured);
+                              }}
                             >
                               <Award className="h-4 w-4 mr-2" />
                               {testimonial.isFeatured ? 'Unfeature' : 'Feature'}
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.preventDefault();
                                 setTestimonialToDelete(testimonial._id);
                                 setDeleteDialogOpen(true);
                               }}

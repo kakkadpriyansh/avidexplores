@@ -57,8 +57,9 @@ async function getTestimonials() {
   try {
     // Use INTERNAL_API_URL for server-side calls to avoid DNS issues
     const base = process.env.INTERNAL_API_URL || 'http://localhost:3000';
-    const response = await fetch(`${base}/api/testimonials?featured=true&limit=6`, {
-      cache: 'no-store'
+    const response = await fetch(`${base}/api/testimonials?approved=true&limit=20`, {
+      cache: 'no-store',
+      next: { revalidate: 0 }
     });
     
     if (!response.ok) {
@@ -207,7 +208,7 @@ export default async function HomePage() {
               What Our Adventurers Say
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Real experiences from real adventurers who've explored with us
+              Real experiences from real adventurers who&apos;ve explored with us
             </p>
           </div>
 
