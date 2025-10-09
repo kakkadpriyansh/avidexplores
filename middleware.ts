@@ -21,7 +21,7 @@ export default withAuth(
     }
 
     // API routes protection
-    if (pathname.startsWith('/api/admin')) {
+    if (pathname.startsWith('/api/admin') || pathname === '/api/upload') {
       if (!token || token.role !== 'ADMIN') {
         return NextResponse.json(
           { error: 'Unauthorized' },

@@ -180,6 +180,7 @@ export async function POST(request: NextRequest) {
     // Save file
     try {
       await writeFile(filePath, buffer);
+      console.log('File successfully written to:', filePath);
     } catch (error) {
       console.error('Failed to write file:', error);
       return NextResponse.json(

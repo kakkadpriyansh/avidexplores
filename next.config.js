@@ -8,7 +8,7 @@ const nextConfig = {
     return [
       {
         source: '/uploads/:path*',
-        destination: '/uploads/:path*',
+        destination: '/api/uploads/:path*',
       },
     ];
   },

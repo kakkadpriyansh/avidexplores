@@ -207,11 +207,32 @@ export async function PUT(
     
     // Only include fields that are actually present in updateData
     if (updateData.title !== undefined) safeUpdate.title = updateData.title;
+    if (updateData.slug !== undefined) safeUpdate.slug = updateData.slug;
+    if (updateData.description !== undefined) safeUpdate.description = updateData.description;
+    if (updateData.shortDescription !== undefined) safeUpdate.shortDescription = updateData.shortDescription;
     if (updateData.price !== undefined) safeUpdate.price = Number(updateData.price);
     if (updateData.discountedPrice !== undefined) safeUpdate.discountedPrice = updateData.discountedPrice;
     if (updateData.duration !== undefined) safeUpdate.duration = String(updateData.duration).trim();
+    if (updateData.category !== undefined) safeUpdate.category = updateData.category;
+    if (updateData.difficulty !== undefined) safeUpdate.difficulty = updateData.difficulty;
+    if (updateData.minParticipants !== undefined) safeUpdate.minParticipants = updateData.minParticipants;
+    if (updateData.maxParticipants !== undefined) safeUpdate.maxParticipants = updateData.maxParticipants;
+    if (updateData.ageLimit !== undefined) safeUpdate.ageLimit = updateData.ageLimit;
+    if (updateData.isActive !== undefined) safeUpdate.isActive = updateData.isActive;
+    if (updateData.isFeatured !== undefined) safeUpdate.isFeatured = updateData.isFeatured;
+    if (updateData.location !== undefined) safeUpdate.location = updateData.location;
+    if (updateData.region !== undefined) safeUpdate.region = updateData.region;
+    if (updateData.images !== undefined) safeUpdate.images = updateData.images;
+    if (updateData.tags !== undefined) safeUpdate.tags = updateData.tags;
+    if (updateData.highlights !== undefined) safeUpdate.highlights = updateData.highlights;
+    if (updateData.availableMonths !== undefined) safeUpdate.availableMonths = updateData.availableMonths;
     if (updateData.availableDates !== undefined) safeUpdate.availableDates = updateData.availableDates;
     if (updateData.departures !== undefined) safeUpdate.departures = updateData.departures;
+    if (updateData.itinerary !== undefined) safeUpdate.itinerary = updateData.itinerary;
+    if (updateData.inclusions !== undefined) safeUpdate.inclusions = updateData.inclusions;
+    if (updateData.exclusions !== undefined) safeUpdate.exclusions = updateData.exclusions;
+    if (updateData.thingsToCarry !== undefined) safeUpdate.thingsToCarry = updateData.thingsToCarry;
+    if (updateData.preparation !== undefined) safeUpdate.preparation = updateData.preparation;
 
     // Set updatedAt to current time
     safeUpdate.updatedAt = new Date();
