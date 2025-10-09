@@ -94,7 +94,7 @@ const EventCard = ({ event }: EventCardProps) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl hover:shadow-[0_20px_50px_-10px_rgba(59,130,246,0.35)] transition-all duration-500 overflow-hidden group border border-white/60 transform hover:-translate-y-2 w-full max-w-[520px] mx-auto">
+    <div className="bg-white rounded-2xl shadow-xl hover:shadow-[0_20px_50px_-10px_rgba(185,28,28,0.35)] transition-all duration-500 overflow-hidden group border border-white/60 transform hover:-translate-y-2 w-full max-w-[520px] mx-auto">
       {/* Image Gallery */}
       <div
         className="relative overflow-hidden aspect-[5/3] cursor-pointer"
