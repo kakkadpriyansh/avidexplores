@@ -55,8 +55,6 @@ export function ImageUpload({
   const handleFileUpload = async (file: File, skipConfirmation = false) => {
     if (!file) return;
 
-    console.log('Starting file upload:', file.name, file.size, file.type);
-    
     if (!file.type.startsWith('image/')) {
       toast({
         title: 'Invalid file type',
@@ -93,19 +91,14 @@ export function ImageUpload({
         formData.append('replaceUrl', value);
       }
 
-      console.log('Making fetch request to /api/upload...');
-      
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
         credentials: 'include',
       });
 
-      console.log('Upload response status:', response.status);
-
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('Upload error response:', errorData);
         
         try {
           const errorJson = JSON.parse(errorData);
@@ -116,7 +109,6 @@ export function ImageUpload({
       }
 
       const data = await response.json();
-      console.log('Upload success response:', data);
       
       onChange(data.url);
       setUrlInput(data.url);

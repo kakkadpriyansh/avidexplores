@@ -136,8 +136,6 @@ export default function EditEventPage() {
         throw new Error('Event not found');
       }
       const data = await response.json();
-      console.log('Fetched event data:', data);
-      console.log('Discounted price from API:', data.discountedPrice);
       setEvent({
         ...data,
         // Normalize duration to string for free-text edit
@@ -389,8 +387,6 @@ export default function EditEventPage() {
     e.preventDefault();
     if (!event) return;
 
-    console.log('Form submission - current event state:', { title: event.title });
-
     setSaving(true);
     try {
       // Sanitize availableDates: include only fully valid entries
@@ -468,21 +464,55 @@ export default function EditEventPage() {
           : []
       }));
 
+      // Sanitize event-level itinerary
+      const sanitizedItinerary = event.itinerary
+        .filter((item: any) => item && typeof item.title === 'string' && item.title.trim() !== '')
+        .map((item: any, index: number) => ({
+          day: Number(item.day ?? index + 1),
+          title: String(item.title || `Day ${index + 1}`),
+          location: item.location ? String(item.location) : undefined,
+          description: String(item.description || 'No description provided'),
+          activities: Array.isArray(item.activities) ? item.activities.map((a: any) => String(a)) : [],
+          meals: Array.isArray(item.meals) ? item.meals.map((m: any) => String(m)) : [],
+          accommodation: item.accommodation ? String(item.accommodation) : undefined,
+          images: Array.isArray(item.images) ? item.images.filter((img: any) => img && String(img).trim()).map((img: any) => String(img)) : []
+        }));
+
       // Minimal payload: update only fields changed on this form section
       const payload: any = {
         title: event.title,
+        slug: event.slug,
+        description: event.description,
+        shortDescription: event.shortDescription,
         price: Number(event.price),
         discountedPrice: (typeof event.discountedPrice === 'number')
           ? event.discountedPrice
           : undefined,
         duration: String(event.duration).trim(),
+        category: event.category,
+        difficulty: event.difficulty,
+        minParticipants: Number(event.minParticipants),
+        maxParticipants: Number(event.maxParticipants),
+        ageLimit: event.ageLimit,
+        isActive: event.isActive,
+        isFeatured: event.isFeatured,
+        location: event.location,
+        region: event.region,
+        images: Array.isArray(event.images) ? event.images.filter((img: any) => img && String(img).trim()).map((img: any) => String(img)) : [],
+        tags: event.tags,
+        highlights: event.highlights,
+        availableMonths: event.availableMonths,
         availableDates: validAvailableDates,
         departures: sanitizedDepartures,
+        itinerary: sanitizedItinerary,
+        inclusions: event.inclusions,
+        exclusions: event.exclusions,
+        thingsToCarry: event.thingsToCarry,
+        preparation: event.preparation,
         updatedAt: new Date().toISOString()
       };
 
-      console.log('Sending payload:', { title: payload.title, price: payload.price, discountedPrice: payload.discountedPrice, duration: payload.duration });
-      console.log('Full departures in payload:', JSON.stringify(payload.departures, null, 2));
+      console.log('IMAGES IN PAYLOAD:', payload.images);
       const response = await fetch(`/api/admin/events/${params.id}`, {
         method: 'PUT',
         headers: {
@@ -505,8 +535,6 @@ export default function EditEventPage() {
         throw new Error(typeof details === 'string' ? details : JSON.stringify(details));
       }
 
-      console.log('API Response:', responseData);
-
       toast({
         title: 'Success',
         description: 'Event updated successfully',
@@ -526,10 +554,7 @@ export default function EditEventPage() {
 
   const updateEvent = (field: string, value: any) => {
     if (!event) return;
-    console.log('updateEvent called:', { field, value });
-    const newEvent = { ...event, [field]: value };
-    console.log('updateEvent setting new state:', { field, value });
-    setEvent(newEvent);
+    setEvent({ ...event, [field]: value });
   };
 
   const updateNestedField = (parent: string, field: string, value: any) => {
