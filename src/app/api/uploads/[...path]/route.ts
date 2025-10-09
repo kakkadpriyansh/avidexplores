@@ -46,13 +46,17 @@ export async function GET(
     // Get the MIME type
     const mimeType = lookup(filePath) || 'application/octet-stream';
     
+    // Convert Node Buffer to ArrayBuffer for Web Response API
+    const uint8 = new Uint8Array(fileBuffer);
+    const blob = new Blob([uint8], { type: String(mimeType) });
+
     // Return the file with appropriate headers
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(blob, {
       status: 200,
       headers: {
         'Content-Type': mimeType,
         'Cache-Control': 'public, max-age=86400', // Cache for 1 day
-        'Content-Length': fileBuffer.length.toString(),
+        'Content-Length': fileBuffer.byteLength.toString(),
       },
     });
 
