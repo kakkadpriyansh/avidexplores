@@ -145,6 +145,32 @@ export default function EventDetailPage() {
   const [selectedDepartureDate, setSelectedDepartureDate] = useState<number | null>(null);
   const [transportDialogOpen, setTransportDialogOpen] = useState(false);
 
+  // Helper function to calculate itinerary dates
+  const getItineraryDate = (dayNumber: number) => {
+    if (!selectedDepartureDate || !selectedDepartureMonth || selectedDepartureIndex === null || !event?.departures) {
+      return '';
+    }
+    
+    const dateGroup = event.departures[selectedDepartureIndex]?.availableDates?.find(d => d.month === selectedDepartureMonth);
+    if (!dateGroup) return '';
+    
+    const monthMap: Record<string, number> = {
+      'jan': 0, 'january': 0, 'feb': 1, 'february': 1, 'mar': 2, 'march': 2,
+      'apr': 3, 'april': 3, 'may': 4, 'jun': 5, 'june': 5,
+      'jul': 6, 'july': 6, 'aug': 7, 'august': 7, 'sep': 8, 'september': 8,
+      'oct': 9, 'october': 9, 'nov': 10, 'november': 10, 'dec': 11, 'december': 11
+    };
+    
+    const [monthName] = selectedDepartureMonth.toLowerCase().split('-');
+    const monthIndex = monthMap[monthName];
+    if (monthIndex === undefined) return '';
+    
+    const date = new Date(dateGroup.year, monthIndex, selectedDepartureDate);
+    date.setDate(date.getDate() + (dayNumber === 0 ? 0 : dayNumber - 1));
+    
+    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  };
+
   useEffect(() => {
     const fetchEventData = async () => {
       try {
@@ -758,6 +784,8 @@ export default function EventDetailPage() {
                                                (day.meals && day.meals.length > 0) || 
                                                day.accommodation;
                       
+                      const dayDate = getItineraryDate(day.day);
+                      
                       return (
                         <div key={index} className="bg-muted/30 rounded-lg overflow-hidden">
                           <button
@@ -766,13 +794,15 @@ export default function EventDetailPage() {
                               hasAdditionalInfo ? 'hover:bg-muted/50 cursor-pointer' : 'cursor-default'
                             }`}
                           >
-                            <div className="bg-gray-600 text-white rounded-full px-3 py-1 text-sm font-medium mr-4 min-w-fit">
+                            <div className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium mr-4 min-w-fit">
                               {day.day === 0 ? 'Day 0' : `Day ${day.day}`}
                             </div>
                             <div className="flex-1">
                               <h3 className="font-medium text-base text-foreground">
                                 {day.day === 0 ? `${day.title} (Pre-arrival)` : day.title}
+                                {dayDate && <span className="hidden sm:inline text-sm text-primary font-semibold ml-2">({dayDate})</span>}
                               </h3>
+                              {dayDate && <p className="sm:hidden text-xs text-primary font-semibold mt-1">({dayDate})</p>}
                             </div>
                             {hasAdditionalInfo && (
                               <div className="ml-2">
