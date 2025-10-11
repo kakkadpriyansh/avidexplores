@@ -8,7 +8,9 @@ interface HeroSettings {
   backgroundImage: string;
   backgroundImages: string[];
   title: string;
+  titleColor: string;
   subtitle: string;
+  subtitleColor: string;
   ctaText: string;
   ctaLink: string;
 }
@@ -18,7 +20,9 @@ export default function Hero() {
     backgroundImage: '/hero-adventure.jpg',
     backgroundImages: [],
     title: 'Discover Your Next Adventure',
+    titleColor: '#ffffff',
     subtitle: 'From challenging mountain treks to peaceful camping escapes, embark on unforgettable journeys with expert guides and fellow adventurers.',
+    subtitleColor: '#e5e7eb',
     ctaText: 'Explore Adventures',
     ctaLink: '/events'
   });
@@ -84,10 +88,10 @@ export default function Hero() {
       )}
 
       <div className="relative z-10 text-center max-w-4xl px-4 sm:px-6 pb-4 sm:pb-8 md:pb-12 lg:pb-16">
-        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6" style={{ color: heroSettings.titleColor }}>
           {heroSettings.title}
         </h1>
-        <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-200">
+        <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8" style={{ color: heroSettings.subtitleColor }}>
           {heroSettings.subtitle}
         </p>
         <Link href={heroSettings.ctaLink}>

@@ -19,7 +19,9 @@ export interface ISiteSettings extends Document {
     backgroundImage: string; // URL to hero background image
     backgroundImages: string[]; // Array of background images for carousel
     title: string; // Main hero title
+    titleColor: string; // Title text color
     subtitle: string; // Hero subtitle/description
+    subtitleColor: string; // Subtitle text color
     ctaText: string; // Call-to-action button text
     ctaLink: string; // Call-to-action button link
   };
@@ -275,11 +277,31 @@ const SiteSettingsSchema = new Schema<ISiteSettings>({
       trim: true,
       default: 'Discover Your Next Adventure'
     },
+    titleColor: {
+      type: String,
+      default: '#ffffff',
+      validate: {
+        validator: function(v: string) {
+          return /^#[0-9A-F]{6}$/i.test(v);
+        },
+        message: 'Please enter a valid hex color'
+      }
+    },
     subtitle: {
       type: String,
       required: [true, 'Hero subtitle is required'],
       trim: true,
       default: 'From challenging mountain treks to peaceful camping escapes, embark on unforgettable journeys with expert guides and fellow adventurers.'
+    },
+    subtitleColor: {
+      type: String,
+      default: '#e5e7eb',
+      validate: {
+        validator: function(v: string) {
+          return /^#[0-9A-F]{6}$/i.test(v);
+        },
+        message: 'Please enter a valid hex color'
+      }
     },
     ctaText: {
       type: String,
@@ -757,7 +779,9 @@ SiteSettingsSchema.statics.createDefaultSettings = function(userId: string) {
       backgroundImage: '/hero-adventure.jpg',
       backgroundImages: [],
       title: 'Discover Your Next Adventure',
+      titleColor: '#ffffff',
       subtitle: 'From challenging mountain treks to peaceful camping escapes, embark on unforgettable journeys with expert guides and fellow adventurers.',
+      subtitleColor: '#e5e7eb',
       ctaText: 'Explore Adventures',
       ctaLink: '/events'
     },

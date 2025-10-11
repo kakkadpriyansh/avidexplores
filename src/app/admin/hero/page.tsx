@@ -15,7 +15,9 @@ interface HeroSettings {
   backgroundImage: string;
   backgroundImages: string[];
   title: string;
+  titleColor: string;
   subtitle: string;
+  subtitleColor: string;
   ctaText: string;
   ctaLink: string;
 }
@@ -27,7 +29,9 @@ export default function HeroManagement() {
     backgroundImage: '',
     backgroundImages: [],
     title: '',
+    titleColor: '#ffffff',
     subtitle: '',
+    subtitleColor: '#e5e7eb',
     ctaText: '',
     ctaLink: ''
   });
@@ -61,7 +65,9 @@ export default function HeroManagement() {
             backgroundImage: data.data?.backgroundImage || '',
             backgroundImages: data.data?.backgroundImages || [],
             title: data.data?.title || '',
+            titleColor: data.data?.titleColor || '#ffffff',
             subtitle: data.data?.subtitle || '',
+            subtitleColor: data.data?.subtitleColor || '#e5e7eb',
             ctaText: data.data?.ctaText || '',
             ctaLink: data.data?.ctaLink || ''
           });
@@ -308,6 +314,17 @@ export default function HeroManagement() {
                   placeholder="Discover Your Next Adventure"
                   className="mt-1"
                 />
+                <div className="flex items-center gap-2 mt-2">
+                  <Label htmlFor="titleColor" className="text-sm">Text Color:</Label>
+                  <input
+                    id="titleColor"
+                    type="color"
+                    value={heroSettings.titleColor}
+                    onChange={(e) => handleInputChange('titleColor', e.target.value)}
+                    className="h-8 w-16 rounded cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-600">{heroSettings.titleColor}</span>
+                </div>
               </div>
 
               <div>
@@ -320,6 +337,17 @@ export default function HeroManagement() {
                   rows={3}
                   className="mt-1"
                 />
+                <div className="flex items-center gap-2 mt-2">
+                  <Label htmlFor="subtitleColor" className="text-sm">Text Color:</Label>
+                  <input
+                    id="subtitleColor"
+                    type="color"
+                    value={heroSettings.subtitleColor}
+                    onChange={(e) => handleInputChange('subtitleColor', e.target.value)}
+                    className="h-8 w-16 rounded cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-600">{heroSettings.subtitleColor}</span>
+                </div>
               </div>
 
               <div>
@@ -365,10 +393,10 @@ export default function HeroManagement() {
               }}
             >
               <div className="text-center max-w-4xl px-6">
-                <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: heroSettings.titleColor }}>
                   {heroSettings.title || 'Hero Title'}
                 </h1>
-                <p className="text-xl md:text-2xl mb-8 text-gray-200">
+                <p className="text-xl md:text-2xl mb-8" style={{ color: heroSettings.subtitleColor }}>
                   {heroSettings.subtitle || 'Hero subtitle will appear here'}
                 </p>
                 <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors">
