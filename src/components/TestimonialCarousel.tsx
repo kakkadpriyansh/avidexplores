@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TestimonialCard from './TestimonialCard';
 
 interface Testimonial {
@@ -19,27 +19,33 @@ interface TestimonialCarouselProps {
 
 const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const animationRef = useRef<number>();
+  const scrollAmountRef = useRef(0);
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer || testimonials.length === 0) return;
 
-    let scrollAmount = 0;
     const scrollSpeed = 0.5;
     const resetPoint = scrollContainer.scrollWidth / 3;
 
     const scroll = () => {
-      scrollAmount += scrollSpeed;
-      if (scrollAmount >= resetPoint) {
-        scrollAmount = 0;
+      if (!isPaused) {
+        scrollAmountRef.current += scrollSpeed;
+        if (scrollAmountRef.current >= resetPoint) {
+          scrollAmountRef.current = 0;
+        }
+        scrollContainer.style.transform = `translateX(-${scrollAmountRef.current}px)`;
       }
-      scrollContainer.style.transform = `translateX(-${scrollAmount}px)`;
-      requestAnimationFrame(scroll);
+      animationRef.current = requestAnimationFrame(scroll);
     };
 
-    const animation = requestAnimationFrame(scroll);
-    return () => cancelAnimationFrame(animation);
-  }, [testimonials]);
+    animationRef.current = requestAnimationFrame(scroll);
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [testimonials, isPaused]);
 
   if (testimonials.length === 0) {
     return (
@@ -55,7 +61,12 @@ const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
     <div className="overflow-hidden">
       <div ref={scrollRef} className="flex gap-4 px-4 will-change-transform">
         {duplicatedTestimonials.map((testimonial, index) => (
-          <div key={`${testimonial._id}-${index}`} className="w-[300px] flex-shrink-0">
+          <div 
+            key={`${testimonial._id}-${index}`} 
+            className="w-[300px] flex-shrink-0"
+            onMouseEnter={() => setIsPaused(true)} 
+            onMouseLeave={() => setIsPaused(false)}
+          >
             <TestimonialCard
               name={testimonial.customerName || testimonial?.userId?.name || 'Happy Traveler'}
               avatar={testimonial.customerPhoto || (testimonial.images?.[0] || '/default-avatar.png')}
