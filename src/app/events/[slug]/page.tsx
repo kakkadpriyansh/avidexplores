@@ -592,7 +592,7 @@ export default function EventDetailPage() {
                               .filter(dateGroup => dateGroup.month === selectedDepartureMonth)
                               .map((dateGroup, index) => (
                                 <div key={index}>
-                                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1">
+                                  <div className="flex flex-wrap gap-3">
                                     {dateGroup.dates.map((date, dateIndex) => (
                                     <button
                                       key={dateIndex}
@@ -600,7 +600,7 @@ export default function EventDetailPage() {
                                         setSelectedDepartureDate(date);
                                         setTransportDialogOpen(true);
                                       }}
-                                      className={`h-11 w-11 flex items-center justify-center text-center border-2 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-md text-sm font-medium ${
+                                      className={`h-10 w-10 flex items-center justify-center text-center border-2 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-md text-sm font-medium ${
                                         selectedDepartureDate === date
                                           ? 'bg-primary text-primary-foreground border-primary'
                                           : 'bg-background text-foreground hover:bg-primary hover:text-primary-foreground border-border hover:border-primary/50'
@@ -656,11 +656,11 @@ export default function EventDetailPage() {
                         .filter(dateGroup => dateGroup.month === selectedMonth)
                         .map((dateGroup, index) => (
                           <div key={index}>
-                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1">
+                            <div className="flex flex-wrap gap-3">
                               {dateGroup.dates.map((date, dateIndex) => (
                                 <button
                                   key={dateIndex}
-                                  className="h-11 w-11 flex items-center justify-center text-center border-2 rounded-full hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-md text-sm font-medium bg-background border-border hover:border-primary/50"
+                                  className="h-10 w-10 flex items-center justify-center text-center border-2 rounded-full hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-md text-sm font-medium bg-background border-border hover:border-primary/50"
                                 >
                                   {date}
                                 </button>
