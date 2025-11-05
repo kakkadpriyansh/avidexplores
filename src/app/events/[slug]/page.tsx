@@ -465,9 +465,12 @@ export default function EventDetailPage() {
             <div className="lg:col-span-2">
               {/* Departures & Transport Options */}
               {(event.departures && event.departures.length > 0) && (
-                <div className="mb-6 p-4 bg-muted/30 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-3">Departures & Transport Options</h3>
-                  <div className="flex flex-wrap gap-3 mb-4">
+                <div className="mb-6 p-6 bg-gradient-to-br from-muted/40 to-muted/20 rounded-xl border border-border/50 shadow-sm">
+                  <h3 className="text-xl font-bold mb-5 flex items-center">
+                    <Plane className="h-5 w-5 mr-2 text-primary" />
+                    Departures & Transport Options
+                  </h3>
+                  <div className="flex flex-wrap gap-2 mb-5">
                     {event.departures.map((dep, idx) => (
                       <button
                         key={idx}
@@ -477,10 +480,10 @@ export default function EventDetailPage() {
                           setSelectedDepartureMonth(null);
                           setSelectedDepartureDate(null);
                         }}
-                        className={`px-6 py-3 rounded-full text-sm font-medium border-2 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg ${
+                        className={`px-5 py-2.5 rounded-lg text-sm font-semibold border transition-all duration-200 ${
                           selectedDepartureIndex === idx
-                            ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
-                            : 'bg-background hover:bg-primary/10 border-border hover:border-primary/50 hover:text-primary'
+                            ? 'bg-primary text-primary-foreground border-primary shadow-md'
+                            : 'bg-background/80 text-foreground hover:bg-primary/5 border-border/60 hover:border-primary/40'
                         }`}
                       >
                         {dep.label?.trim() ? dep.label : `${dep.origin} → ${dep.destination}`}
@@ -551,20 +554,20 @@ export default function EventDetailPage() {
                   </Dialog>
 
                   {selectedDepartureIndex !== null && event.departures[selectedDepartureIndex] && (
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                       {selectedTransportIndex !== null && (
-                        <p className="text-xs text-muted-foreground">
-                          Selected transport: {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.mode}
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                          <CheckCircle className="h-3.5 w-3.5" />
+                          {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.mode}
                           {' '}(+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.price || 0).toLocaleString()})
-                        </p>
+                        </div>
                       )}
 
                       <div>
-                        <h4 className="text-sm font-medium mb-2 flex items-center">
-                          <Calendar className="h-4 w-4 mr-2 text-primary" />
+                        <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wide">
                           Departure Dates
                         </h4>
-                        <div className="flex flex-wrap gap-3 mb-4">
+                        <div className="flex flex-wrap gap-2 mb-4">
                           {event.departures[selectedDepartureIndex].availableDates?.map((dateGroup, dIdx) => {
                             const monthKey = dateGroup.month;
                             return (
@@ -575,10 +578,10 @@ export default function EventDetailPage() {
                                   setSelectedDepartureMonth(next);
                                   setSelectedDepartureDate(null);
                                 }}
-                                className={`px-6 py-3 rounded-full text-sm font-medium border-2 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg ${
+                                className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-all duration-200 uppercase ${
                                   selectedDepartureMonth === monthKey
-                                    ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
-                                    : 'bg-background hover:bg-primary/10 border-border hover:border-primary/50 hover:text-primary'
+                                    ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                                    : 'bg-background/60 text-muted-foreground hover:text-foreground hover:bg-background border-border/60 hover:border-primary/30'
                                 }`}
                               >
                                 {dateGroup.month}
@@ -587,12 +590,12 @@ export default function EventDetailPage() {
                           })}
                         </div>
                         {selectedDepartureMonth ? (
-                          <div className="mt-4 p-3 bg-background rounded-xl border border-border/50 shadow-sm">
+                          <div className="mt-3 p-4 bg-background/60 rounded-lg border border-border/40">
                             {event.departures[selectedDepartureIndex].availableDates
                               .filter(dateGroup => dateGroup.month === selectedDepartureMonth)
                               .map((dateGroup, index) => (
                                 <div key={index}>
-                                  <div className="flex flex-wrap gap-3">
+                                  <div className="flex flex-wrap gap-2">
                                     {dateGroup.dates.map((date, dateIndex) => (
                                     <button
                                       key={dateIndex}
@@ -600,10 +603,10 @@ export default function EventDetailPage() {
                                         setSelectedDepartureDate(date);
                                         setTransportDialogOpen(true);
                                       }}
-                                      className={`h-10 w-10 flex items-center justify-center text-center border-2 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-md text-sm font-medium ${
+                                      className={`h-11 w-11 flex items-center justify-center border rounded-lg transition-all duration-200 text-sm font-semibold ${
                                         selectedDepartureDate === date
-                                          ? 'bg-primary text-primary-foreground border-primary'
-                                          : 'bg-background text-foreground hover:bg-primary hover:text-primary-foreground border-border hover:border-primary/50'
+                                          ? 'bg-primary text-primary-foreground border-primary shadow-sm scale-105'
+                                          : 'bg-background text-foreground hover:bg-primary/10 hover:text-primary border-border/60 hover:border-primary/50'
                                       }`}
                                     >
                                       {date}
@@ -614,8 +617,8 @@ export default function EventDetailPage() {
                               ))}
                           </div>
                         ) : (
-                          <p className="text-xs text-muted-foreground text-center py-2">
-                            Click on a month to view departure dates
+                          <p className="text-xs text-muted-foreground text-center py-3 italic">
+                            Select a month to view available dates
                           </p>
                         )}
                       </div>
