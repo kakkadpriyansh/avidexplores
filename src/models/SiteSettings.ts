@@ -787,7 +787,7 @@ SiteSettingsSchema.statics.createDefaultSettings = function(userId: string) {
     },
     contact: {
       email: 'info@avidexplorers.com',
-      phone: '+91 9876543210',
+      phone: '+91 88665 52400',
       address: {
         street: '123 Travel Street',
         city: 'Mumbai',
