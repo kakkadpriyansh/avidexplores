@@ -58,8 +58,7 @@ async function getTestimonials() {
     // Use INTERNAL_API_URL for server-side calls to avoid DNS issues
     const base = process.env.INTERNAL_API_URL || 'http://localhost:3000';
     const response = await fetch(`${base}/api/testimonials?approved=true&limit=20`, {
-      cache: 'no-store',
-      next: { revalidate: 0 }
+      cache: 'no-store'
     });
     
     if (!response.ok) {
