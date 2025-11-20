@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Mountain, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Instagram, Youtube, Linkedin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 

@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     let seoData: ISEO | null = null;
 
     // Build query based on parameters
-    let query: any = { 
+    const query: any = { 
       pageType: pageType.toUpperCase(),
       isActive: true 
     };

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     // Build query based on tags
-    let query: any = { isActive: true };
+    const query: any = { isActive: true };
     if (tags && tags.length > 0) {
       query.tags = { $in: tags };
     }

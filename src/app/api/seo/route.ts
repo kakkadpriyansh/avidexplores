@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     // Build query
-    let query: any = { isActive: true };
+    const query: any = { isActive: true };
     
     if (pageType) {
       query.pageType = pageType;
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     // Check for existing SEO setting
-    let existingQuery: any = { pageType: seoData.pageType };
+    const existingQuery: any = { pageType: seoData.pageType };
     if (seoData.pageId) {
       existingQuery.pageId = seoData.pageId;
     }

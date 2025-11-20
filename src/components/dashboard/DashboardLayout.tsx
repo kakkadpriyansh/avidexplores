@@ -2,18 +2,11 @@
 
 import { ReactNode } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { DashboardNav, DashboardMobileNav } from './DashboardNav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import {
-  LogOut,
-  Menu,
-  X,
-  Bell,
-  Search
-} from 'lucide-react';
+import { LogOut, Menu, X, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 
@@ -25,7 +18,6 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, title, description }: DashboardLayoutProps) {
   const { data: session } = useSession();
-  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (!session) {

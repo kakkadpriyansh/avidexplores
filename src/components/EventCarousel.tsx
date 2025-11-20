@@ -1,7 +1,5 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import EventCard from './EventCard';
 import { useRef } from 'react';
 
@@ -40,15 +38,7 @@ interface EventCarouselProps {
 const EventCarousel = ({ events, title, icon: Icon }: EventCarouselProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const scrollAmount = 320; // Width of card + gap
-      scrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
-    }
-  };
+  // scrolling handled via native horizontal scroll UI
 
   return (
     <div className="mb-16">

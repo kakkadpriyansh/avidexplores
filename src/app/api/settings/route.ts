@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const section = searchParams.get('section'); // Optional: get specific section
 
     // Get active settings
-    let settings = await (SiteSettings as any).getActiveSettings();
+    const settings = await (SiteSettings as any).getActiveSettings();
 
     if (!settings) {
       return NextResponse.json(

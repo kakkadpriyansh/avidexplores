@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Menu, User, LogOut, Calendar } from 'lucide-react';
+import { Menu, LogOut, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build aggregation pipeline for search
-    let pipeline: any[] = [
+    const pipeline: any[] = [
       { $match: filter }
     ];
 
