@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     if (adminView) {
       const session = await getServerSession(authOptions);
       const role = (session?.user as any)?.role;
-      if (!session || !role || role !== 'ADMIN') {
+      if (!session || !role || (role !== 'ADMIN' && role !== 'SUB_ADMIN')) {
         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 403 });
       }
     }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
     const role = (session?.user as any)?.role;
 
-    if (!session || !role || role !== 'ADMIN') {
+    if (!session || !role || (role !== 'ADMIN' && role !== 'SUB_ADMIN')) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 403 });
     }
 

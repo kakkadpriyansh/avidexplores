@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { success: false, error: 'Admin access required' },
         { status: 403 }

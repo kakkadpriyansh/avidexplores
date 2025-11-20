@@ -134,7 +134,7 @@ export default function CreateEventPage() {
       router.push('/login?callbackUrl=/admin/events/create');
       return;
     }
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       router.push('/dashboard');
       return;
     }
@@ -557,7 +557,7 @@ export default function CreateEventPage() {
     );
   }
 
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
     return null;
   }
 

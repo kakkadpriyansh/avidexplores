@@ -49,7 +49,7 @@ export async function GET(
 
     // Check if user owns this booking or is admin
     // userId is populated, so it contains _id
-    if ((booking.userId as any)._id?.toString() !== session.user.id && session.user.role !== 'ADMIN') {
+    if ((booking.userId as any)._id?.toString() !== session.user.id && session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { success: false, error: 'Access denied' },
         { status: 403 }
@@ -110,7 +110,7 @@ export async function PUT(
     }
 
     // Check if user owns this booking or is admin
-    if (booking.userId.toString() !== session.user.id && session.user.role !== 'ADMIN') {
+    if (booking.userId.toString() !== session.user.id && session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { success: false, error: 'Access denied' },
         { status: 403 }
@@ -175,7 +175,7 @@ export async function DELETE(
     }
 
     // Check if user owns this booking or is admin
-    if (booking.userId.toString() !== session.user.id && session.user.role !== 'ADMIN') {
+    if (booking.userId.toString() !== session.user.id && session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { success: false, error: 'Access denied' },
         { status: 403 }

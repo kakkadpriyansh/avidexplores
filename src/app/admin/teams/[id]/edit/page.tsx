@@ -47,7 +47,7 @@ export default function EditTeamMemberPage() {
       router.push(`/login?callbackUrl=/admin/teams/${id}/edit`);
       return;
     }
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       router.push('/dashboard');
       return;
     }
@@ -119,7 +119,7 @@ export default function EditTeamMemberPage() {
   };
 
   if (status === 'loading' || loading) return null;
-  if (!session || session.user.role !== 'ADMIN') return null;
+  if (!session || session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') return null;
 
   return (
     <div className="min-h-screen bg-background">

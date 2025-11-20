@@ -57,7 +57,7 @@ interface IUserItem {
   _id: string;
   name: string;
   email: string;
-  role: "USER" | "ADMIN" | "GUIDE";
+  role: "USER" | "ADMIN" | "GUIDE" | "SUB_ADMIN";
   isVerified?: boolean;
   isBanned?: boolean;
   isActive?: boolean;
@@ -262,6 +262,7 @@ export default function AdminUsersPage() {
                       <SelectItem value="USER">User</SelectItem>
                       <SelectItem value="GUIDE">Guide</SelectItem>
                       <SelectItem value="ADMIN">Admin</SelectItem>
+                      <SelectItem value="SUB_ADMIN">Sub Admin</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
@@ -333,28 +334,6 @@ export default function AdminUsersPage() {
                             <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            {u.isBanned ? (
-                              <DropdownMenuItem onClick={() => doUserAction(u._id, "unban")}> <UserCheck className="h-4 w-4 mr-2" /> Unban</DropdownMenuItem>
-                            ) : (
-                              <DropdownMenuItem onClick={() => {
-                                const reason = prompt("Ban reason (required)") || "";
-                                if (!reason.trim()) return;
-                                doUserAction(u._id, "ban", { reason });
-                              }}> <UserX className="h-4 w-4 mr-2" /> Ban</DropdownMenuItem>
-                            )}
-                            {u.isVerified ? (
-                              <DropdownMenuItem onClick={() => doUserAction(u._id, "unverify")}> <XCircle className="h-4 w-4 mr-2" /> Mark Unverified</DropdownMenuItem>
-                            ) : (
-                              <DropdownMenuItem onClick={() => doUserAction(u._id, "verify")}> <CheckCircle2 className="h-4 w-4 mr-2" /> Verify</DropdownMenuItem>
-                            )}
-                            <DropdownMenuSeparator />
-                            <DropdownMenuLabel>Change Role</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => doUserAction(u._id, "changeRole", { role: "USER" })}><UserCog className="h-4 w-4 mr-2" /> Set User</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => doUserAction(u._id, "changeRole", { role: "GUIDE" })}><ShieldCheck className="h-4 w-4 mr-2" /> Set Guide</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => doUserAction(u._id, "changeRole", { role: "ADMIN" })}><Crown className="h-4 w-4 mr-2" /> Set Admin</DropdownMenuItem>
-                            <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-red-600" onClick={() => deleteUser(u._id)}>
                               <Ban className="h-4 w-4 mr-2" /> Delete User
                             </DropdownMenuItem>

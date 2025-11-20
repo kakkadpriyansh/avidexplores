@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || (session.user as any)?.role !== 'ADMIN') {
+    const userRole = (session.user as any)?.role;
+    if (!session || (userRole !== 'ADMIN' && userRole !== 'SUB_ADMIN')) {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }

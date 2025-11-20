@@ -36,7 +36,7 @@ export default function CreateTestimonial() {
       router.push('/login?callbackUrl=/admin/testimonials/create');
       return;
     }
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       router.push('/dashboard');
       return;
     }

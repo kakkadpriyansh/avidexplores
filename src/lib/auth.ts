@@ -23,7 +23,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  role: 'USER' | 'ADMIN' | 'GUIDE';
+  role: 'USER' | 'ADMIN' | 'SUB_ADMIN' | 'GUIDE';
 }
 
 export async function verifyToken(request: NextRequest): Promise<AuthUser | null> {
@@ -129,7 +129,8 @@ export const authOptions: NextAuthOptions = {
             id: user._id.toString(),
             email: user.email,
             name: user.name,
-            role: user.role as 'USER' | 'ADMIN' | 'GUIDE',
+            role: user.role as 'USER' | 'ADMIN' | 'SUB_ADMIN' | 'GUIDE',
+            permissions: user.permissions || [],
             image: user.avatar
           };
         } catch (error) {
@@ -146,13 +147,15 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
+        token.permissions = user.permissions;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub!;
-        session.user.role = token.role as 'USER' | 'ADMIN' | 'GUIDE';
+        session.user.role = token.role as 'USER' | 'ADMIN' | 'SUB_ADMIN' | 'GUIDE';
+        session.user.permissions = token.permissions;
       }
       return session;
     },

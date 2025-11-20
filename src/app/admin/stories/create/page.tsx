@@ -61,7 +61,7 @@ export default function CreateStoryPage() {
       router.push('/login?callbackUrl=/admin/stories/create');
       return;
     }
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       router.push('/dashboard');
       return;
     }
@@ -189,7 +189,7 @@ export default function CreateStoryPage() {
     );
   }
 
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
     return null;
   }
 

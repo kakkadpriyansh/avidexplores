@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { hasPermission } from '@/lib/permissions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,6 +71,8 @@ interface Testimonial {
 }
 
 export default function AdminTestimonialsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -111,8 +116,21 @@ export default function AdminTestimonialsPage() {
   };
 
   useEffect(() => {
+    if (status === 'loading') return;
+    if (!session) {
+      router.push('/login?callbackUrl=/admin/testimonials');
+      return;
+    }
+    if (!hasPermission(session, 'testimonials')) {
+      router.push('/admin');
+      return;
+    }
     fetchTestimonials(activeTab);
-  }, [activeTab, searchTerm]);
+  }, [activeTab, searchTerm, session, status, router]);
+
+  if (!session || !hasPermission(session, 'testimonials')) {
+    return null;
+  }
 
   const handleStatusChange = async (id: string, approved: boolean) => {
     try {

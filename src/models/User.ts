@@ -4,7 +4,8 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: 'USER' | 'ADMIN' | 'GUIDE';
+  role: 'USER' | 'ADMIN' | 'SUB_ADMIN' | 'GUIDE';
+  permissions?: string[];
   avatar?: string;
   phone?: string;
   dateOfBirth?: Date;
@@ -66,8 +67,12 @@ const UserSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ['USER', 'ADMIN', 'GUIDE'],
+    enum: ['USER', 'ADMIN', 'SUB_ADMIN', 'GUIDE'],
     default: 'USER'
+  },
+  permissions: {
+    type: [String],
+    default: []
   },
   avatar: {
     type: String,
@@ -175,4 +180,9 @@ UserSchema.index({ isVerified: 1 });
 UserSchema.index({ isBanned: 1 });
 UserSchema.index({ createdAt: -1 });
 
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+// Delete cached model to ensure schema updates are applied
+if (mongoose.models.User) {
+  delete mongoose.models.User;
+}
+
+export default mongoose.model<IUser>('User', UserSchema);

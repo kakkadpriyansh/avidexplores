@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { hasPermission } from '@/lib/permissions';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,8 +46,8 @@ export default function AdminBookingsPage() {
       router.push('/login?callbackUrl=/admin/bookings');
       return;
     }
-    if (session.user.role !== 'ADMIN') {
-      router.push('/dashboard');
+    if (!hasPermission(session, 'bookings')) {
+      router.push('/admin');
       return;
     }
     fetchData();
@@ -140,7 +141,7 @@ export default function AdminBookingsPage() {
     );
   }
 
-  if (!session || session.user.role !== 'ADMIN') return null;
+  if (!session || !hasPermission(session, 'bookings')) return null;
 
   return (
     <div className="min-h-screen bg-background">

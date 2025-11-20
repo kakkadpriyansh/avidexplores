@@ -20,8 +20,8 @@ export async function GET(
       );
     }
 
-    // Check if user is admin
-    if (session.user.role !== 'ADMIN') {
+    // Check if user is admin or sub-admin
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }
@@ -71,8 +71,8 @@ export async function PUT(
       );
     }
 
-    // Check if user is admin
-    if (session.user.role !== 'ADMIN') {
+    // Check if user is admin or sub-admin
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }
@@ -372,8 +372,8 @@ export async function DELETE(
       );
     }
 
-    // Check if user is admin
-    if (session.user.role !== 'ADMIN') {
+    // Check if user is admin or sub-admin
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }

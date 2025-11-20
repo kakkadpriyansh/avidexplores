@@ -85,7 +85,7 @@ export async function PUT(
     }
 
     // Check if user is admin or story author
-    const isAdmin = session.user.role === 'ADMIN';
+    const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'SUB_ADMIN';
     const isAuthor = existingStory.userId.toString() === session.user.id;
     
     if (!isAdmin && !isAuthor) {
@@ -211,7 +211,7 @@ export async function DELETE(
     }
 
     // Check if user is admin or story author
-    const isAdmin = session.user.role === 'ADMIN';
+    const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'SUB_ADMIN';
     const isAuthor = existingStory.userId.toString() === session.user.id;
     
     if (!isAdmin && !isAuthor) {

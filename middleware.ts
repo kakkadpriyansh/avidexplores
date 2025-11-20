@@ -8,7 +8,7 @@ export default withAuth(
 
     // Admin routes protection
     if (pathname.startsWith('/admin')) {
-      if (!token || token.role !== 'ADMIN') {
+      if (!token || (token.role !== 'ADMIN' && token.role !== 'SUB_ADMIN')) {
         return NextResponse.redirect(new URL('/login?callbackUrl=' + pathname, req.url));
       }
     }
@@ -22,7 +22,7 @@ export default withAuth(
 
     // API routes protection
     if (pathname.startsWith('/api/admin') || pathname === '/api/upload') {
-      if (!token || token.role !== 'ADMIN') {
+      if (!token || (token.role !== 'ADMIN' && token.role !== 'SUB_ADMIN')) {
         return NextResponse.json(
           { error: 'Unauthorized' },
           { status: 401 }

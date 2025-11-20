@@ -72,7 +72,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }

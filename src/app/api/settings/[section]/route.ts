@@ -100,7 +100,7 @@ export async function PUT(
       );
     }
 
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -185,14 +185,18 @@ export async function PUT(
     }
 
     // Update specific section (merge with existing data)
-    settings[section] = { ...settings[section], ...body };
+    if (settings[section] && typeof settings[section] === 'object') {
+      settings[section] = { ...settings[section].toObject?.() || settings[section], ...body };
+    } else {
+      settings[section] = body;
+    }
 
     // Update metadata
     settings.lastUpdatedBy = session.user.id;
     settings.version = incrementVersion(settings.version);
 
-    // Save settings
-    await settings.save();
+    // Save settings with validation disabled for partial updates
+    await settings.save({ validateModifiedOnly: true });
 
     // Populate user info and return
     await settings.populate('lastUpdatedBy', 'name email');
@@ -217,6 +221,7 @@ export async function PUT(
     if ((error as any).name === 'ValidationError') {
       const validationErrors = Object.values((error as any).errors).map((err: any) => err.message);
       console.error('Validation errors:', validationErrors);
+      console.error('Full error:', error);
       return NextResponse.json(
         { 
           error: 'Validation failed',

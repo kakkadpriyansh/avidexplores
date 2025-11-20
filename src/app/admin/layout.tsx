@@ -8,25 +8,24 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/toaster';
-import { Mountain, LayoutDashboard, Calendar, BookOpen, Users, Menu, LogOut, MapPin, Image, Star, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
+import { Mountain, LayoutDashboard, Calendar, BookOpen, Users, Menu, LogOut, MapPin, Image, Star, ChevronLeft, ChevronRight, MessageSquare, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/events', label: 'Events', icon: Calendar },
-  { href: '/admin/bookings', label: 'Bookings', icon: BookOpen },
-  { href: '/admin/inquiries', label: 'Inquiries', icon: MessageSquare },
-  // { href: '/admin/stories', label: 'Stories', icon: PenSquare }, // temporarily hidden
-  { href: '/admin/testimonials', label: 'Testimonials', icon: Star },
-  { href: '/admin/hero', label: 'Hero Section', icon: Image },
-  { href: '/admin/destination-cards', label: 'Destination Cards', icon: MapPin },
-  { href: '/admin/teams', label: 'Teams', icon: Users },
-  { href: '/admin/users', label: 'Users', icon: Users },
+const allNavItems = [
+  { href: '/admin/admin-dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin_only' },
+  { href: '/admin/events', label: 'Events', icon: Calendar, permission: 'events' },
+  { href: '/admin/bookings', label: 'Bookings', icon: BookOpen, permission: 'bookings' },
+  { href: '/admin/inquiries', label: 'Inquiries', icon: MessageSquare, permission: 'inquiries' },
+  { href: '/admin/testimonials', label: 'Testimonials', icon: Star, permission: 'testimonials' },
+  { href: '/admin/hero', label: 'Hero Section', icon: Image, permission: 'hero' },
+  { href: '/admin/destination-cards', label: 'Destination Cards', icon: MapPin, permission: 'destinations' },
+  { href: '/admin/teams', label: 'Teams', icon: Users, permission: 'teams' },
+  { href: '/admin/admins', label: 'Admins', icon: Shield, permission: 'admin_only' },
+  { href: '/admin/users', label: 'Users', icon: Users, permission: 'admin_only' },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const { data: session, status } = useSession();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -44,21 +43,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     } catch {}
   }, [sidebarCollapsed]);
 
-  // Handle authentication and redirect
-  useEffect(() => {
-    if (status === 'loading') return; // Still loading, don't redirect yet
-    
-    if (!session) {
-      router.push('/login?callbackUrl=' + encodeURIComponent(pathname));
-      return;
-    }
-    
-    if (session.user.role !== 'ADMIN') {
-      router.push('/dashboard');
-      return;
-    }
-  }, [session, status, router, pathname]);
-
   // Show loading state while checking authentication
   if (status === 'loading') {
     return (
@@ -72,16 +56,23 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   // Don't render admin panel if not authenticated or not admin
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN')) {
     return null;
   }
+
+  const navItems = allNavItems.filter(item => {
+    if (item.permission === 'admin_only') return session?.user.role === 'ADMIN';
+    if (session?.user.role === 'ADMIN') return true;
+    return (session?.user as any).permissions?.includes(item.permission);
+  });
 
   const SidebarNav = ({ collapsed }: { collapsed: boolean }) => (
     <nav className="flex flex-col h-full">
       <div className={cn('flex items-center gap-2 px-4 h-16 border-b', collapsed ? 'justify-center' : '')}>
-        <Mountain className="h-6 w-6 text-primary" />
-        {!collapsed && (
-          <span className="font-product-sans font-bold text-lg">Avid Explorers Admin</span>
+        {collapsed ? (
+          <img src="/logo/Avid Red Black.png" alt="Avid" className="h-8" />
+        ) : (
+          <img src="/logo/Avid name black.png" alt="Avid Explorers" className="h-8" />
         )}
       </div>
       <div className="flex-1 p-2">
@@ -163,8 +154,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 <ChevronLeft className="h-4 w-4" />
               )}
             </Button>
-            <Separator orientation="vertical" className="mx-2 h-6" />
-            <span className="text-sm text-muted-foreground">Sidebar {sidebarCollapsed ? 'collapsed' : 'expanded'}</span>
           </div>
           {/* Top spacer for mobile header */}
           <div className="md:hidden h-2" />

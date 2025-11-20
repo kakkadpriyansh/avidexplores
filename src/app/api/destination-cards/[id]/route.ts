@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const session = await getServerSession(authOptions);
     const role = (session?.user as any)?.role;
 
-    if (!session || !role || role !== 'ADMIN') {
+    if (!session || !role || (role !== 'ADMIN' && role !== 'SUB_ADMIN')) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -115,7 +115,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     const session = await getServerSession(authOptions);
     const role = (session?.user as any)?.role;
 
-    if (!session || !role || role !== 'ADMIN') {
+    if (!session || !role || (role !== 'ADMIN' && role !== 'SUB_ADMIN')) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 403 });
     }
 

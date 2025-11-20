@@ -70,7 +70,7 @@ export default function AdminStoriesPage() {
       router.push('/login?callbackUrl=/admin/stories');
       return;
     }
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       router.push('/dashboard');
       return;
     }
@@ -180,7 +180,7 @@ export default function AdminStoriesPage() {
     );
   }
 
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
     return null;
   }
 

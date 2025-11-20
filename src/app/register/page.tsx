@@ -100,12 +100,6 @@ export default function RegisterPage() {
           <div className="max-w-md mx-auto">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="flex items-center justify-center space-x-2 mb-4">
-                <Mountain className="h-8 w-8 text-primary" />
-                <span className="font-product-sans font-bold text-2xl text-foreground">
-                  Avid Explorers
-                </span>
-              </div>
               <h1 className="text-3xl font-product-sans font-bold text-foreground mb-2">
                 Start Your Adventure
               </h1>

@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { hasPermission } from '@/lib/permissions';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,8 +44,8 @@ export default function AdminInquiriesPage() {
       router.push('/login?callbackUrl=/admin/inquiries');
       return;
     }
-    if (session.user.role !== 'ADMIN') {
-      router.push('/dashboard');
+    if (!hasPermission(session, 'inquiries')) {
+      router.push('/admin');
       return;
     }
     
@@ -117,7 +118,7 @@ export default function AdminInquiriesPage() {
     );
   }
 
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || !hasPermission(session, 'inquiries')) {
     return null;
   }
 

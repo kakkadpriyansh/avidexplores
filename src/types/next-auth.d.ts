@@ -6,7 +6,8 @@ declare module 'next-auth' {
       id: string;
       email: string;
       name: string;
-      role: 'USER' | 'ADMIN' | 'GUIDE';
+      role: 'USER' | 'ADMIN' | 'SUB_ADMIN' | 'GUIDE';
+      permissions?: string[];
       image?: string;
     };
   }
@@ -15,13 +16,15 @@ declare module 'next-auth' {
     id: string;
     email: string;
     name: string;
-    role: 'USER' | 'ADMIN' | 'GUIDE';
+    role: 'USER' | 'ADMIN' | 'SUB_ADMIN' | 'GUIDE';
+    permissions?: string[];
     image?: string;
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
-    role: 'USER' | 'ADMIN' | 'GUIDE';
+    role: 'USER' | 'ADMIN' | 'SUB_ADMIN' | 'GUIDE';
+    permissions?: string[];
   }
 }

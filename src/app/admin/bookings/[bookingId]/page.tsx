@@ -93,7 +93,7 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
       router.push('/login?callbackUrl=/admin/bookings');
       return;
     }
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
       router.push('/dashboard');
       return;
     }
@@ -203,7 +203,7 @@ export default function BookingDetailsPage({ params }: { params: { bookingId: st
     );
   }
 
-  if (!session || session.user.role !== 'ADMIN' || !booking) {
+  if (!session || session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN' || !booking) {
     return null;
   }
 

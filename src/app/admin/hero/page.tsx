@@ -48,8 +48,8 @@ export default function HeroManagement() {
       return;
     }
 
-    if (session.user.role !== 'ADMIN') {
-      router.push('/admin');
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN') {
+      router.push('/dashboard');
       return;
     }
   }, [session, status, router]);
@@ -82,7 +82,7 @@ export default function HeroManagement() {
       }
     };
 
-    if (session?.user?.role === 'ADMIN') {
+    if (session?.user?.role === 'ADMIN' || session?.user?.role === 'SUB_ADMIN') {
       fetchHeroSettings();
     } else {
       setLoading(false);
@@ -143,6 +143,7 @@ export default function HeroManagement() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      console.log('Sending hero settings:', heroSettings);
       const response = await fetch('/api/settings/hero', {
         method: 'PUT',
         headers: {
@@ -157,7 +158,7 @@ export default function HeroManagement() {
       } else {
         const errorData = await response.json();
         console.error('API Error Response:', errorData);
-        toast.error(errorData.error || 'Failed to update hero settings');
+        toast.error(errorData.details ? errorData.details.join(', ') : (errorData.error || 'Failed to update hero settings'));
       }
     } catch (error) {
       console.error('Error updating hero settings:', error);
@@ -179,7 +180,7 @@ export default function HeroManagement() {
     );
   }
 
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUB_ADMIN')) {
     return null;
   }
 

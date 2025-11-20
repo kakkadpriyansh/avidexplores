@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user is admin to show all stories or only published ones
     const session = await getServerSession(authOptions);
-    const isAdmin = session?.user?.role === 'ADMIN';
+    const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUB_ADMIN';
     
     // Build filter object
     const filter: any = isAdmin ? {} : { isPublished: true };
