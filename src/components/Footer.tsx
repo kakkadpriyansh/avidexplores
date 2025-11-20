@@ -143,14 +143,14 @@ const Footer = () => {
 
         <div className="border-t border-slate-700 mt-12 pt-8 text-center text-slate-400">
           <p>
-            Developed and designed by{' '}
+            Made in India with ❤️ | Designed & Developed by{' '}
             <a
-              href="https://kakkadpriyanshportfolio.vercel.app"
+              href="https://prnexgen.in"
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-orange-400"
             >
-              Priyansh
+              PRNexGen
             </a>
           </p>
         </div>
