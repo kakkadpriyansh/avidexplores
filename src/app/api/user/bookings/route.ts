@@ -5,6 +5,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { Model } from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 // Helper to stringify event location (object -> "City, State, Country")
 function stringifyLocation(loc: any): string {
   if (!loc) return '';

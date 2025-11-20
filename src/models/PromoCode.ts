@@ -27,7 +27,6 @@ const PromoCodeSchema = new Schema<IPromoCode>({
   code: {
     type: String,
     required: [true, 'Promo code is required'],
-    unique: true,
     uppercase: true,
     trim: true,
     minlength: [3, 'Code must be at least 3 characters'],
@@ -130,7 +129,7 @@ PromoCodeSchema.pre('save', function(next) {
 });
 
 // Indexes for performance
-PromoCodeSchema.index({ code: 1 });
+PromoCodeSchema.index({ code: 1 }, { unique: true });
 PromoCodeSchema.index({ isActive: 1 });
 PromoCodeSchema.index({ validFrom: 1, validUntil: 1 });
 PromoCodeSchema.index({ applicableCategories: 1 });

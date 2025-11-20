@@ -3,6 +3,8 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { Linkedin, Instagram, Twitter, Facebook } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 async function getTeamMembers() {
   try {
     // Use INTERNAL_API_URL for server-side calls to avoid DNS issues

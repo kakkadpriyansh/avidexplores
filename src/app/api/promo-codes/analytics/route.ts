@@ -6,6 +6,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { Model } from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/promo-codes/analytics - Get promo code analytics (Admin only)
 export async function GET(request: NextRequest) {
   try {

@@ -4,6 +4,8 @@ import SEO, { ISEO } from '@/models/SEO';
 import Event, { IEvent } from '@/models/Event';
 import { Model } from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/seo/public - Get SEO data for public pages (No auth required)
 export async function GET(request: NextRequest) {
   try {

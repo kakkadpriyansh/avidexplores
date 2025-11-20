@@ -72,7 +72,6 @@ const BookingSchema = new Schema<IBooking>({
   bookingId: {
     type: String,
     required: [true, 'Booking ID is required'],
-    unique: true,
     uppercase: true
   },
   date: {
@@ -234,7 +233,7 @@ BookingSchema.pre('save', function(next) {
 });
 
 // Indexes for better performance
-BookingSchema.index({ bookingId: 1 });
+BookingSchema.index({ bookingId: 1 }, { unique: true });
 BookingSchema.index({ userId: 1 });
 BookingSchema.index({ eventId: 1 });
 BookingSchema.index({ status: 1 });

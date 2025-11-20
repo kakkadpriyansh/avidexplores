@@ -105,7 +105,6 @@ const EventSchema = new Schema<IEvent>({
   slug: {
     type: String,
     required: [true, 'Slug is required'],
-    unique: true,
     lowercase: true,
     trim: true
   },
@@ -394,7 +393,7 @@ const EventSchema = new Schema<IEvent>({
 });
 
 // Indexes for better performance
-EventSchema.index({ slug: 1 });
+EventSchema.index({ slug: 1 }, { unique: true });
 EventSchema.index({ category: 1 });
 EventSchema.index({ difficulty: 1 });
 EventSchema.index({ isActive: 1 });

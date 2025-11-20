@@ -4,6 +4,8 @@ import { getAuditLogs, getAuditStatistics } from '@/lib/adminAudit';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/admin/audit-logs - Get audit logs with filtering and pagination (Admin only)
 export async function GET(request: NextRequest) {
   try {

@@ -5,6 +5,8 @@ import { Model } from 'mongoose';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/transactions/export - Export transaction logs as CSV or Excel (Admin only)
 export async function GET(request: NextRequest) {
   try {

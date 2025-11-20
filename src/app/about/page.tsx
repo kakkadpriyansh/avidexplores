@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Shield, Users, Award, Heart, ArrowRight } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 async function getTeamMembers() {
   try {
     // Use INTERNAL_API_URL for server-side calls to avoid DNS issues
