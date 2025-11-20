@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/toaster';
-import { Mountain, LayoutDashboard, Calendar, BookOpen, Users, Menu, LogOut, MapPin, Image, Star, ChevronLeft, ChevronRight, MessageSquare, Shield } from 'lucide-react';
+
+import { Mountain, LayoutDashboard, Calendar, BookOpen, Users, Menu, LogOut, MapPin, Image, Star, ChevronLeft, ChevronRight, MessageSquare, Shield, KeyRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const allNavItems = [
@@ -22,6 +23,7 @@ const allNavItems = [
   { href: '/admin/teams', label: 'Teams', icon: Users, permission: 'teams' },
   { href: '/admin/admins', label: 'Admins', icon: Shield, permission: 'admin_only' },
   { href: '/admin/users', label: 'Users', icon: Users, permission: 'admin_only' },
+  { href: '/admin/change-password', label: 'Change Password', icon: KeyRound, permission: 'admin_only' },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
