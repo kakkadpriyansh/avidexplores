@@ -43,6 +43,27 @@ Fixed duplicate schema indexes by removing `unique: true` from field definitions
 - Removed `unique: true` from `code` field
 - Added `{ unique: true }` to `code` index
 
+**Blog Model (`/models/Blog.ts`):**
+- Removed `unique: true` from `slug` field
+- Added `{ unique: true }` to `slug` index
+
+**Story Model (`/models/Story.ts`):**
+- Removed `unique: true` from `slug` field
+- Added `{ unique: true }` to `slug` index
+
+**Subscriber Model (`/models/Subscriber.ts`):**
+- Removed `unique: true` from `email` field
+- Added `{ unique: true }` to `email` index
+
+**DeviceToken Model (`/models/DeviceToken.ts`):**
+- Removed `unique: true` from `token` field
+- Added `{ unique: true }` to `token` index
+
+**TransactionLog Model (`/models/TransactionLog.ts`):**
+- Removed `unique: true` and `index: true` from `transactionId` field
+- Added `{ unique: true }` to `transactionId` index
+- Removed `index: true` from multiple fields that are already in compound indexes
+
 ## What These Changes Do
 
 ### Dynamic Export

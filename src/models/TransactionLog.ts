@@ -75,33 +75,27 @@ const TransactionLogSchema = new Schema<ITransactionLog>({
   transactionId: {
     type: String,
     required: [true, 'Transaction ID is required'],
-    unique: true,
-    trim: true,
-    index: true
+    trim: true
   },
   bookingId: {
     type: Schema.Types.ObjectId,
-    ref: 'Booking',
-    index: true
+    ref: 'Booking'
   },
   userId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
-    index: true
+    ref: 'User'
   },
   
   type: {
     type: String,
     enum: ['payment', 'refund', 'partial_refund', 'cancellation_fee', 'processing_fee', 'discount', 'promo_code', 'adjustment'],
-    required: [true, 'Transaction type is required'],
-    index: true
+    required: [true, 'Transaction type is required']
   },
   status: {
     type: String,
     enum: ['pending', 'processing', 'completed', 'failed', 'cancelled', 'disputed', 'refunded'],
     required: [true, 'Transaction status is required'],
-    default: 'pending',
-    index: true
+    default: 'pending'
   },
   
   amount: {
@@ -153,8 +147,7 @@ const TransactionLogSchema = new Schema<ITransactionLog>({
   paymentMethod: {
     type: String,
     enum: ['razorpay', 'paypal', 'bank_transfer', 'cash', 'wallet', 'upi', 'card', 'net_banking'],
-    required: [true, 'Payment method is required'],
-    index: true
+    required: [true, 'Payment method is required']
   },
   paymentGateway: {
     type: String,
@@ -163,8 +156,7 @@ const TransactionLogSchema = new Schema<ITransactionLog>({
   },
   gatewayTransactionId: {
     type: String,
-    trim: true,
-    index: true
+    trim: true
   },
   gatewayResponse: {
     type: Schema.Types.Mixed
@@ -172,8 +164,7 @@ const TransactionLogSchema = new Schema<ITransactionLog>({
   
   eventId: {
     type: Schema.Types.ObjectId,
-    ref: 'Event',
-    index: true
+    ref: 'Event'
   },
   promoCodeId: {
     type: Schema.Types.ObjectId,
@@ -200,16 +191,13 @@ const TransactionLogSchema = new Schema<ITransactionLog>({
   initiatedAt: {
     type: Date,
     required: [true, 'Initiated date is required'],
-    default: Date.now,
-    index: true
+    default: Date.now
   },
   processedAt: {
-    type: Date,
-    index: true
+    type: Date
   },
   completedAt: {
-    type: Date,
-    index: true
+    type: Date
   },
   failedAt: {
     type: Date
@@ -217,8 +205,7 @@ const TransactionLogSchema = new Schema<ITransactionLog>({
   
   isReconciled: {
     type: Boolean,
-    default: false,
-    index: true
+    default: false
   },
   reconciledAt: {
     type: Date
@@ -258,6 +245,7 @@ const TransactionLogSchema = new Schema<ITransactionLog>({
 });
 
 // Compound indexes for efficient querying
+TransactionLogSchema.index({ transactionId: 1 }, { unique: true });
 TransactionLogSchema.index({ userId: 1, createdAt: -1 });
 TransactionLogSchema.index({ bookingId: 1, type: 1 });
 TransactionLogSchema.index({ status: 1, createdAt: -1 });

@@ -53,7 +53,6 @@ const DeviceTokenSchema = new Schema<IDeviceToken>({
   token: {
     type: String,
     required: [true, 'Device token is required'],
-    unique: true,
     trim: true
   },
   platform: {

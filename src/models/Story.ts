@@ -36,7 +36,6 @@ const StorySchema = new Schema<IStory>({
   slug: {
     type: String,
     required: [true, 'Slug is required'],
-    unique: true,
     lowercase: true,
     trim: true
   },
@@ -135,7 +134,7 @@ StorySchema.pre('save', function(next) {
 });
 
 // Indexes for better performance
-StorySchema.index({ slug: 1 });
+StorySchema.index({ slug: 1 }, { unique: true });
 StorySchema.index({ userId: 1 });
 StorySchema.index({ category: 1 });
 StorySchema.index({ isPublished: 1 });

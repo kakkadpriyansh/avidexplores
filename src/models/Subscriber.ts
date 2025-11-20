@@ -23,7 +23,6 @@ const SubscriberSchema = new Schema<ISubscriber>({
   email: {
     type: String,
     required: [true, 'Email is required'],
-    unique: true,
     lowercase: true,
     trim: true,
     match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please enter a valid email']
@@ -89,7 +88,7 @@ SubscriberSchema.pre('save', function(next) {
 });
 
 // Indexes for better performance
-SubscriberSchema.index({ email: 1 });
+SubscriberSchema.index({ email: 1 }, { unique: true });
 SubscriberSchema.index({ isActive: 1 });
 SubscriberSchema.index({ source: 1 });
 SubscriberSchema.index({ tags: 1 });

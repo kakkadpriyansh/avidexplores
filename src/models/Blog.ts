@@ -69,7 +69,6 @@ const BlogSchema = new Schema<IBlog>({
   slug: {
     type: String,
     required: [true, 'Slug is required'],
-    unique: true,
     trim: true,
     lowercase: true,
     match: [/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens']
