@@ -154,23 +154,20 @@ export default async function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-product-sans font-bold text-foreground mb-4">
-              Why Travel With Us?
+              What Makes Us Different
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Safety, expertise, and unforgettable experiences are at the heart of everything we do
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                 <Shield className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-product-sans font-semibold text-foreground">
-                Safety First
+                Safety & Support
               </h3>
               <p className="text-muted-foreground">
-                All our adventures are led by certified guides with comprehensive safety protocols
+                We believe travel should feel safe and stress-free for everyone. Our trained team, clear policies, and dedicated support ensure travellers of all ages feel confident throughout their journey.
               </p>
             </div>
 
@@ -179,10 +176,10 @@ export default async function HomePage() {
                 <Users className="h-8 w-8 text-secondary" />
               </div>
               <h3 className="text-xl font-product-sans font-semibold text-foreground">
-                Expert Guides
+                Personalised Planning
               </h3>
               <p className="text-muted-foreground">
-                Our experienced guides know every trail and ensure you have the best experience
+                No two travellers are the same — and neither are our trip plans. We listen, understand your needs, and craft experiences that match your pace, comfort, and style.
               </p>
             </div>
 
@@ -191,10 +188,22 @@ export default async function HomePage() {
                 <Zap className="h-8 w-8 text-accent" />
               </div>
               <h3 className="text-xl font-product-sans font-semibold text-foreground">
-                Unforgettable Memories
+                Comfort & Value
               </h3>
               <p className="text-muted-foreground">
-                Create lasting memories with like-minded adventurers in stunning locations
+                Meaningful travel doesn't need to be complicated or expensive. We focus on comfort, transparency, and the right balance of quality and affordability.
+              </p>
+            </div>
+
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-product-sans font-semibold text-foreground">
+                Seamless Experience
+              </h3>
+              <p className="text-muted-foreground">
+                From the first inquiry to the final return, we make every step smooth. Clear communication, organised planning, and dependable coordination define how we work.
               </p>
             </div>
           </div>
