@@ -7,7 +7,8 @@ import { hasPermission } from '@/lib/permissions';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronRight, Calendar, Eye, Download } from 'lucide-react';
+import { ChevronDown, ChevronRight, Calendar, Eye, Download, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface Booking {
   _id: string;
@@ -39,6 +40,9 @@ export default function AdminBookingsPage() {
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
   const [expandedDepartures, setExpandedDepartures] = useState<Set<string>>(new Set());
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -133,6 +137,27 @@ export default function AdminBookingsPage() {
     );
   };
 
+  const filteredBookings = bookings.filter(b => {
+    const matchesSearch = !searchQuery || 
+      b.bookingId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.userId.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.userId.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.eventId.title.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const bookingDate = new Date(b.date);
+    const matchesStartDate = !startDate || bookingDate >= new Date(startDate);
+    const matchesEndDate = !endDate || bookingDate <= new Date(endDate);
+    
+    return matchesSearch && matchesStartDate && matchesEndDate;
+  });
+
+  const filteredEvents = events.filter(event => {
+    if (!searchQuery && !startDate && !endDate) return true;
+    const eventBookings = filteredBookings.filter(b => b.eventId._id === event._id);
+    const eventMatchesSearch = !searchQuery || event.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return eventMatchesSearch || eventBookings.length > 0;
+  });
+
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -147,20 +172,70 @@ export default function AdminBookingsPage() {
     <div className="min-h-screen bg-background">
       <div className="py-8">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-start mb-8">
-            <div>
-              <h1 className="text-3xl font-product-sans font-bold text-foreground mb-2">Booking Management</h1>
-              <p className="text-muted-foreground">View bookings organized by event, departure, and date</p>
+          <div className="mb-8">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h1 className="text-3xl font-product-sans font-bold text-foreground mb-2">Booking Management</h1>
+                <p className="text-muted-foreground">View bookings organized by event, departure, and date</p>
+              </div>
+              <Button onClick={exportBookings}>
+                <Download className="mr-2 h-4 w-4" />
+                Export CSV
+              </Button>
             </div>
-            <Button onClick={exportBookings}>
-              <Download className="mr-2 h-4 w-4" />
-              Export CSV
-            </Button>
+            
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by booking ID, customer name, email, or event..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-10"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  placeholder="Start Date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-40"
+                />
+                <Input
+                  type="date"
+                  placeholder="End Date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-40"
+                />
+                {(startDate || endDate) && (
+                  <Button variant="outline" size="icon" onClick={() => { setStartDate(''); setEndDate(''); }}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-4">
-            {events.map(event => {
-              const eventBookings = bookings.filter(b => b.eventId._id === event._id);
+            {filteredEvents.length === 0 ? (
+              <Card className="card-adventure">
+                <CardContent className="p-8 text-center text-muted-foreground">
+                  No events found matching your search criteria
+                </CardContent>
+              </Card>
+            ) : null}
+            {filteredEvents.map(event => {
+              const eventBookings = filteredBookings.filter(b => b.eventId._id === event._id);
               const isEventExpanded = expandedEvents.has(event._id);
               
               return (
@@ -200,7 +275,8 @@ export default function AdminBookingsPage() {
                           event.departures.map((departure, depIdx) => {
                             const depKey = `${event._id}-${depIdx}`;
                             const isDepartureExpanded = expandedDepartures.has(depKey);
-                            const depBookings = bookings.filter(b => b.eventId._id === event._id && b.selectedDeparture === departure.label);
+                            const depBookings = filteredBookings.filter(b => b.eventId._id === event._id && b.selectedDeparture === departure.label);
+                            if (depBookings.length === 0 && (searchQuery || startDate || endDate)) return null;
 
                             return (
                               <div key={depKey} className="border-b border-border/30 last:border-0">
@@ -241,7 +317,8 @@ export default function AdminBookingsPage() {
                                             {dateEntry.dates.map(date => {
                                               const dateKey = `${depKey}-${dateEntry.month}-${dateEntry.year}-${date}`;
                                               const isDateExpanded = expandedDates.has(dateKey);
-                                              const dateBookings = getBookingsForDate(event._id, departure.label, dateEntry.month, dateEntry.year, date);
+                                              const dateBookings = getBookingsForDate(event._id, departure.label, dateEntry.month, dateEntry.year, date).filter(b => filteredBookings.includes(b));
+                                              if (dateBookings.length === 0 && (searchQuery || startDate || endDate)) return null;
 
                                               return (
                                                 <div key={dateKey}>
