@@ -252,7 +252,9 @@ const getOTPEmailTemplate = (otp: string, type: 'login' | 'reset') => {
                 <!-- Header with Logo -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); padding: 40px 30px; text-align: center;">
-                    <img src="${process.env.NEXT_PUBLIC_BASE_URL}/logo/avid Full white (1).png" alt="Avid Explores" style="max-width: 200px; height: auto; margin-bottom: 10px;" />
+                    <div style="font-size: 36px; font-weight: bold; color: #ffffff; margin-bottom: 10px; letter-spacing: 2px;">
+                      AVID EXPLORERS
+                    </div>
                     <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">${title}</h1>
                   </td>
                 </tr>
@@ -283,7 +285,7 @@ const getOTPEmailTemplate = (otp: string, type: 'login' | 'reset') => {
                     
                     <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px 20px; margin: 25px 0; border-radius: 4px;">
                       <p style="color: #92400e; font-size: 14px; margin: 0; line-height: 1.5;">
-                        <strong>⚠️ Security Notice:</strong> Never share this OTP with anyone. Avid Explores will never ask for your OTP via phone or email.
+                        <strong>⚠️ Security Notice:</strong> Never share this OTP with anyone. Avid Explorers will never ask for your OTP via phone or email.
                       </p>
                     </div>
                     
@@ -305,7 +307,7 @@ const getOTPEmailTemplate = (otp: string, type: 'login' | 'reset') => {
                       </a>
                     </p>
                     <p style="color: #9ca3af; font-size: 12px; margin: 15px 0 0 0;">
-                      © ${new Date().getFullYear()} Avid Explores. All rights reserved.
+                      © ${new Date().getFullYear()} Avid Explorers. All rights reserved.
                     </p>
                     <p style="color: #9ca3af; font-size: 12px; margin: 5px 0 0 0;">
                       Your trusted adventure partner
@@ -328,7 +330,7 @@ export const sendOTPEmail = async (email: string, otp: string, type: 'login' | '
     const template = getOTPEmailTemplate(otp, type);
     
     await transporter.sendMail({
-      from: `"Avid Explores" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      from: `"Avid Explorers" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
       to: email,
       subject: template.subject,
       html: template.html,
