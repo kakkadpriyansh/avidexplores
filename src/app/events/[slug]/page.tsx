@@ -36,7 +36,8 @@ import {
   ChevronDown,
   ChevronUp,
   Compass,
-  Utensils
+  Utensils,
+  Download
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingRing } from '@/components/ui/loading-ring';
@@ -117,6 +118,7 @@ interface DatabaseEvent {
   }[];
   availableMonths?: string[];
   thingsToCarry: string[];
+  brochure?: string;
   ageLimit: {
     min: number;
     max: number;
@@ -1115,6 +1117,23 @@ export default function EventDetailPage() {
                   <Heart className="h-4 w-4 mr-2" />
                   Add to Wishlist
                 </Button>
+                {event.brochure && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full mt-3"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = event.brochure!;
+                      link.download = `${event.title}-brochure.pdf`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Brochure
+                  </Button>
+                )}
                 
                 {/* Help section inside booking card */}
                 <div className="mt-6 pt-6 border-t border-border">

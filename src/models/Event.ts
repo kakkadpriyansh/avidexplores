@@ -87,6 +87,7 @@ export interface IEvent extends Document {
   tags: string[];
   highlights: string[];
   thingsToCarry: string[];
+  brochure?: string;
   guide: mongoose.Types.ObjectId;
   isActive: boolean;
   isFeatured: boolean;
@@ -370,6 +371,10 @@ const EventSchema = new Schema<IEvent>({
   tags: [String],
   highlights: [String],
   thingsToCarry: [String],
+  brochure: {
+    type: String,
+    required: false
+  },
   guide: {
     type: Schema.Types.ObjectId,
     ref: 'User',

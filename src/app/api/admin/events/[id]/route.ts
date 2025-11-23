@@ -232,6 +232,9 @@ export async function PUT(
     if (updateData.inclusions !== undefined) safeUpdate.inclusions = updateData.inclusions;
     if (updateData.exclusions !== undefined) safeUpdate.exclusions = updateData.exclusions;
     if (updateData.thingsToCarry !== undefined) safeUpdate.thingsToCarry = updateData.thingsToCarry;
+    if (updateData.brochure !== undefined) {
+      safeUpdate.brochure = updateData.brochure === '' ? null : updateData.brochure;
+    }
     if (updateData.preparation !== undefined) safeUpdate.preparation = updateData.preparation;
 
     // Set updatedAt to current time

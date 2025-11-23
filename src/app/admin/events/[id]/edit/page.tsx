@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ImageUpload } from '@/components/ui/image-upload';
+import { PdfUpload } from '@/components/ui/pdf-upload';
 import { RegionSelect } from '@/components/ui/region-select';
 import { Trash2, Plus, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -104,6 +105,7 @@ interface Event {
   tags: string[];
   highlights: string[];
   thingsToCarry: string[];
+  brochure?: string;
   guide: string;
   isActive: boolean;
   isFeatured: boolean;
@@ -145,7 +147,8 @@ export default function EditEventPage() {
         availableDates: Array.isArray(data.availableDates)
           ? data.availableDates
           : [],
-        departures: Array.isArray((data as any).departures) ? (data as any).departures : []
+        departures: Array.isArray((data as any).departures) ? (data as any).departures : [],
+        brochure: data.brochure || ''
       });
     } catch (error) {
       console.error('Error fetching event:', error);
@@ -508,6 +511,7 @@ export default function EditEventPage() {
         inclusions: event.inclusions,
         exclusions: event.exclusions,
         thingsToCarry: event.thingsToCarry,
+        brochure: event.brochure && event.brochure.trim() !== '' ? event.brochure : undefined,
         preparation: event.preparation,
         updatedAt: new Date().toISOString()
       };
@@ -1070,6 +1074,23 @@ export default function EditEventPage() {
                       </Button>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Event Brochure</CardTitle>
+                  <CardDescription>Upload a PDF brochure for this event (optional)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PdfUpload
+                    value={event.brochure || ''}
+                    onChange={(url) => {
+                      updateEvent('brochure', url || '');
+                    }}
+                    placeholder="Upload or enter brochure PDF URL"
+                    eventId={params.id as string}
+                  />
                 </CardContent>
               </Card>
             </div>
