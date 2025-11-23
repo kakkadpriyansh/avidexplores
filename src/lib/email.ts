@@ -226,3 +226,118 @@ export const sendAdminNotification = async (subject: string, content: string) =>
     return false;
   }
 };
+
+// OTP Email Template
+const getOTPEmailTemplate = (otp: string, type: 'login' | 'reset') => {
+  const title = type === 'login' ? 'Login Verification' : 'Password Reset';
+  const message = type === 'login' 
+    ? 'You requested an OTP to login to your account.' 
+    : 'You requested to reset your password.';
+  
+  return {
+    subject: `${title} - Your OTP Code`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${title}</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 0;">
+          <tr>
+            <td align="center">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
+                <!-- Header with Logo -->
+                <tr>
+                  <td style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); padding: 40px 30px; text-align: center;">
+                    <img src="${process.env.NEXT_PUBLIC_BASE_URL}/logo/avid Full white (1).png" alt="Avid Explores" style="max-width: 200px; height: auto; margin-bottom: 10px;" />
+                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">${title}</h1>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 40px 30px;">
+                    <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                      Hello,
+                    </p>
+                    
+                    <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
+                      ${message}
+                    </p>
+                    
+                    <!-- OTP Box -->
+                    <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px dashed #dc2626; border-radius: 8px; padding: 30px; text-align: center; margin: 30px 0;">
+                      <p style="color: #666666; font-size: 14px; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 1px;">
+                        Your OTP Code
+                      </p>
+                      <div style="font-size: 42px; font-weight: bold; color: #dc2626; letter-spacing: 8px; font-family: 'Courier New', monospace;">
+                        ${otp}
+                      </div>
+                      <p style="color: #666666; font-size: 13px; margin: 15px 0 0 0;">
+                        Valid for 10 minutes
+                      </p>
+                    </div>
+                    
+                    <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px 20px; margin: 25px 0; border-radius: 4px;">
+                      <p style="color: #92400e; font-size: 14px; margin: 0; line-height: 1.5;">
+                        <strong>⚠️ Security Notice:</strong> Never share this OTP with anyone. Avid Explores will never ask for your OTP via phone or email.
+                      </p>
+                    </div>
+                    
+                    <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 25px 0 0 0;">
+                      If you didn't request this OTP, please ignore this email or contact our support team immediately.
+                    </p>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 14px; margin: 0 0 10px 0;">
+                      Need help? Contact us at
+                    </p>
+                    <p style="margin: 0 0 15px 0;">
+                      <a href="mailto:support@avidexplorers.com" style="color: #dc2626; text-decoration: none; font-weight: 600;">
+                        support@avidexplorers.com
+                      </a>
+                    </p>
+                    <p style="color: #9ca3af; font-size: 12px; margin: 15px 0 0 0;">
+                      © ${new Date().getFullYear()} Avid Explores. All rights reserved.
+                    </p>
+                    <p style="color: #9ca3af; font-size: 12px; margin: 5px 0 0 0;">
+                      Your trusted adventure partner
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `,
+  };
+};
+
+// Send OTP Email
+export const sendOTPEmail = async (email: string, otp: string, type: 'login' | 'reset' = 'reset') => {
+  try {
+    const template = getOTPEmailTemplate(otp, type);
+    
+    await transporter.sendMail({
+      from: `"Avid Explores" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      to: email,
+      subject: template.subject,
+      html: template.html,
+    });
+    
+    console.log(`OTP email sent to ${email}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending OTP email:', error);
+    return false;
+  }
+};

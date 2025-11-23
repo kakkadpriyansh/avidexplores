@@ -110,18 +110,32 @@ export const authOptions: NextAuthOptions = {
           const user = await (UserModel as Model<IUser>).findOne({
             email: credentials.email.toLowerCase(),
             isActive: true
-          }).lean();
+          });
 
           if (!user || !user.password) {
             return null;
           }
 
-          const isPasswordValid = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
+          // Check if it's OTP login (6 digits)
+          const isOTP = /^\d{6}$/.test(credentials.password);
+          
+          let isValid = false;
+          
+          if (isOTP && user.otp && user.otpExpiry) {
+            // Verify OTP
+            if (user.otp === credentials.password && new Date() <= user.otpExpiry) {
+              isValid = true;
+              // Clear OTP after successful login
+              user.otp = undefined;
+              user.otpExpiry = undefined;
+              await user.save();
+            }
+          } else {
+            // Verify password
+            isValid = await bcrypt.compare(credentials.password, user.password);
+          }
 
-          if (!isPasswordValid) {
+          if (!isValid) {
             return null;
           }
 

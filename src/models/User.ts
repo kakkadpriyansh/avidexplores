@@ -42,6 +42,8 @@ export interface IUser extends Document {
   passwordResetRequestedBy?: mongoose.Types.ObjectId;
   createdBy?: mongoose.Types.ObjectId;
   updatedBy?: mongoose.Types.ObjectId;
+  otp?: string;
+  otpExpiry?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -167,6 +169,12 @@ const UserSchema = new Schema<IUser>({
   updatedBy: {
     type: Schema.Types.ObjectId,
     ref: 'User'
+  },
+  otp: {
+    type: String
+  },
+  otpExpiry: {
+    type: Date
   }
 }, {
   timestamps: true
