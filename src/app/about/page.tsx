@@ -134,25 +134,17 @@ export default async function AboutPage() {
           {teamMembers.length === 0 ? (
             <div className="text-center text-muted-foreground">No team members available yet.</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {teamMembers.map((member: any, index: number) => (
-                <div key={member._id || index} className="card-glass text-center">
+                <div key={member._id || index} className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden max-w-[260px] mx-auto">
                   <img 
                     src={member.image || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face'} 
                     alt={member.name}
-                    className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-white/20"
+                    className="w-full aspect-square object-cover"
                   />
-                  <h3 className="text-xl font-semibold text-foreground mb-1">{member.name}</h3>
-                  <p className="text-primary font-medium mb-2">{member.role}</p>
-                  {member.experience && (
-                    <p className="text-sm text-muted-foreground mb-4">{member.experience} experience</p>
-                  )}
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {/* {(member.specialties || []).map((specialty: string, idx: number) => (
-                      <span key={idx} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                        {specialty}
-                      </span>
-                    ))} */}
+                  <div className="p-3">
+                    <h3 className="text-base font-semibold text-[#DC2626] mb-1">{member.name}</h3>
+                    <p className="text-sm text-gray-700">{member.role}</p>
                   </div>
                 </div>
               ))}
