@@ -71,7 +71,7 @@ const EventCard = ({ event }: EventCardProps) => {
   }, [images.length, isPaused]);
 
   const getDifficultyColor = (difficulty: string) => {
-    const normalizedDifficulty = difficulty.toLowerCase();
+    const normalizedDifficulty = difficulty?.toLowerCase() || '';
     switch (normalizedDifficulty) {
       case 'easy':
         return 'bg-green-100 text-green-800';
@@ -89,7 +89,7 @@ const EventCard = ({ event }: EventCardProps) => {
   };
 
   const formatDifficulty = (difficulty: string) => {
-    return difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase();
+    return difficulty ? difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase() : 'N/A';
   };
 
   return (
