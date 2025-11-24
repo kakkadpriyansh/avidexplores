@@ -21,7 +21,7 @@ import {
   Image
 } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, ComposedChart, Bar, Line, Legend } from 'recharts';
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
@@ -225,22 +225,26 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <Card className="card-adventure">
               <CardHeader>
-                <CardTitle>Monthly Revenue</CardTitle>
+                <CardTitle>Monthly Revenue & Bookings</CardTitle>
               </CardHeader>
               <CardContent>
                 <ChartContainer
                   config={{
-                    revenue: { label: 'Revenue', color: 'hsl(var(--primary))' },
+                    revenue: { label: 'Revenue (₹)', color: 'hsl(var(--primary))' },
+                    bookings: { label: 'Bookings', color: '#10b981' },
                   }}
-                  className="w-full"
+                  className="w-full h-[300px]"
                 >
-                  <AreaChart data={monthlyData} margin={{ left: 8, right: 8 }}>
+                  <ComposedChart data={monthlyData} margin={{ left: 8, right: 8 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
+                    <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Area type="monotone" dataKey="revenue" stroke="var(--color-revenue)" fill="var(--color-revenue)" fillOpacity={0.15} />
-                  </AreaChart>
+                    <Legend />
+                    <Bar yAxisId="left" dataKey="revenue" fill="var(--color-revenue)" name="Revenue (₹)" />
+                    <Line yAxisId="right" type="monotone" dataKey="bookings" stroke="var(--color-bookings)" strokeWidth={2} name="Bookings" />
+                  </ComposedChart>
                 </ChartContainer>
               </CardContent>
             </Card>
