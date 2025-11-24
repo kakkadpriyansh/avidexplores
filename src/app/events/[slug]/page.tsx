@@ -95,6 +95,9 @@ interface DatabaseEvent {
     label: string;
     origin: string;
     destination: string;
+    price?: number;
+    discountedPrice?: number;
+    isSelected?: boolean;
     transportOptions: { mode: string; price: number }[];
     availableDates: {
       month: string;
@@ -214,6 +217,18 @@ export default function EventDetailPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
+
+  // Auto-select departure with isSelected flag
+  useEffect(() => {
+    if (event?.departures) {
+      const selectedIndex = event.departures.findIndex(dep => dep.isSelected);
+      if (selectedIndex !== -1) {
+        setSelectedDepartureIndex(selectedIndex);
+      }
+    }
+  }, [event?.departures]);
+
+
 
   // Sync carousel with currentImageIndex state
   useEffect(() => {
@@ -485,7 +500,10 @@ export default function EventDetailPage() {
                             : 'bg-background hover:bg-primary/10 border-border hover:border-primary/50 hover:text-primary'
                         }`}
                       >
-                        {dep.label?.trim() ? dep.label : `${dep.origin} → ${dep.destination}`}
+                        <div className="flex flex-col items-start">
+                          <span>{dep.label?.trim() ? dep.label : `${dep.origin} → ${dep.destination}`}</span>
+                          {dep.price && <span className="text-xs font-semibold mt-0.5 hidden">₹{Number(dep.price).toLocaleString()}</span>}
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -1060,40 +1078,47 @@ export default function EventDetailPage() {
               {/* Booking Card - Hidden on mobile, shown on desktop */}
               <div className={`card-adventure p-6 hidden lg:block ${activeTab === 'itinerary' ? 'sticky top-24 z-10' : ''}`}>
                 <div className="text-center mb-4">
-                  {(() => {
-                    const baseHasDiscount = event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price;
-                    const transportPrice = (selectedDepartureIndex !== null && selectedTransportIndex !== null)
-                      ? Number(event.departures?.[selectedDepartureIndex]?.transportOptions?.[selectedTransportIndex]?.price || 0)
-                      : 0;
-                    const displayOriginal = Number(event.price || 0) + transportPrice;
-                    const displayDiscounted = (baseHasDiscount ? Number(event.discountedPrice || 0) : Number(event.price || 0)) + transportPrice;
-                    return baseHasDiscount ? (
-                      <div>
-                        <div className="flex items-center justify-center space-x-2 mb-1">
-                          <span className="text-lg text-muted-foreground line-through">
-                            ₹{displayOriginal.toLocaleString()}
-                          </span>
-                          <div className="text-3xl font-bold text-green-600">
-                            ₹{displayDiscounted.toLocaleString()}
-                          </div>
+                  {selectedDepartureIndex !== null ? (
+                    (() => {
+                      const departure = event.departures?.[selectedDepartureIndex];
+                      const departurePrice = Number(departure?.price || 0);
+                      const discountedPrice = Number(departure?.discountedPrice || 0);
+                      const transportPrice = (selectedTransportIndex !== null)
+                        ? Number(departure?.transportOptions?.[selectedTransportIndex]?.price || 0)
+                        : 0;
+                      const totalPrice = departurePrice + transportPrice;
+                      const totalDiscountedPrice = (discountedPrice > 0 ? discountedPrice : departurePrice) + transportPrice;
+                      const hasDiscount = discountedPrice > 0 && discountedPrice < departurePrice;
+                      
+                      return (
+                        <div>
+                          {hasDiscount ? (
+                            <div className="mb-2">
+                              <div className="text-3xl font-bold text-red-600 mb-1">
+                                ₹{totalPrice.toLocaleString()}
+                              </div>
+                              <div className="text-sm text-muted-foreground line-through">
+                                ₹{totalDiscountedPrice.toLocaleString()}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-3xl font-bold text-primary mb-1">
+                              ₹{totalPrice.toLocaleString()}
+                            </div>
+                          )}
+                          <div className="text-sm text-muted-foreground">per person</div>
+                          {transportPrice > 0 && (
+                            <div className="text-xs text-muted-foreground mt-1">Includes transport (+₹{transportPrice.toLocaleString()})</div>
+                          )}
                         </div>
-                        <div className="text-sm text-muted-foreground">per person</div>
-                        {transportPrice > 0 && (
-                          <div className="text-xs text-muted-foreground mt-1">Includes transport (+₹{transportPrice.toLocaleString()})</div>
-                        )}
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="text-3xl font-bold text-primary mb-1">
-                          ₹{displayDiscounted.toLocaleString()}
-                        </div>
-                        <div className="text-sm text-muted-foreground">per person</div>
-                        {transportPrice > 0 && (
-                          <div className="text-xs text-muted-foreground mt-1">Includes transport (+₹{transportPrice.toLocaleString()})</div>
-                        )}
-                      </div>
-                    );
-                  })()}
+                      );
+                    })()
+                  ) : (
+                    <div>
+                      <div className="text-3xl font-bold text-muted-foreground mb-1">-</div>
+                      <div className="text-sm text-muted-foreground">Select a departure</div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-3 mb-6">
@@ -1189,32 +1214,41 @@ export default function EventDetailPage() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 z-50">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1">
-            {(() => {
-              const baseHasDiscount = event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price;
-              const transportPrice = (selectedDepartureIndex !== null && selectedTransportIndex !== null)
-                ? Number(event.departures?.[selectedDepartureIndex]?.transportOptions?.[selectedTransportIndex]?.price || 0)
-                : 0;
-              const displayOriginal = Number(event.price || 0) + transportPrice;
-              const displayDiscounted = (baseHasDiscount ? Number(event.discountedPrice || 0) : Number(event.price || 0)) + transportPrice;
-              return baseHasDiscount ? (
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <span className="text-sm text-muted-foreground line-through">
-                    ₹{displayOriginal.toLocaleString()}
-                  </span>
-                  <span className="text-xl font-bold text-green-600">
-                    ₹{displayDiscounted.toLocaleString()}
-                  </span>
-                  <span className="text-sm text-muted-foreground">per person</span>
-                </div>
-              ) : (
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-bold text-primary">
-                    ₹{displayDiscounted.toLocaleString()}
-                  </span>
-                  <span className="text-sm text-muted-foreground">per person</span>
-                </div>
-              );
-            })()}
+            {selectedDepartureIndex !== null ? (
+              (() => {
+                const departure = event.departures?.[selectedDepartureIndex];
+                const departurePrice = Number(departure?.price || 0);
+                const discountedPrice = Number(departure?.discountedPrice || 0);
+                const transportPrice = (selectedTransportIndex !== null)
+                  ? Number(departure?.transportOptions?.[selectedTransportIndex]?.price || 0)
+                  : 0;
+                const totalPrice = departurePrice + transportPrice;
+                const totalDiscountedPrice = (discountedPrice > 0 ? discountedPrice : departurePrice) + transportPrice;
+                const hasDiscount = discountedPrice > 0 && discountedPrice < departurePrice;
+                
+                return (
+                  <div className="flex flex-col gap-1">
+                    {hasDiscount ? (
+                      <div className="flex flex-col">
+                        <span className="text-xl font-bold text-red-600">
+                          ₹{totalPrice.toLocaleString()}
+                        </span>
+                        <span className="text-xs text-muted-foreground line-through">
+                          ₹{totalDiscountedPrice.toLocaleString()}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-xl font-bold text-primary">
+                        ₹{totalPrice.toLocaleString()}
+                      </span>
+                    )}
+                    <span className="text-xs text-muted-foreground">per person</span>
+                  </div>
+                );
+              })()
+            ) : (
+              <div className="text-sm text-muted-foreground">Select a departure</div>
+            )}
           </div>
           <Button 
             className="btn-hero px-8"

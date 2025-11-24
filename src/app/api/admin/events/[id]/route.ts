@@ -41,12 +41,7 @@ export async function GET(
       );
     }
 
-    // Log dateTransportModes when fetching
-    if (event.departures && event.departures.length > 0) {
-      console.log('GET /api/admin/events/[id] - Retrieved dateTransportModes:', JSON.stringify(event.departures[0]?.availableDates?.[0]?.dateTransportModes, null, 2));
-    }
-
-    return NextResponse.json(event);
+    return NextResponse.json(event.toObject ? event.toObject() : event);
   } catch (error) {
     console.error('Error fetching event:', error);
     return NextResponse.json(
@@ -80,6 +75,8 @@ export async function PUT(
     }
 
     const body = await request.json();
+    console.log('PUT /api/admin/events/[id] - Full body received:', JSON.stringify(body, null, 2));
+    console.log('PUT /api/admin/events/[id] - Departures from body:', JSON.stringify(body.departures, null, 2));
     
     // Remove system fields that shouldn't be updated
     const { _id, createdAt, updatedAt, ...updateData } = body as any;
@@ -125,11 +122,22 @@ export async function PUT(
         .filter((dep: any) => dep && typeof dep.label === 'string' && dep.label.trim() !== ''
           && typeof dep.origin === 'string' && dep.origin.trim() !== ''
           && typeof dep.destination === 'string' && dep.destination.trim() !== '')
-        .map((dep: any) => ({
-          label: String(dep.label).trim(),
-          origin: String(dep.origin).trim(),
-          destination: String(dep.destination).trim(),
-          transportOptions: Array.isArray(dep.transportOptions) ? dep.transportOptions
+        .map((dep: any) => {
+          const depObj: any = {
+            label: String(dep.label).trim(),
+            origin: String(dep.origin).trim(),
+            destination: String(dep.destination).trim(),
+            isSelected: Boolean(dep.isSelected || false)
+          };
+          if (dep.price !== undefined && dep.price !== null && typeof dep.price === 'number' && !isNaN(dep.price)) {
+            depObj.price = dep.price;
+          }
+          if (dep.discountedPrice !== undefined && dep.discountedPrice !== null && typeof dep.discountedPrice === 'number' && !isNaN(dep.discountedPrice)) {
+            depObj.discountedPrice = dep.discountedPrice;
+          }
+          return {
+            ...depObj,
+            transportOptions: Array.isArray(dep.transportOptions) ? dep.transportOptions
             .filter((opt: any) => opt && typeof opt.mode === 'string' && ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(opt.mode)
               && opt.price !== undefined && opt.price !== null)
             .map((opt: any) => ({
@@ -184,8 +192,10 @@ export async function PUT(
                   images: Array.isArray(item.images) ? item.images.map((img: any) => String(img)) : []
                 }))
             : []
-        }));
+          };
+        });
       updateData.departures = validDepartures;
+      console.log('PUT /api/admin/events/[id] - Sanitized departures:', JSON.stringify(validDepartures, null, 2));
     }
 
     // Handle discountedPrice explicitly: allow clearing by sending null
@@ -199,7 +209,9 @@ export async function PUT(
       updateData.discountedPrice = Number(updateData.discountedPrice);
     }
     
+    console.log('PUT /api/admin/events/[id] - Raw body departures:', JSON.stringify(body.departures?.map((d: any) => ({ label: d.label, isSelected: d.isSelected })), null, 2));
     console.log('PUT /api/admin/events/[id] - Raw body received:', JSON.stringify(body, null, 2));
+    console.log('PUT /api/admin/events/[id] - Sanitized departures isSelected:', JSON.stringify(updateData.departures?.map((d: any) => ({ label: d.label, isSelected: d.isSelected })), null, 2));
     console.log('PUT /api/admin/events/[id] - Update data after processing:', JSON.stringify(updateData, null, 2));
     
     // Build a minimal safeUpdate with only the fields that are actually provided
@@ -242,6 +254,8 @@ export async function PUT(
 
     await connectDB();
 
+    console.log('PUT /api/admin/events/[id] - Final safeUpdate departures full:', JSON.stringify(safeUpdate.departures, null, 2));
+    console.log('PUT /api/admin/events/[id] - Final safeUpdate departures with discountedPrice:', JSON.stringify(safeUpdate.departures?.map((d: any) => ({ label: d.label, isSelected: d.isSelected, discountedPrice: d.discountedPrice })), null, 2));
     console.log('PUT /api/admin/events/[id] - Final safeUpdate payload:', JSON.stringify(safeUpdate, null, 2));
     console.log('PUT /api/admin/events/[id] - Duration field type:', typeof safeUpdate.duration);
     console.log('PUT /api/admin/events/[id] - Duration field value:', safeUpdate.duration);
@@ -280,9 +294,10 @@ export async function PUT(
         updatedAt: event.updatedAt
       });
       
-      // Verify dateTransportModes was saved
+      // Verify isSelected was saved
       if (event.departures && event.departures.length > 0) {
-        console.log('PUT /api/admin/events/[id] - Saved departures dateTransportModes:', JSON.stringify(event.departures[0]?.availableDates?.[0]?.dateTransportModes, null, 2));
+        console.log('PUT /api/admin/events/[id] - Saved departures full:', JSON.stringify(event.departures, null, 2));
+        console.log('PUT /api/admin/events/[id] - Saved departures with discountedPrice:', JSON.stringify(event.departures.map((d: any) => ({ label: d.label, isSelected: d.isSelected, discountedPrice: d.discountedPrice })), null, 2));
       }
 
       return NextResponse.json({

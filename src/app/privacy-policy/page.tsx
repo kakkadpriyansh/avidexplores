@@ -29,7 +29,6 @@ export default function PrivacyPolicy() {
                 </div>
               </div>
             </div>
-
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-4">2. How We Use Your Information</h2>
               <div className="space-y-3 text-muted-foreground">

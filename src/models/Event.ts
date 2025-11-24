@@ -21,6 +21,9 @@ export interface IEvent extends Document {
     label: string; // e.g., "Rajkot to Rajkot"
     origin: string;
     destination: string;
+    price?: number; // base price for this departure
+    discountedPrice?: number; // discounted price for this departure
+    isSelected?: boolean;
     transportOptions: {
       mode: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS';
       price: number; // per person additional price for transport
@@ -180,6 +183,20 @@ const EventSchema = new Schema<IEvent>({
       type: String,
       required: [true, 'Destination is required'],
       trim: true
+    },
+    price: {
+      type: Number,
+      required: false,
+      min: [0, 'Price cannot be negative']
+    },
+    discountedPrice: {
+      type: Number,
+      required: false,
+      min: [0, 'Discounted price cannot be negative']
+    },
+    isSelected: {
+      type: Boolean,
+      default: false
     },
     transportOptions: [{
       mode: {

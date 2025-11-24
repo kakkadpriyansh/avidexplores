@@ -38,6 +38,9 @@ interface Event {
     label: string;
     origin: string;
     destination: string;
+    price?: number;
+    discountedPrice?: number;
+    isSelected?: boolean;
     transportOptions: {
       mode: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS';
       price: number;
@@ -171,6 +174,9 @@ export default function EditEventPage() {
         label: '',
         origin: '',
         destination: '',
+        price: 0,
+        discountedPrice: undefined,
+        isSelected: false,
         transportOptions: [{ mode: 'BUS', price: 0 }],
         availableDates: []
       }]
@@ -409,63 +415,77 @@ export default function EditEventPage() {
         .filter((e: any) => e.dates.length > 0);
 
       // Sanitize departures data including dateTransportModes
-      const sanitizedDepartures = (event.departures || []).map((dep: any) => ({
-        label: String(dep.label || '').trim(),
-        origin: String(dep.origin || '').trim(),
-        destination: String(dep.destination || '').trim(),
-        transportOptions: Array.isArray(dep.transportOptions) 
-          ? dep.transportOptions.filter((opt: any) => opt && opt.mode && opt.price !== undefined)
-              .map((opt: any) => ({
-                mode: String(opt.mode),
-                price: Number(opt.price)
-              }))
-          : [],
-        availableDates: Array.isArray(dep.availableDates)
-          ? dep.availableDates
-              .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
-                && entry.year !== undefined && entry.year !== null
-                && Array.isArray(entry.dates) && entry.dates.length > 0
-                && entry.dates.every((d: any) => Number.isFinite(Number(d))))
-              .map((entry: any) => ({
-                month: String(entry.month).trim(),
-                year: Number(entry.year),
-                dates: entry.dates.map((d: any) => Number(d)),
-                dateTransportModes: entry.dateTransportModes && typeof entry.dateTransportModes === 'object'
-                  ? Object.fromEntries(
-                      Object.entries(entry.dateTransportModes)
-                        .filter(([k, v]: any) => Number.isFinite(Number(k)) && Array.isArray(v))
-                        .map(([k, v]: any) => [
-                          String(k),
-                          (v as any[])
-                            .map((m: any) => String(m))
-                            .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
-                        ])
-                    )
-                  : undefined,
-                availableTransportModes: Array.isArray(entry.availableTransportModes)
-                  ? entry.availableTransportModes
-                      .map((m: any) => String(m))
-                      .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
-                  : undefined,
-                availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
-                totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
-              }))
-          : [],
-        itinerary: Array.isArray(dep.itinerary)
-          ? dep.itinerary
-              .filter((item: any) => item && typeof item.title === 'string' && item.title.trim() !== '')
-              .map((item: any, index: number) => ({
-                day: Number(item.day ?? index + 1),
-                title: String(item.title || `Day ${index + 1}`),
-                location: item.location ? String(item.location) : undefined,
-                description: String(item.description || 'No description provided'),
-                activities: Array.isArray(item.activities) ? item.activities.map((a: any) => String(a)) : [],
-                meals: Array.isArray(item.meals) ? item.meals.map((m: any) => String(m)) : [],
-                accommodation: item.accommodation ? String(item.accommodation) : undefined,
-                images: Array.isArray(item.images) ? item.images.map((img: any) => String(img)) : []
-              }))
-          : []
-      }));
+      const sanitizedDepartures = (event.departures || []).map((dep: any) => {
+        const depObj: any = {
+          label: String(dep.label || '').trim(),
+          origin: String(dep.origin || '').trim(),
+          destination: String(dep.destination || '').trim(),
+          isSelected: Boolean(dep.isSelected || false)
+        };
+        // Include price if it's a valid number
+        if (typeof dep.price === 'number' && !isNaN(dep.price)) {
+          depObj.price = dep.price;
+        }
+        // Include discountedPrice if it's a valid number
+        if (typeof dep.discountedPrice === 'number' && !isNaN(dep.discountedPrice)) {
+          depObj.discountedPrice = dep.discountedPrice;
+        }
+        return {
+          ...depObj,
+          transportOptions: Array.isArray(dep.transportOptions) 
+            ? dep.transportOptions.filter((opt: any) => opt && opt.mode && opt.price !== undefined)
+                .map((opt: any) => ({
+                  mode: String(opt.mode),
+                  price: Number(opt.price)
+                }))
+            : [],
+          availableDates: Array.isArray(dep.availableDates)
+            ? dep.availableDates
+                .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
+                  && entry.year !== undefined && entry.year !== null
+                  && Array.isArray(entry.dates) && entry.dates.length > 0
+                  && entry.dates.every((d: any) => Number.isFinite(Number(d))))
+                .map((entry: any) => ({
+                  month: String(entry.month).trim(),
+                  year: Number(entry.year),
+                  dates: entry.dates.map((d: any) => Number(d)),
+                  dateTransportModes: entry.dateTransportModes && typeof entry.dateTransportModes === 'object'
+                    ? Object.fromEntries(
+                        Object.entries(entry.dateTransportModes)
+                          .filter(([k, v]: any) => Number.isFinite(Number(k)) && Array.isArray(v))
+                          .map(([k, v]: any) => [
+                            String(k),
+                            (v as any[])
+                              .map((m: any) => String(m))
+                              .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                          ])
+                      )
+                    : undefined,
+                  availableTransportModes: Array.isArray(entry.availableTransportModes)
+                    ? entry.availableTransportModes
+                        .map((m: any) => String(m))
+                        .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                    : undefined,
+                  availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
+                  totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
+                }))
+            : [],
+          itinerary: Array.isArray(dep.itinerary)
+            ? dep.itinerary
+                .filter((item: any) => item && typeof item.title === 'string' && item.title.trim() !== '')
+                .map((item: any, index: number) => ({
+                  day: Number(item.day ?? index + 1),
+                  title: String(item.title || `Day ${index + 1}`),
+                  location: item.location ? String(item.location) : undefined,
+                  description: String(item.description || 'No description provided'),
+                  activities: Array.isArray(item.activities) ? item.activities.map((a: any) => String(a)) : [],
+                  meals: Array.isArray(item.meals) ? item.meals.map((m: any) => String(m)) : [],
+                  accommodation: item.accommodation ? String(item.accommodation) : undefined,
+                  images: Array.isArray(item.images) ? item.images.map((img: any) => String(img)) : []
+                }))
+            : []
+        };
+      });
 
       // Sanitize event-level itinerary
       const sanitizedItinerary = event.itinerary
@@ -517,6 +537,8 @@ export default function EditEventPage() {
       };
 
       console.log('IMAGES IN PAYLOAD:', payload.images);
+      console.log('Sending departures with discountedPrice:', JSON.stringify(payload.departures?.map((d: any) => ({ label: d.label, isSelected: d.isSelected, discountedPrice: d.discountedPrice })), null, 2));
+      console.log('Full departures payload:', JSON.stringify(payload.departures, null, 2));
       const response = await fetch(`/api/admin/events/${params.id}`, {
         method: 'PUT',
         headers: {
@@ -1365,8 +1387,28 @@ export default function EditEventPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {(event?.departures || []).map((departure, depIndex) => (
-                    <div key={depIndex} className="border rounded-lg p-4 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div key={depIndex} className={`border rounded-lg p-4 space-y-4 ${departure.isSelected ? 'bg-blue-50 border-blue-300' : ''}`}>
+                      <div className="flex items-start gap-4 pb-4 border-b">
+                        <input
+                          type="checkbox"
+                          checked={departure.isSelected || false}
+                          onChange={(e) => {
+                            setEvent(prev => {
+                              if (!prev) return prev;
+                              const newDepartures = [...(prev.departures || [])];
+                              newDepartures.forEach((dep, idx) => {
+                                dep.isSelected = idx === depIndex ? e.target.checked : false;
+                              });
+                              return { ...prev, departures: newDepartures };
+                            });
+                          }}
+                          className="mt-1 w-5 h-5 cursor-pointer"
+                        />
+                        <div className="flex-1">
+                          <Label className="text-base font-semibold">Departure {depIndex + 1}</Label>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                         <div>
                           <Label>Label</Label>
                           <Input
@@ -1391,9 +1433,49 @@ export default function EditEventPage() {
                             placeholder="e.g., Spiti"
                           />
                         </div>
+                        <div>
+                          <Label>Price (₹)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={departure.price !== undefined && departure.price !== null ? departure.price : ''}
+                            onChange={(e) => {
+                              if (e.target.value === '') {
+                                updateDepartureField(depIndex, 'price', undefined);
+                              } else {
+                                const value = parseFloat(e.target.value);
+                                if (!isNaN(value) && value >= 0) {
+                                  updateDepartureField(depIndex, 'price', value);
+                                }
+                              }
+                            }}
+                            placeholder="Enter price"
+                          />
+                        </div>
+                        <div>
+                          <Label>Discounted Price (₹)</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={(departure as any).discountedPrice !== undefined && (departure as any).discountedPrice !== null ? (departure as any).discountedPrice : ''}
+                            onChange={(e) => {
+                              if (e.target.value === '') {
+                                updateDepartureField(depIndex, 'discountedPrice' as any, undefined);
+                              } else {
+                                const value = parseFloat(e.target.value);
+                                if (!isNaN(value) && value >= 0) {
+                                  updateDepartureField(depIndex, 'discountedPrice' as any, value);
+                                }
+                              }
+                            }}
+                            placeholder="Optional"
+                          />
+                        </div>
                         <div className="flex items-end">
                           <Button type="button" variant="outline" onClick={() => removeDeparture(depIndex)}>
-                            Remove Departure
+                            Remove
                           </Button>
                         </div>
                       </div>
