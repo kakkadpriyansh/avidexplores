@@ -1095,10 +1095,10 @@ export default function EventDetailPage() {
                           {hasDiscount ? (
                             <div className="mb-2">
                               <div className="text-3xl font-bold text-red-600 mb-1">
-                                ₹{totalPrice.toLocaleString()}
+                                ₹{totalDiscountedPrice.toLocaleString()}
                               </div>
                               <div className="text-sm text-muted-foreground line-through">
-                                ₹{totalDiscountedPrice.toLocaleString()}
+                                ₹{totalPrice.toLocaleString()}
                               </div>
                             </div>
                           ) : (
@@ -1134,7 +1134,23 @@ export default function EventDetailPage() {
                 
                 <Button 
                   className="btn-hero w-full mb-3"
-                  onClick={() => router.push(`/events/${params.slug}/book`)}
+                  onClick={() => {
+                    const searchParams = new URLSearchParams();
+                    if (selectedDepartureIndex !== null) {
+                      searchParams.set('departureIndex', selectedDepartureIndex.toString());
+                    }
+                    if (selectedTransportIndex !== null) {
+                      searchParams.set('transportIndex', selectedTransportIndex.toString());
+                    }
+                    if (selectedDepartureMonth) {
+                      searchParams.set('departureMonth', selectedDepartureMonth);
+                    }
+                    if (selectedDepartureDate !== null) {
+                      searchParams.set('departureDate', selectedDepartureDate.toString());
+                    }
+                    const url = `/events/${params.slug}/book${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+                    router.push(url);
+                  }}
                 >
                   Book Now
                 </Button>
@@ -1231,10 +1247,10 @@ export default function EventDetailPage() {
                     {hasDiscount ? (
                       <div className="flex flex-col">
                         <span className="text-xl font-bold text-red-600">
-                          ₹{totalPrice.toLocaleString()}
+                          ₹{totalDiscountedPrice.toLocaleString()}
                         </span>
                         <span className="text-xs text-muted-foreground line-through">
-                          ₹{totalDiscountedPrice.toLocaleString()}
+                          ₹{totalPrice.toLocaleString()}
                         </span>
                       </div>
                     ) : (
@@ -1252,7 +1268,23 @@ export default function EventDetailPage() {
           </div>
           <Button 
             className="btn-hero px-8"
-            onClick={() => router.push(`/events/${params.slug}/book`)}
+            onClick={() => {
+              const searchParams = new URLSearchParams();
+              if (selectedDepartureIndex !== null) {
+                searchParams.set('departureIndex', selectedDepartureIndex.toString());
+              }
+              if (selectedTransportIndex !== null) {
+                searchParams.set('transportIndex', selectedTransportIndex.toString());
+              }
+              if (selectedDepartureMonth) {
+                searchParams.set('departureMonth', selectedDepartureMonth);
+              }
+              if (selectedDepartureDate !== null) {
+                searchParams.set('departureDate', selectedDepartureDate.toString());
+              }
+              const url = `/events/${params.slug}/book${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+              router.push(url);
+            }}
           >
             Book Now
           </Button>

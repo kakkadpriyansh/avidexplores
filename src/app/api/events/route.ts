@@ -65,7 +65,8 @@ export async function GET(request: NextRequest) {
       .populate('createdBy', 'name email')
       .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     // Get total count for pagination
     const total = await (Event as Model<IEvent>).countDocuments(filter);
@@ -210,6 +211,8 @@ export async function POST(request: NextRequest) {
             label: String(dep.label).trim(),
             origin: String(dep.origin).trim(),
             destination: String(dep.destination).trim(),
+            price: dep.price !== undefined ? Number(dep.price) : undefined,
+            discountedPrice: dep.discountedPrice !== undefined ? Number(dep.discountedPrice) : undefined,
             transportOptions: Array.isArray(dep.transportOptions) ? dep.transportOptions
               .filter((opt: any) => opt && typeof opt.mode === 'string' && ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(opt.mode)
                 && opt.price !== undefined && opt.price !== null)

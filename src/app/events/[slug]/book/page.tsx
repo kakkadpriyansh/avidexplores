@@ -65,6 +65,9 @@ interface Event {
     label: string;
     origin: string;
     destination: string;
+    price?: number;
+    discountedPrice?: number;
+    isSelected?: boolean;
     transportOptions: { mode: string; price: number }[];
     availableDates: {
       month: string;
@@ -132,6 +135,7 @@ export default function BookEventPage() {
   const [selectedDepartureMonth, setSelectedDepartureMonth] = useState<string | null>(null);
   const [selectedDepartureDate, setSelectedDepartureDate] = useState<number | null>(null);
   const [transportDialogOpen, setTransportDialogOpen] = useState(false);
+  const [departureInitialized, setDepartureInitialized] = useState(false);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -141,6 +145,47 @@ export default function BookEventPage() {
     }
     fetchEvent();
   }, [session, status, params.slug, router]);
+
+  // Read URL parameters and set selections - priority over auto-select
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const departureIndex = urlParams.get('departureIndex');
+      const transportIndex = urlParams.get('transportIndex');
+      const departureMonth = urlParams.get('departureMonth');
+      const departureDate = urlParams.get('departureDate');
+
+      if (departureIndex !== null) {
+        setSelectedDepartureIndex(parseInt(departureIndex));
+        setDepartureInitialized(true); // Prevent auto-select from overriding
+      }
+      if (transportIndex !== null) {
+        setSelectedTransportIndex(parseInt(transportIndex));
+      }
+      if (departureMonth) {
+        setSelectedDepartureMonth(departureMonth);
+      }
+      if (departureDate !== null) {
+        setSelectedDepartureDate(parseInt(departureDate));
+      }
+    }
+  }, []);
+
+  // Auto-select departure only if no URL parameters were provided
+  useEffect(() => {
+    if (event?.departures && !departureInitialized) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasUrlParams = urlParams.get('departureIndex') !== null;
+      
+      if (!hasUrlParams) {
+        const selectedIndex = event.departures.findIndex(dep => dep.isSelected);
+        if (selectedIndex !== -1) {
+          setSelectedDepartureIndex(selectedIndex);
+        }
+      }
+      setDepartureInitialized(true);
+    }
+  }, [event?.departures, departureInitialized]);
 
   const fetchEvent = async () => {
     try {
@@ -222,12 +267,31 @@ export default function BookEventPage() {
 
   const calculateTotal = () => {
     if (!event) return 0;
-    const basePrice = event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price 
-      ? event.discountedPrice 
-      : event.price;
-    const transportPrice = (selectedDepartureIndex !== null && selectedTransportIndex !== null)
-      ? Number(event.departures?.[selectedDepartureIndex]?.transportOptions?.[selectedTransportIndex]?.price || 0)
-      : 0;
+    
+    let basePrice = event.price;
+    let transportPrice = 0;
+    
+    // If departure is selected, use departure-specific pricing
+    if (selectedDepartureIndex !== null && event.departures?.[selectedDepartureIndex]) {
+      const departure = event.departures[selectedDepartureIndex];
+      const departurePrice = Number((departure as any).price || event.price);
+      const departureDiscountedPrice = Number((departure as any).discountedPrice || 0);
+      
+      basePrice = (departureDiscountedPrice > 0 && departureDiscountedPrice < departurePrice) 
+        ? departureDiscountedPrice 
+        : departurePrice;
+      
+      // Add transport price if selected
+      if (selectedTransportIndex !== null && departure.transportOptions?.[selectedTransportIndex]) {
+        transportPrice = Number(departure.transportOptions[selectedTransportIndex].price || 0);
+      }
+    } else {
+      // Fallback to event-level pricing
+      basePrice = (event.discountedPrice && event.discountedPrice > 0 && event.discountedPrice < event.price) 
+        ? event.discountedPrice 
+        : event.price;
+    }
+    
     return (basePrice + transportPrice) * participants.length;
   };
 
@@ -366,29 +430,16 @@ export default function BookEventPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        <div>
-                          <Label>Select Departure *</Label>
-                          <Select
-                            value={selectedDepartureIndex !== null ? selectedDepartureIndex.toString() : ''}
-                            onValueChange={(value) => {
-                              setSelectedDepartureIndex(parseInt(value));
-                              setSelectedTransportIndex(null);
-                              setSelectedDepartureMonth(null);
-                              setSelectedDepartureDate(null);
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Choose departure city" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {event.departures.map((dep, idx) => (
-                                <SelectItem key={idx} value={idx.toString()}>
-                                  {dep.label?.trim() ? dep.label : `${dep.origin} → ${dep.destination}`}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                        {selectedDepartureIndex !== null && event.departures[selectedDepartureIndex] && (
+                          <div>
+                            <Label>Selected Departure</Label>
+                            <Input 
+                              value={event.departures[selectedDepartureIndex].label?.trim() ? event.departures[selectedDepartureIndex].label : `${event.departures[selectedDepartureIndex].origin} → ${event.departures[selectedDepartureIndex].destination}`}
+                              disabled 
+                              className="text-foreground"
+                            />
+                          </div>
+                        )}
                       </div>
 
                       {/* Transport selection modal */}
@@ -457,10 +508,10 @@ export default function BookEventPage() {
 
                       {selectedDepartureIndex !== null && event.departures[selectedDepartureIndex] && (
                         <div className="space-y-4">
-                          {selectedTransportIndex !== null && (
+                          {selectedTransportIndex !== null && event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] && (
                             <p className="text-xs text-muted-foreground">
-                              Selected transport: {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.mode}
-                              {' '}(+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.price || 0).toLocaleString()})
+                              Selected transport: {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].mode.replace('_', ' ')}
+                              {' '}(+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].price || 0).toLocaleString()})
                             </p>
                           )}
 
@@ -493,7 +544,10 @@ export default function BookEventPage() {
                                   value={selectedDepartureDate?.toString() || ''}
                                   onValueChange={(value) => {
                                     setSelectedDepartureDate(parseInt(value));
-                                    setTransportDialogOpen(true);
+                                    // Only open transport dialog if transport not already selected from URL
+                                    if (selectedTransportIndex === null) {
+                                      setTransportDialogOpen(true);
+                                    }
                                   }}
                                 >
                                   <SelectTrigger>
@@ -733,13 +787,13 @@ export default function BookEventPage() {
                     )}
                     
                     {/* Selected Departure & Transport */}
-                    {event.departures && selectedDepartureIndex !== null && (
+                    {event.departures && selectedDepartureIndex !== null && event.departures[selectedDepartureIndex] && (
                       <>
                         <div className="flex justify-between">
                           <span>Departure:</span>
                           <span className="font-medium">{event.departures[selectedDepartureIndex].label}</span>
                         </div>
-                        {selectedTransportIndex !== null && (
+                        {selectedTransportIndex !== null && event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] && (
                           <div className="flex justify-between">
                             <span>Transport:</span>
                             <span className="font-medium">
@@ -755,17 +809,42 @@ export default function BookEventPage() {
                     <div className="flex justify-between">
                       <span>Base price per person:</span>
                       <span className="font-medium">
-                        ₹{(event.discountedPrice || event.price).toLocaleString()}
-                        {event.discountedPrice && (
-                          <span className="text-sm text-muted-foreground line-through ml-2">
-                            ₹{event.price.toLocaleString()}
-                          </span>
-                        )}
+                        {(() => {
+                          if (selectedDepartureIndex !== null && event.departures?.[selectedDepartureIndex]) {
+                            const departure = event.departures[selectedDepartureIndex];
+                            const departurePrice = Number((departure as any).price || event.price);
+                            const departureDiscountedPrice = Number((departure as any).discountedPrice || 0);
+                            const hasDiscount = departureDiscountedPrice > 0 && departureDiscountedPrice < departurePrice;
+                            
+                            return (
+                              <>
+                                ₹{(hasDiscount ? departureDiscountedPrice : departurePrice).toLocaleString()}
+                                {hasDiscount && (
+                                  <span className="text-sm text-muted-foreground line-through ml-2">
+                                    ₹{departurePrice.toLocaleString()}
+                                  </span>
+                                )}
+                              </>
+                            );
+                          } else {
+                            return (
+                              <>
+                                ₹{(event.discountedPrice || event.price).toLocaleString()}
+                                {event.discountedPrice && (
+                                  <span className="text-sm text-muted-foreground line-through ml-2">
+                                    ₹{event.price.toLocaleString()}
+                                  </span>
+                                )}
+                              </>
+                            );
+                          }
+                        })()
+                        }
                       </span>
                     </div>
                     
                     {/* Transport cost breakdown */}
-                    {event.departures && selectedDepartureIndex !== null && selectedTransportIndex !== null && (
+                    {event.departures && selectedDepartureIndex !== null && selectedTransportIndex !== null && event.departures[selectedDepartureIndex] && event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] && (
                       <div className="flex justify-between">
                         <span>Transport cost per person:</span>
                         <span className="font-medium">
@@ -775,9 +854,22 @@ export default function BookEventPage() {
                     )}
                     
                     <Separator />
-                    <div className="flex justify-between text-lg font-bold">
-                      <span>Total Amount:</span>
-                      <span>₹{calculateTotal().toLocaleString()}</span>
+                    <div className="space-y-2">
+                      {selectedDepartureIndex !== null && event.departures?.[selectedDepartureIndex] && (
+                        <div className="text-sm text-muted-foreground space-y-1">
+                          <div>Departure: {event.departures[selectedDepartureIndex].label}</div>
+                          {selectedTransportIndex !== null && event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] && (
+                            <div>Transport: {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].mode.replace('_', ' ')} (+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].price || 0).toLocaleString()})</div>
+                          )}
+                          {selectedDepartureDate && selectedDepartureMonth && (
+                            <div>Date: {selectedDepartureDate} {selectedDepartureMonth.split('-')[0]} {selectedDepartureMonth.split('-')[1]}</div>
+                          )}
+                        </div>
+                      )}
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>Total Amount:</span>
+                        <span>₹{calculateTotal().toLocaleString()}</span>
+                      </div>
                     </div>
                     
                     <div className="bg-muted/50 p-3 rounded-lg">
@@ -794,9 +886,17 @@ export default function BookEventPage() {
                       </div>
                     </div>
 
+                    {/* Debug info */}
+                    <div className="text-xs text-muted-foreground space-y-1 p-2 bg-muted/30 rounded">
+                      <div>Departure: {selectedDepartureIndex !== null ? 'Selected' : 'Not selected'}</div>
+                      <div>Date: {selectedDepartureDate !== null ? selectedDepartureDate : 'Not selected'}</div>
+                      <div>Transport: {selectedTransportIndex !== null ? 'Selected' : 'Not selected'}</div>
+                      <div>Month: {selectedDepartureMonth || 'Not selected'}</div>
+                    </div>
+                    
                     <Button 
                       onClick={handleSubmit}
-                      disabled={selectedDepartureIndex === null || !selectedDepartureDate || !selectedTransportIndex || submitting}
+                      disabled={selectedDepartureIndex === null || !selectedDepartureDate || selectedTransportIndex === null || !selectedDepartureMonth || submitting}
                       className="w-full"
                       size="lg"
                     >

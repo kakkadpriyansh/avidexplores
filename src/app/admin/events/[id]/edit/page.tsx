@@ -1434,7 +1434,7 @@ export default function EditEventPage() {
                           />
                         </div>
                         <div>
-                          <Label>Price (₹)</Label>
+                          <Label>Original Price (₹)</Label>
                           <Input
                             type="number"
                             min="0"
