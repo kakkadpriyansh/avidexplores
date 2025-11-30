@@ -918,8 +918,8 @@ export default function BookEventPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Booking Registration Done!</AlertDialogTitle>
             <AlertDialogDescription>
-              Your booking has been successfully registered. Complete payment by visiting our office. 
-              You can view your booking details and status in your bookings page.
+              Your booking has been successfully registered. Complete payment using Razorpay on the bookings page. 
+              Your booking status will be updated automatically after successful payment.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -927,7 +927,7 @@ export default function BookEventPage() {
               setShowSuccessDialog(false);
               router.push('/bookings');
             }}>
-              View My Bookings
+              Proceed to Payment
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

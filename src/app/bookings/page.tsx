@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import Navigation from '@/components/Navigation';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Search, 
   Filter, 
@@ -21,8 +22,15 @@ import {
   Download,
   Eye,
   Star,
-  MessageSquare
+  MessageSquare,
+  CreditCard
 } from 'lucide-react';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 interface UserBooking {
   _id: string;
@@ -54,10 +62,12 @@ interface UserBooking {
 export default function BookingHistoryPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { toast } = useToast();
   const [bookings, setBookings] = useState<UserBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [processingPayment, setProcessingPayment] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -108,49 +118,244 @@ export default function BookingHistoryPage() {
     }
   };
 
+  const handleRazorpayPayment = async (booking: UserBooking) => {
+    try {
+      setProcessingPayment(booking._id);
+      
+      // Create Razorpay order
+      const orderResponse = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          bookingId: booking.bookingId,
+          amount: booking.totalAmount
+        })
+      });
+      
+      const orderData = await orderResponse.json();
+      
+      if (!orderResponse.ok || !orderData.success) {
+        throw new Error(orderData.error || 'Failed to create order');
+      }
+      
+      // Initialize Razorpay
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_RiJUS1wq4Lm1iA',
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Avid Explores',
+        description: `Payment for ${booking.eventId.title}`,
+        order_id: orderData.id,
+        handler: async function (response: any) {
+          try {
+            // Verify payment
+            const verifyResponse = await fetch('/api/payment/verify', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                bookingId: booking.bookingId
+              })
+            });
+            
+            const verifyData = await verifyResponse.json();
+            
+            if (verifyResponse.ok && verifyData.success) {
+              toast({
+                title: "Payment Successful!",
+                description: "Your booking has been confirmed.",
+              });
+              
+              // Refresh bookings
+              fetchUserBookings();
+            } else {
+              throw new Error(verifyData.error || 'Payment verification failed');
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            toast({
+              title: "Payment Verification Failed",
+              description: "Please contact support if amount was deducted.",
+              variant: "destructive"
+            });
+          } finally {
+            setProcessingPayment(null);
+          }
+        },
+        prefill: {
+          name: session?.user?.name || '',
+          email: session?.user?.email || '',
+          contact: booking.participants[0]?.phone || ''
+        },
+        theme: {
+          color: '#ef4444'
+        },
+        modal: {
+          ondismiss: function() {
+            setProcessingPayment(null);
+          }
+        }
+      };
+      
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Payment Failed",
+        description: error instanceof Error ? error.message : "Failed to initiate payment",
+        variant: "destructive"
+      });
+      setProcessingPayment(null);
+    }
+  };
+
   const downloadBookingReceipt = (booking: UserBooking) => {
-    // Generate PDF receipt
     const receiptContent = `
+      <!DOCTYPE html>
       <html>
         <head>
-          <title>Booking Receipt</title>
+          <title>Invoice - ${booking.bookingId}</title>
           <style>
-            body { font-family: Arial, sans-serif; margin: 40px; }
-            .header { text-align: center; margin-bottom: 30px; }
-            .title { font-size: 24px; font-weight: bold; color: #333; }
-            .subtitle { font-size: 16px; color: #666; margin-top: 5px; }
-            .section { margin: 20px 0; }
-            .label { font-weight: bold; }
-            .participants { margin-top: 15px; }
-            .participant { margin: 5px 0; }
-            .footer { margin-top: 40px; text-align: center; color: #666; }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Arial', sans-serif; padding: 40px; background: #fff; color: #000; }
+            .invoice { max-width: 800px; margin: 0 auto; background: white; }
+            .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 30px; border-bottom: 3px solid #ef4444; margin-bottom: 30px; }
+            .logo-section { display: flex; align-items: center; gap: 10px; }
+            .logo { height: 50px; }
+            .company-name { height: 35px; }
+            .invoice-title { text-align: right; }
+            .invoice-title h1 { font-size: 32px; color: #ef4444; margin-bottom: 5px; }
+            .invoice-title p { color: #666; font-size: 14px; }
+            .info-section { display: flex; justify-content: space-between; margin-bottom: 30px; }
+            .info-box { flex: 1; }
+            .info-box h3 { color: #ef4444; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; }
+            .info-box p { color: #333; font-size: 13px; line-height: 1.6; }
+            .booking-details { background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #ef4444; }
+            .booking-details h3 { color: #ef4444; margin-bottom: 15px; font-size: 16px; }
+            .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+            .detail-row:last-child { border-bottom: none; }
+            .detail-label { color: #666; font-size: 13px; }
+            .detail-value { color: #000; font-weight: 600; font-size: 13px; }
+            .participants-section { margin-bottom: 30px; }
+            .participants-section h3 { color: #ef4444; margin-bottom: 15px; font-size: 16px; }
+            .participant-card { background: #fff; border: 1px solid #e5e7eb; padding: 15px; margin-bottom: 10px; border-radius: 6px; }
+            .participant-card h4 { color: #000; margin-bottom: 8px; font-size: 14px; }
+            .participant-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; color: #666; }
+            .amount-section { background: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+            .amount-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 14px; }
+            .amount-total { border-top: 2px solid #ef4444; margin-top: 10px; padding-top: 15px; font-size: 18px; font-weight: bold; color: #ef4444; }
+            .payment-status { display: inline-block; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-top: 10px; }
+            .status-success { background: #dcfce7; color: #166534; }
+            .status-pending { background: #fef3c7; color: #92400e; }
+            .footer { text-align: center; padding-top: 30px; border-top: 2px solid #e5e7eb; color: #666; font-size: 12px; }
+            .footer p { margin: 5px 0; }
+            .footer strong { color: #ef4444; }
+            @media print {
+              body { padding: 20px; }
+              .invoice { box-shadow: none; }
+            }
           </style>
         </head>
         <body>
-          <div class="header">
-            <div class="title">AVID EXPLORES</div>
-            <div class="subtitle">Booking Receipt</div>
-          </div>
-          
-          <div class="section">
-            <div><span class="label">Booking ID:</span> ${booking.bookingId}</div>
-            <div><span class="label">Event:</span> ${booking.eventId.title}</div>
-            <div><span class="label">Location:</span> ${booking.eventId.location}</div>
-            <div><span class="label">Total Amount:</span> ₹${booking.totalAmount.toLocaleString()}</div>
-            <div><span class="label">Status:</span> ${booking.status}</div>
-            <div><span class="label">Payment Status:</span> ${booking.paymentInfo.paymentStatus}</div>
-            <div><span class="label">Booking Date:</span> ${new Date(booking.createdAt).toLocaleDateString()}</div>
-          </div>
-          
-          <div class="section">
-            <div class="label">Participants (${booking.participants.length}):</div>
-            <div class="participants">
-              ${booking.participants.map((p, i) => `<div class="participant">${i + 1}. ${p.name} (${p.age} years, ${p.gender})</div>`).join('')}
+          <div class="invoice">
+            <div class="header">
+              <div class="logo-section">
+                <img src="/logo/Avid Red Black.png" alt="Avid Explores" class="logo" />
+                <img src="/logo/Avid name black.png" alt="Avid Explores" class="company-name" />
+              </div>
+              <div class="invoice-title">
+                <h1>INVOICE</h1>
+                <p>Booking ID: ${booking.bookingId}</p>
+              </div>
             </div>
-          </div>
-          
-          <div class="footer">
-            Thank you for choosing Avid Explores!
+
+            <div class="info-section">
+              <div class="info-box">
+                <h3>From</h3>
+                <p><strong>Avid Explorers</strong><br/>
+                Email: info@avidexplorers.in<br/>
+                Phone: +91 88665 52400</p>
+              </div>
+              <div class="info-box" style="text-align: right;">
+                <h3>Invoice Details</h3>
+                <p><strong>Date:</strong> ${new Date(booking.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}<br/>
+                <strong>Status:</strong> ${booking.status}<br/>
+                <strong>Payment:</strong> ${booking.paymentInfo.paymentStatus}</p>
+              </div>
+            </div>
+
+            <div class="booking-details">
+              <h3>Booking Details</h3>
+              <div class="detail-row">
+                <span class="detail-label">Event Name</span>
+                <span class="detail-value">${booking.eventId.title}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Location</span>
+                <span class="detail-value">${booking.eventId.location}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Number of Participants</span>
+                <span class="detail-value">${booking.participants.length}</span>
+              </div>
+              ${booking.paymentInfo.transactionId ? `
+              <div class="detail-row">
+                <span class="detail-label">Transaction ID</span>
+                <span class="detail-value">${booking.paymentInfo.transactionId}</span>
+              </div>` : ''}
+            </div>
+
+            <div class="participants-section">
+              <h3>Participant Details</h3>
+              ${booking.participants.map((p, i) => `
+                <div class="participant-card">
+                  <h4>${i + 1}. ${p.name}</h4>
+                  <div class="participant-info">
+                    <span>Age: ${p.age} years</span>
+                    <span>Gender: ${p.gender}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="amount-section">
+              <div class="amount-row">
+                <span>Base Amount (${booking.participants.length} × ₹${(booking.totalAmount / booking.participants.length).toLocaleString('en-IN')})</span>
+                <span>₹${booking.totalAmount.toLocaleString('en-IN')}</span>
+              </div>
+              <div class="amount-row amount-total">
+                <span>Total Amount</span>
+                <span>₹${booking.totalAmount.toLocaleString('en-IN')}</span>
+              </div>
+              <div>
+                <span class="payment-status ${booking.paymentInfo.paymentStatus === 'SUCCESS' ? 'status-success' : 'status-pending'}">
+                  ${booking.paymentInfo.paymentStatus === 'SUCCESS' ? '✓ PAID' : 'PENDING PAYMENT'}
+                </span>
+                ${booking.paymentInfo.paymentMethod && booking.paymentInfo.paymentMethod !== 'PENDING' ? `
+                <span style="margin-left: 10px; color: #666; font-size: 12px;">via ${booking.paymentInfo.paymentMethod}</span>
+                ` : ''}
+              </div>
+            </div>
+
+            ${booking.specialRequests ? `
+            <div style="background: #f9fafb; padding: 15px; border-radius: 6px; margin-bottom: 30px;">
+              <h3 style="color: #ef4444; margin-bottom: 10px; font-size: 14px;">Special Requests</h3>
+              <p style="color: #666; font-size: 13px;">${booking.specialRequests}</p>
+            </div>
+            ` : ''}
+
+            <div class="footer">
+              <p><strong>Thank you for choosing Avid Explorers!</strong></p>
+              <p>For any queries, contact us at info@avidexplorers.in</p>
+              <p style="margin-top: 15px; font-size: 11px;">This is a computer-generated invoice and does not require a signature.</p>
+            </div>
           </div>
         </body>
       </html>
@@ -163,8 +368,7 @@ export default function BookingHistoryPage() {
       printWindow.focus();
       setTimeout(() => {
         printWindow.print();
-        printWindow.close();
-      }, 250);
+      }, 500);
     }
   };
 
@@ -349,10 +553,12 @@ export default function BookingHistoryPage() {
                             <Clock className="h-4 w-4 mr-2" />
                             <span>Booked on {new Date(booking.createdAt).toLocaleDateString()}</span>
                           </div>
-                          <div className="flex items-center text-muted-foreground">
-                            <DollarSign className="h-4 w-4 mr-2" />
-                            <span>{booking.paymentInfo.paymentMethod}</span>
-                          </div>
+                          {booking.paymentInfo.paymentMethod && booking.paymentInfo.paymentMethod !== 'PENDING' && (
+                            <div className="flex items-center text-muted-foreground">
+                              <DollarSign className="h-4 w-4 mr-2" />
+                              <span>{booking.paymentInfo.paymentMethod}</span>
+                            </div>
+                          )}
                         </div>
                         
                         {booking.specialRequests && (
@@ -381,6 +587,18 @@ export default function BookingHistoryPage() {
                             >
                               <Star className="h-3 w-3 mr-1" />
                               Write Review
+                            </Button>
+                          )}
+                          
+                          {booking.status === 'PENDING' && booking.paymentInfo.paymentStatus === 'PENDING' && (
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleRazorpayPayment(booking)}
+                              disabled={processingPayment === booking._id}
+                            >
+                              <CreditCard className="h-3 w-3 mr-1" />
+                              {processingPayment === booking._id ? 'Processing...' : 'Pay with Razorpay'}
                             </Button>
                           )}
                           
