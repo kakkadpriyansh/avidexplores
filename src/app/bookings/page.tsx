@@ -191,7 +191,7 @@ export default function BookingHistoryPage() {
         prefill: {
           name: session?.user?.name || '',
           email: session?.user?.email || '',
-          contact: booking.participants[0]?.phone || ''
+          contact: ''
         },
         theme: {
           color: '#ef4444'
