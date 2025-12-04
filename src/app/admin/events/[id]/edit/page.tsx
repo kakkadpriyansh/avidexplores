@@ -201,9 +201,12 @@ export default function EditEventPage() {
 
   const addTransportOption = (depIndex: number) => {
     setEvent(prev => {
-      if (!prev) return prev;
-      const newDepartures = [...(prev.departures || [])];
-      newDepartures[depIndex].transportOptions.push({ mode: 'BUS', price: 0 });
+      if (!prev || !prev.departures || !prev.departures[depIndex]) return prev;
+      const newDepartures = [...prev.departures];
+      newDepartures[depIndex] = {
+        ...newDepartures[depIndex],
+        transportOptions: [...newDepartures[depIndex].transportOptions, { mode: 'BUS', price: 0 }]
+      };
       return { ...prev, departures: newDepartures };
     });
   };
@@ -219,9 +222,12 @@ export default function EditEventPage() {
 
   const removeTransportOption = (depIndex: number, optIndex: number) => {
     setEvent(prev => {
-      if (!prev) return prev;
-      const newDepartures = [...(prev.departures || [])];
-      newDepartures[depIndex].transportOptions = newDepartures[depIndex].transportOptions.filter((_, i) => i !== optIndex);
+      if (!prev || !prev.departures || !prev.departures[depIndex]) return prev;
+      const newDepartures = [...prev.departures];
+      newDepartures[depIndex] = {
+        ...newDepartures[depIndex],
+        transportOptions: newDepartures[depIndex].transportOptions.filter((_, i) => i !== optIndex)
+      };
       return { ...prev, departures: newDepartures };
     });
   };
@@ -820,46 +826,7 @@ export default function EditEventPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="price">Price (₹)</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={event.price || ''}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (isNaN(value) || value < 0) {
-                          updateEvent('price', 0);
-                        } else {
-                          updateEvent('price', value);
-                        }
-                      }}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="discountedPrice">Discounted Price (₹)</Label>
-                    <Input
-                      id="discountedPrice"
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={event.discountedPrice || ''}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (isNaN(value) || value < 0) {
-                          updateEvent('discountedPrice', undefined);
-                        } else {
-                          updateEvent('discountedPrice', value);
-                        }
-                      }}
-                      placeholder="Optional discounted price"
-                    />
-                  </div>
-                </div>
+
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -1120,264 +1087,7 @@ export default function EditEventPage() {
 
           <TabsContent value="availability">
             <div className="space-y-6">
-              {/* Available Months */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Available Months</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {months.map((month) => (
-                      <label key={month} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={(event?.availableMonths || []).includes(month)}
-                          onChange={(e) => {
-                            if (!event) return;
-                            if (e.target.checked) {
-                              setEvent(prev => prev ? {
-                                ...prev,
-                                availableMonths: [...(prev.availableMonths || []), month]
-                              } : prev);
-                            } else {
-                              setEvent(prev => prev ? {
-                                ...prev,
-                                availableMonths: (prev.availableMonths || []).filter(m => m !== month)
-                              } : prev);
-                            }
-                          }}
-                          className="rounded"
-                        />
-                        <span className="text-sm">{month}</span>
-                      </label>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
 
-              {/* Available Dates */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Available Dates</CardTitle>
-                  <CardDescription>Add specific dates when this event is available</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {(event?.availableDates || []).map((dateEntry, index) => (
-                    <div key={index} className="border rounded-lg p-4 space-y-4">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-medium">Date Entry {index + 1}</h4>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            if (!event) return;
-                            setEvent(prev => prev ? {
-                              ...prev,
-                              availableDates: (prev.availableDates || []).filter((_, i) => i !== index)
-                            } : prev);
-                          }}
-                          
-                        >
-                          Remove
-                        </Button>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor={`month-${index}`}>Month</Label>
-                          <select
-                            id={`month-${index}`}
-                            value={dateEntry.month}
-                            onChange={(e) => {
-                              if (!event) return;
-                              const newDates = [...(event.availableDates || [])];
-                              newDates[index] = { ...newDates[index], month: e.target.value };
-                              setEvent({ ...event, availableDates: newDates });
-                            }}
-                            className="w-full p-2 border rounded-md"
-                          >
-                            <option value="">Select Month</option>
-                            {months.map((m) => (
-                              <option key={m} value={m}>{m}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <Label htmlFor={`year-${index}`}>Year</Label>
-                          <Input
-                            id={`year-${index}`}
-                            type="number"
-                            value={dateEntry.year || ''}
-                            onChange={(e) => {
-                              if (!event) return;
-                              const newDates = [...(event.availableDates || [])];
-                              newDates[index] = { ...newDates[index], year: parseInt(e.target.value) || new Date().getFullYear() };
-                              setEvent({ ...event, availableDates: newDates });
-                            }}
-                            placeholder="2024"
-                            min={new Date().getFullYear()}
-                            max={new Date().getFullYear() + 5}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label htmlFor={`location-${index}`}>Location (Optional)</Label>
-                        <Input
-                          id={`location-${index}`}
-                          value={dateEntry.location || ''}
-                          onChange={(e) => {
-                            if (!event) return;
-                            const newDates = [...(event.availableDates || [])];
-                            newDates[index] = { ...newDates[index], location: e.target.value };
-                            setEvent({ ...event, availableDates: newDates });
-                          }}
-                          placeholder="Starting location for this date"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor={`totalSeats-${index}`}>Total Seats</Label>
-                          <Input
-                            id={`totalSeats-${index}`}
-                            type="number"
-                            value={dateEntry.totalSeats || ''}
-                            onChange={(e) => {
-                              if (!event) return;
-                              const newDates = [...(event.availableDates || [])];
-                              const totalSeats = parseInt(e.target.value) || 0;
-                              newDates[index] = { 
-                                ...newDates[index], 
-                                totalSeats,
-                                availableSeats: newDates[index].availableSeats || totalSeats
-                              };
-                              setEvent({ ...event, availableDates: newDates });
-                            }}
-                            placeholder="20"
-                            min={1}
-                            max={100}
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor={`availableSeats-${index}`}>Available Seats</Label>
-                          <Input
-                            id={`availableSeats-${index}`}
-                            type="number"
-                            value={dateEntry.availableSeats || ''}
-                            onChange={(e) => {
-                              if (!event) return;
-                              const newDates = [...(event.availableDates || [])];
-                              newDates[index] = { ...newDates[index], availableSeats: parseInt(e.target.value) || 0 };
-                              setEvent({ ...event, availableDates: newDates });
-                            }}
-                            placeholder="20"
-                            min={0}
-                            max={dateEntry.totalSeats || 100}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label>Available Dates in {dateEntry.month || 'Selected Month'}</Label>
-                        <div className="mt-2">
-                          <div className="flex flex-wrap gap-2 mb-2">
-                            {dateEntry.dates.map((date, dateIndex) => (
-                              <span key={dateIndex} className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-                                {date}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    if (!event) return;
-                                    const newDates = [...(event.availableDates || [])];
-                                    newDates[index] = {
-                                      ...newDates[index],
-                                      dates: newDates[index].dates.filter((_, i) => i !== dateIndex)
-                                    };
-                                    setEvent({ ...event, availableDates: newDates });
-                                  }}
-                                  className="text-blue-600 hover:text-blue-800"
-                                >
-                                  ×
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                          <div className="flex gap-2">
-                            <Input
-                              type="number"
-                              placeholder="Add date (1-31)"
-                              min="1"
-                              max="31"
-                              onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  const input = e.target as HTMLInputElement;
-                                  const val = parseInt(input.value);
-                                  if (!event) return;
-                                  if (val >= 1 && val <= 31 && !dateEntry.dates.includes(val)) {
-                                    const newDates = [...(event.availableDates || [])];
-                                    const updatedDates = [...newDates[index].dates, val].sort((a, b) => a - b);
-                                    newDates[index] = { ...newDates[index], dates: updatedDates };
-                                    setEvent({ ...event, availableDates: newDates });
-                                    input.value = '';
-                                  }
-                                }
-                              }}
-                              className="flex-1"
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={(e) => {
-                                const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
-                                const val = parseInt(input?.value || '');
-                                if (!event || !input) return;
-                                if (val >= 1 && val <= 31 && !dateEntry.dates.includes(val)) {
-                                  const newDates = [...(event.availableDates || [])];
-                                  const updatedDates = [...newDates[index].dates, val].sort((a, b) => a - b);
-                                  newDates[index] = { ...newDates[index], dates: updatedDates };
-                                  setEvent({ ...event, availableDates: newDates });
-                                  input.value = '';
-                                }
-                              }}
-                            >
-                              Add Date
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      if (!event) return;
-                      setEvent(prev => prev ? {
-                        ...prev,
-                        availableDates: [
-                          ...(prev.availableDates || []),
-                          { 
-                            month: '', 
-                            year: new Date().getFullYear(), 
-                            dates: [], 
-                            location: '',
-                            totalSeats: 20,
-                            availableSeats: 20
-                          }
-                        ]
-                      } : prev);
-                    }}
-                  >
-                    Add Date Entry
-                  </Button>
-                </CardContent>
-              </Card>
 
               {/* Departures & Transport Options */}
               <Card>
@@ -1516,7 +1226,14 @@ export default function EditEventPage() {
                               </div>
                             </div>
                           ))}
-                          <Button type="button" variant="outline" onClick={() => addTransportOption(depIndex)}>
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              addTransportOption(depIndex);
+                            }}
+                          >
                             Add Transport Option
                           </Button>
                             </div>
