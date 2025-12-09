@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
       discountAmount,
       finalAmount,
       paymentInfo: {
-        paymentMethod: 'PENDING',
+        paymentMethod: 'RAZORPAY',
         paymentStatus: 'PENDING'
       },
       specialRequests,
