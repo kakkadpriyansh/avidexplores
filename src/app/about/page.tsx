@@ -69,20 +69,19 @@ export default async function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-3xl font-bold text-foreground mb-6">Our Story</h2>
+                <h3 className="text-2xl font-semibold text-foreground mb-4">About Us</h3>
                 <p className="text-muted-foreground mb-4">
-                  Founded in 2012 by a group of passionate adventurers, Avid Explores began as a small collective 
-                  of friends who shared a love for the great outdoors. What started as weekend trips to nearby 
-                  mountains has grown into one of India's most trusted adventure travel companies.
+                  Founded in 2025, Avid Explorers began with a simple vision — to make travel meaningful, memorable, and accessible for young explorers. What started as a passion-driven idea has grown into a dedicated travel brand that focuses on creating personalized, well-designed, and enriching travel experiences.
                 </p>
                 <p className="text-muted-foreground mb-4">
-                  Over the years, we've guided thousands of adventurers through some of the most breathtaking 
-                  landscapes in India and beyond. From the snow-capped peaks of the Himalayas to the pristine 
-                  beaches of Goa, we've made it our mission to showcase the incredible diversity of our planet.
+                  At Avid Explorers, we believe travel is more than just moving from one place to another — it is about stories, connections, and moments that stay with you. Every journey we curate is crafted with attention to detail, care, and an understanding of what today’s travellers truly seek: comfort, authenticity, and a sense of discovery.
                 </p>
-                <p className="text-muted-foreground">
-                  Today, we continue to operate with the same passion and dedication that inspired our founding, 
-                  always putting safety, sustainability, and unforgettable experiences at the heart of everything we do.
+                <p className="text-muted-foreground mb-4">
+                  We stay committed to responsible travel, transparency, and delivering value without unnecessary complications. Whether you’re traveling solo, with friends, or looking for a refreshing break, we ensure your experience feels smooth, safe, and unforgettable.
                 </p>
+                <p className="text-muted-foreground mb-2">Our mission is simple:</p>
+                <p className="text-muted-foreground mb-4">To help you explore the world in a way that feels personal and meaningful.</p>
+                <p className="text-foreground font-medium">Avid Explorers — Experience the Unforgettable.</p>
               </div>
               <div className="relative">
                 <img 
