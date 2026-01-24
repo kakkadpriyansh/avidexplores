@@ -75,8 +75,6 @@ export async function PUT(
     }
 
     const body = await request.json();
-    console.log('PUT /api/admin/events/[id] - Full body received:', JSON.stringify(body, null, 2));
-    console.log('PUT /api/admin/events/[id] - Departures from body:', JSON.stringify(body.departures, null, 2));
     
     // Remove system fields that shouldn't be updated
     const { _id, createdAt, updatedAt, ...updateData } = body as any;
@@ -195,7 +193,6 @@ export async function PUT(
           };
         });
       updateData.departures = validDepartures;
-      console.log('PUT /api/admin/events/[id] - Sanitized departures:', JSON.stringify(validDepartures, null, 2));
     }
 
     // Handle discountedPrice explicitly: allow clearing by sending null
@@ -209,12 +206,7 @@ export async function PUT(
       updateData.discountedPrice = Number(updateData.discountedPrice);
     }
     
-    console.log('PUT /api/admin/events/[id] - Raw body departures:', JSON.stringify(body.departures?.map((d: any) => ({ label: d.label, isSelected: d.isSelected })), null, 2));
-    console.log('PUT /api/admin/events/[id] - Raw body received:', JSON.stringify(body, null, 2));
-    console.log('PUT /api/admin/events/[id] - Sanitized departures isSelected:', JSON.stringify(updateData.departures?.map((d: any) => ({ label: d.label, isSelected: d.isSelected })), null, 2));
-    console.log('PUT /api/admin/events/[id] - Update data after processing:', JSON.stringify(updateData, null, 2));
-    
-    // Build a minimal safeUpdate with only the fields that are actually provided
+    // Only include fields that are actually present in updateData
     const safeUpdate: any = {};
     
     // Only include fields that are actually present in updateData
@@ -222,7 +214,9 @@ export async function PUT(
     if (updateData.slug !== undefined) safeUpdate.slug = updateData.slug;
     if (updateData.description !== undefined) safeUpdate.description = updateData.description;
     if (updateData.shortDescription !== undefined) safeUpdate.shortDescription = updateData.shortDescription;
-    if (updateData.price !== undefined) safeUpdate.price = Number(updateData.price);
+    if (updateData.price !== undefined) {
+      safeUpdate.price = Number(updateData.price);
+    }
     if (updateData.discountedPrice !== undefined) safeUpdate.discountedPrice = updateData.discountedPrice;
     if (updateData.duration !== undefined) safeUpdate.duration = String(updateData.duration).trim();
     if (updateData.category !== undefined) safeUpdate.category = updateData.category;
@@ -254,17 +248,7 @@ export async function PUT(
 
     await connectDB();
 
-    console.log('PUT /api/admin/events/[id] - Final safeUpdate departures full:', JSON.stringify(safeUpdate.departures, null, 2));
-    console.log('PUT /api/admin/events/[id] - Final safeUpdate departures with discountedPrice:', JSON.stringify(safeUpdate.departures?.map((d: any) => ({ label: d.label, isSelected: d.isSelected, discountedPrice: d.discountedPrice })), null, 2));
-    console.log('PUT /api/admin/events/[id] - Final safeUpdate payload:', JSON.stringify(safeUpdate, null, 2));
-    console.log('PUT /api/admin/events/[id] - Duration field type:', typeof safeUpdate.duration);
-    console.log('PUT /api/admin/events/[id] - Duration field value:', safeUpdate.duration);
-    if (safeUpdate.departures && safeUpdate.departures.length > 0) {
-      console.log('PUT /api/admin/events/[id] - Departures dateTransportModes:', JSON.stringify(safeUpdate.departures[0]?.availableDates?.[0]?.dateTransportModes, null, 2));
-    }
-
     try {
-      console.log('PUT /api/admin/events/[id] - About to call findByIdAndUpdate with ID:', params.id);
       
       // Try using direct MongoDB update without Mongoose casting
       const event = await (Event as any).findByIdAndUpdate(
@@ -285,19 +269,8 @@ export async function PUT(
         );
       }
       
-      console.log('PUT /api/admin/events/[id] - Updated event result:', {
-        id: event._id?.toString?.(),
-        title: event.title,
-        price: event.price,
-        discountedPrice: event.discountedPrice,
-        duration: event.duration,
-        updatedAt: event.updatedAt
-      });
-      
       // Verify isSelected was saved
       if (event.departures && event.departures.length > 0) {
-        console.log('PUT /api/admin/events/[id] - Saved departures full:', JSON.stringify(event.departures, null, 2));
-        console.log('PUT /api/admin/events/[id] - Saved departures with discountedPrice:', JSON.stringify(event.departures.map((d: any) => ({ label: d.label, isSelected: d.isSelected, discountedPrice: d.discountedPrice })), null, 2));
       }
 
       return NextResponse.json({
@@ -310,7 +283,6 @@ export async function PUT(
         updatedAt: event.updatedAt
       });
     } catch (mongoError: any) {
-      console.error('PUT /api/admin/events/[id] - MongoDB update error:', mongoError);
       if (mongoError?.name === 'ValidationError') {
         const validationErrors = Object.values(mongoError.errors || {}).map((err: any) => err.message);
         return NextResponse.json(

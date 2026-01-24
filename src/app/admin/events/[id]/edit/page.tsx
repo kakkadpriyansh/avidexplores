@@ -141,6 +141,7 @@ export default function EditEventPage() {
         throw new Error('Event not found');
       }
       const data = await response.json();
+      console.log('EDIT FORM - Fetched event data:', { id: data._id, title: data.title, price: data.price, discountedPrice: data.discountedPrice });
       setEvent({
         ...data,
         // Normalize duration to string for free-text edit
@@ -402,6 +403,8 @@ export default function EditEventPage() {
     e.preventDefault();
     if (!event) return;
 
+    console.log('EDIT FORM - Submitting event with price:', { id: event._id, title: event.title, price: event.price, discountedPrice: event.discountedPrice });
+
     setSaving(true);
     try {
       // Sanitize availableDates: include only fully valid entries
@@ -545,6 +548,7 @@ export default function EditEventPage() {
       console.log('IMAGES IN PAYLOAD:', payload.images);
       console.log('Sending departures with discountedPrice:', JSON.stringify(payload.departures?.map((d: any) => ({ label: d.label, isSelected: d.isSelected, discountedPrice: d.discountedPrice })), null, 2));
       console.log('Full departures payload:', JSON.stringify(payload.departures, null, 2));
+      console.log('EDIT FORM - Final payload price data:', { price: payload.price, discountedPrice: payload.discountedPrice });
       const response = await fetch(`/api/admin/events/${params.id}`, {
         method: 'PUT',
         headers: {
@@ -556,6 +560,7 @@ export default function EditEventPage() {
       let responseData: any = null;
       try {
         responseData = await response.json();
+        console.log('EDIT FORM - API Response:', responseData);
       } catch (e) {
         // Non-JSON error response
       }
@@ -586,6 +591,7 @@ export default function EditEventPage() {
 
   const updateEvent = (field: string, value: any) => {
     if (!event) return;
+    console.log('EDIT FORM - Updating field:', field, 'with value:', value, 'type:', typeof value);
     setEvent({ ...event, [field]: value });
   };
 
@@ -822,6 +828,33 @@ export default function EditEventPage() {
                       onChange={(e) => updateEvent('duration', e.target.value)}
                       placeholder="e.g., 5 Days 4 Nights, 1 Week, 3 days 2 nights"
                       required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="price">Price (₹)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={event.price}
+                      onChange={(e) => updateEvent('price', Number(e.target.value))}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="discountedPrice">Discounted Price (₹)</Label>
+                    <Input
+                      id="discountedPrice"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={event.discountedPrice || ''}
+                      onChange={(e) => updateEvent('discountedPrice', e.target.value ? Number(e.target.value) : undefined)}
+                      placeholder="Optional"
                     />
                   </div>
                 </div>

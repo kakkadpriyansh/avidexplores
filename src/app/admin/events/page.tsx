@@ -58,25 +58,50 @@ export default function AdminEventsPage() {
     fetchEvents();
   }, [session, status, router]);
 
+  // Refresh events when returning to this page
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchEvents();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/events?admin=true');
+      const response = await fetch('/api/events?limit=50');
       if (response.ok) {
         const data = await response.json();
-        const items: EventItem[] = (data.data || []).map((e: any) => ({
-          _id: e._id,
-          title: e.title,
-          slug: e.slug,
-          price: e.price,
-          discountedPrice: e.discountedPrice,
-          locationStr: e?.location?.name || e?.location?.state || '—',
-          durationStr: e?.duration ? `${e.duration} days` : '—',
-          maxParticipants: e.maxParticipants,
-          currentBookings: e.currentBookings || 0,
-          status: e.isActive ? 'PUBLISHED' : 'DRAFT',
-          createdAt: e.createdAt
-        }));
+        const items: EventItem[] = (data.data || []).map((e: any) => {
+          // Get display price from departures if available, otherwise use main price
+          let displayPrice = e.price || 0;
+          let displayDiscountedPrice = e.discountedPrice;
+          
+          if (e.departures && e.departures.length > 0) {
+            const selectedDep = e.departures.find((d: any) => d.isSelected);
+            const dep = selectedDep || e.departures[0];
+            if (dep && dep.price && dep.price > 0) {
+              displayPrice = dep.price;
+              displayDiscountedPrice = dep.discountedPrice;
+            }
+          }
+          
+          return {
+            _id: e._id,
+            title: e.title,
+            slug: e.slug,
+            price: displayPrice,
+            discountedPrice: displayDiscountedPrice ? Number(displayDiscountedPrice) : undefined,
+            locationStr: e?.location?.name || e?.location?.state || '—',
+            durationStr: e?.duration ? `${e.duration} days` : '—',
+            maxParticipants: e.maxParticipants,
+            currentBookings: e.currentBookings || 0,
+            status: e.isActive ? 'PUBLISHED' : 'DRAFT',
+            createdAt: e.createdAt
+          };
+        });
         setEvents(items);
       }
     } catch (error) {
@@ -90,7 +115,6 @@ export default function AdminEventsPage() {
     if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
     
     try {
-      console.log('Deleting event:', eventId);
       const response = await fetch(`/api/events/${eventId}`, {
         method: 'DELETE',
         headers: {
@@ -99,13 +123,11 @@ export default function AdminEventsPage() {
       });
       
       const data = await response.json();
-      console.log('Delete response:', response.status, data);
       
       if (response.ok) {
         setEvents(events.filter(event => event._id !== eventId));
         alert('Event deleted successfully');
       } else {
-        console.error('Delete failed:', data);
         alert(data.error || `Failed to delete event (${response.status})`);
       }
     } catch (error) {
@@ -116,7 +138,7 @@ export default function AdminEventsPage() {
 
   const handleStatusChange = async (eventId: string, newStatus: string) => {
     try {
-      const response = await fetch(`/api/events/${eventId}`, {
+      const response = await fetch(`/api/admin/events/${eventId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -283,12 +305,12 @@ export default function AdminEventsPage() {
                               {event.discountedPrice ? (
                                 <div className="flex items-center space-x-2">
                                   <span className="text-sm text-muted-foreground line-through">
-                                    ₹{event.price.toLocaleString()}
+                                    ₹{(event.price || 0).toLocaleString()}
                                   </span>
-                                  <span>₹{event.discountedPrice.toLocaleString()}</span>
+                                  <span>₹{(event.discountedPrice || 0).toLocaleString()}</span>
                                 </div>
                               ) : (
-                                <span>₹{event.price.toLocaleString()}</span>
+                                <span>₹{(event.price || 0).toLocaleString()}</span>
                               )}
                             </div>
                           </td>
