@@ -10,6 +10,9 @@ import ClientProviders from './providers';
 export const metadata: Metadata = {
   title: 'Avid Explores - Adventure Travel & Stories',
   description: 'Discover amazing adventures, read inspiring travel stories, and join our community of explorers.',
+  icons: {
+    icon: '/logo/Avid Red Black.png',
+  },
 }
 
 export default function RootLayout({
