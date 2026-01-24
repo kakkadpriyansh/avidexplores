@@ -37,21 +37,21 @@ const StoryCard = ({ story }: StoryCardProps) => {
   const [likeCount, setLikeCount] = useState(50);
   const [viewCount, setViewCount] = useState(100);
   const [commentCount, setCommentCount] = useState(5);
-  
+
   // Generate random engagement metrics for demo (client-side only)
   useEffect(() => {
     setLikeCount(Math.floor(Math.random() * 200) + 50);
     setViewCount(Math.floor(Math.random() * 5000) + 100);
     setCommentCount(Math.floor(Math.random() * 50) + 5);
   }, []);
-  
+
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsLiked(!isLiked);
     setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
   };
-  
+
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -79,21 +79,12 @@ const StoryCard = ({ story }: StoryCardProps) => {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-        
+
         {/* Floating Read Time Badge */}
-        <div className="absolute top-4 right-4">
-          <div className="bg-card/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center space-x-1 text-sm font-medium text-card-foreground border border-border/50">
-            <Clock className="h-3 w-3" />
-            <span>{story.readTime} min</span>
-          </div>
-        </div>
-        
+
+
         {/* Category Badge */}
-        <div className="absolute top-4 left-4">
-          <Badge className="bg-primary/90 text-primary-foreground border-0 hover:bg-primary">
-            {story.tags[0]}
-          </Badge>
-        </div>
+
       </div>
 
       {/* Content */}
@@ -101,7 +92,7 @@ const StoryCard = ({ story }: StoryCardProps) => {
         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300 line-clamp-2 leading-tight">
           {story.title}
         </h3>
-        
+
         <p className="text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
           {story.excerpt}
         </p>
@@ -126,20 +117,19 @@ const StoryCard = ({ story }: StoryCardProps) => {
               </div>
             </div>
           </div>
-          
+
           {/* Engagement Stats */}
           <div className="flex items-center space-x-4 text-xs text-muted-foreground">
             <div className="flex items-center space-x-1">
               <Eye className="h-3 w-3" />
               <span>{viewCount}</span>
             </div>
-            <button 
+            <button
               onClick={handleLike}
               aria-label={isLiked ? 'Unlike story' : 'Like story'}
               title={isLiked ? 'Unlike story' : 'Like story'}
-              className={`flex items-center space-x-1 transition-colors hover:text-red-500 ${
-                isLiked ? 'text-red-500' : ''
-              }`}
+              className={`flex items-center space-x-1 transition-colors hover:text-red-500 ${isLiked ? 'text-red-500' : ''
+                }`}
             >
               <Heart className={`h-3 w-3 ${isLiked ? 'fill-current' : ''}`} />
               <span>{likeCount}</span>
@@ -148,7 +138,7 @@ const StoryCard = ({ story }: StoryCardProps) => {
               <MessageCircle className="h-3 w-3" />
               <span>{commentCount}</span>
             </div>
-            <button 
+            <button
               onClick={handleShare}
               aria-label="Share story"
               title="Share story"

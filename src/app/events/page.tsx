@@ -49,7 +49,7 @@ export default function EventsPage() {
         setLoading(true);
         const response = await fetch('/api/events?limit=50'); // Fetch more events for the public page
         const data = await response.json();
-        
+
         if (data.success) {
           setEvents(data.data);
           setFilteredEvents(data.data);
@@ -70,29 +70,29 @@ export default function EventsPage() {
   // Filter events based on search term and selected region
   useEffect(() => {
     let filtered = events;
-    
+
     // Filter by search term
     if (searchTerm.trim()) {
       filtered = filtered.filter(event => {
-        const locationString = typeof event.location === 'string' 
-          ? event.location 
+        const locationString = typeof event.location === 'string'
+          ? event.location
           : `${event.location?.name || ''} ${event.location?.state || ''}`;
-        
+
         return event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-               locationString.toLowerCase().includes(searchTerm.toLowerCase()) ||
-               event.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-               (event.region && event.region.toLowerCase().includes(searchTerm.toLowerCase())) ||
-               event.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+          locationString.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          event.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (event.region && event.region.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          event.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
       });
     }
-    
+
     // Filter by selected region
     if (selectedRegion !== 'all') {
-      filtered = filtered.filter(event => 
+      filtered = filtered.filter(event =>
         (event.region || 'Other Adventures') === selectedRegion
       );
     }
-    
+
     setFilteredEvents(filtered);
   }, [searchTerm, selectedRegion, events]);
 
@@ -140,13 +140,13 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       {/* Header */}
       <section
         className="relative w-full pt-20 pb-6 px-4 md:px-8 lg:px-16 flex flex-col items-center justify-center bg-gradient-to-br from-[#FFE5E5] via-[#FFF5F5] to-[#F8F8F8]"
       >
         <h2 className="relative z-10 text-3xl md:text-4xl font-extrabold text-[#B71C1C] mb-1 text-center drop-shadow-sm">
-          All Adventures
+          All Trips
         </h2>
         <div className="relative z-10 w-16 h-1 bg-[#B71C1C] rounded-full mb-2" />
         <p className="relative z-10 text-base md:text-lg text-[#333] text-center max-w-2xl">
@@ -182,7 +182,7 @@ export default function EventsPage() {
               );
             })}
           </div>
-          
+
           {/* Search */}
           <div className="flex justify-center">
             <div className="relative w-full max-w-md">
@@ -212,8 +212,8 @@ export default function EventsPage() {
               <p className="text-lg text-red-600 mb-4">
                 {error}
               </p>
-              <button 
-                onClick={() => window.location.reload()} 
+              <button
+                onClick={() => window.location.reload()}
                 className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Try Again
@@ -231,7 +231,7 @@ export default function EventsPage() {
                 {searchTerm ? 'No adventures found matching your search' : 'No adventures available at the moment'}
               </p>
               {searchTerm && (
-                <button 
+                <button
                   onClick={() => setSearchTerm('')}
                   className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
                 >

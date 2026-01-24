@@ -194,9 +194,8 @@ const EventCard = ({ event }: EventCardProps) => {
                     e.nativeEvent.stopImmediatePropagation();
                     setCurrentImageIndex(index);
                   }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                    index === currentImageIndex ? 'bg-white shadow ring-1 ring-white/70 scale-125' : 'bg-white/60 hover:bg-white/80'
-                  }`}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex ? 'bg-white shadow ring-1 ring-white/70 scale-125' : 'bg-white/60 hover:bg-white/80'
+                    }`}
                   style={{ pointerEvents: 'auto' }}
                 />
               ))}
@@ -206,16 +205,8 @@ const EventCard = ({ event }: EventCardProps) => {
         <div className="absolute -top-8 -right-8 w-40 h-40 bg-fuchsia-400/20 blur-3xl rounded-full group-hover:opacity-80 opacity-0 transition-opacity"></div>
         <div className="absolute -bottom-10 -left-10 w-44 h-44 bg-blue-400/20 blur-3xl rounded-full group-hover:opacity-80 opacity-0 transition-opacity"></div>
 
-        <div className="absolute top-2 left-2">
-          <Badge className={`${getDifficultyColor(event.difficulty)} font-medium px-2 py-0.5 text-xs backdrop-blur-md border border-white/30 shadow-sm`}>
-            {formatDifficulty(event.difficulty)}
-          </Badge>
-        </div>
-        <div className="absolute top-2 right-2">
-          <Badge variant="secondary" className="bg-white/70 backdrop-blur-xl text-foreground font-medium px-2 py-0.5 text-xs border border-white/60 shadow-sm">
-            {event.category}
-          </Badge>
-        </div>
+
+
         <div className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
       </div>
 
@@ -227,7 +218,7 @@ const EventCard = ({ event }: EventCardProps) => {
                 <div className="flex items-center space-x-2 text-xs text-gray-600 mb-0.5">
                   <Clock className="h-3 w-3 text-primary" />
                   <span className="font-medium">
-                    {typeof event.duration === 'number' 
+                    {typeof event.duration === 'number'
                       ? `${event.duration}d`
                       : event.duration
                     }
@@ -250,8 +241,8 @@ const EventCard = ({ event }: EventCardProps) => {
             <div className="flex items-center space-x-1.5">
               <MapPin className="h-3 w-3 text-primary flex-shrink-0" />
               <span className="truncate font-medium">
-                {typeof event.location === 'string' 
-                  ? event.location 
+                {typeof event.location === 'string'
+                  ? event.location
                   : `${event.location?.name || 'Location TBD'}, ${event.location?.state || ''}`
                 }
               </span>
