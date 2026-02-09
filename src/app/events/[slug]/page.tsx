@@ -1054,7 +1054,7 @@ export default function EventDetailPage() {
                   </div>
                   <div>
                     <div className="font-medium">Email us</div>
-                    <div className="text-muted-foreground">hello@avidexplorers.com</div>
+                    <div className="text-muted-foreground">info@avidexplorers.in</div>
                   </div>
                   <div>
                     <div className="font-medium">WhatsApp</div>
