@@ -23,8 +23,7 @@ const DestinationCard = ({ name, image, subtitle, slug, link, order }: Destinati
         alt={name}
         className="absolute inset-0 w-full h-full object-cover"
       />
-      {/* Overlay: subtle at top, stronger at bottom for depth */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/60" />
+
 
       {/* Title at top like the reference card */}
       <div className="absolute top-0 left-0 right-0 p-3 text-white pointer-events-none">
