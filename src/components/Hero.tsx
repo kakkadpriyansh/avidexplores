@@ -16,26 +16,27 @@ interface HeroSettings {
 }
 
 export default function Hero() {
-  const [heroSettings, setHeroSettings] = useState<HeroSettings>({
-    backgroundImage: '/hero-adventure.jpg',
-    backgroundImages: [],
-    title: 'Discover Your Next Adventure',
-    titleColor: '#ffffff',
-    subtitle: 'From challenging mountain treks to peaceful camping escapes, embark on unforgettable journeys with expert guides and fellow adventurers.',
-    subtitleColor: '#e5e7eb',
-    ctaText: 'Explore Adventures',
-    ctaLink: '/events'
-  });
+  const [heroSettings, setHeroSettings] = useState<HeroSettings | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
+    // Prevent scroll jumping on refresh
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
+    
     const fetchHeroSettings = async () => {
       try {
-        const response = await fetch('/api/settings/hero');
+        const response = await fetch('/api/settings/hero', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
         if (response.ok) {
           const data = await response.json();
           setHeroSettings(data.data);
-        }``
+        }
       } catch (error) {
         console.error('Error fetching hero settings:', error);
       }
@@ -45,16 +46,31 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    const images = heroSettings.backgroundImages.length > 0 ? heroSettings.backgroundImages : [heroSettings.backgroundImage];
+    if (!heroSettings) return;
+    
+    const images = heroSettings.backgroundImages?.length > 0 ? heroSettings.backgroundImages : [heroSettings.backgroundImage];
     if (images.length > 1) {
       const interval = setInterval(() => {
         setCurrentImageIndex((prev) => (prev + 1) % images.length);
       }, 3000);
       return () => clearInterval(interval);
     }
-  }, [heroSettings.backgroundImages, heroSettings.backgroundImage]);
+  }, [heroSettings]);
 
-  const images = heroSettings.backgroundImages.length > 0 ? heroSettings.backgroundImages : [heroSettings.backgroundImage];
+  if (!heroSettings) {
+    return (
+      <section className="relative min-h-[40vh] md:min-h-[40vh] lg:min-h-[40vh] xl:min-h-[50vh] flex items-center justify-center bg-gray-200">
+        <div className="animate-pulse text-center">
+          <div className="w-64 h-8 bg-gray-300 rounded mb-4 mx-auto"></div>
+          <div className="w-96 h-4 bg-gray-300 rounded mx-auto"></div>
+        </div>
+      </section>
+    );
+  }
+
+
+
+  const images = heroSettings.backgroundImages?.length > 0 ? heroSettings.backgroundImages : [heroSettings.backgroundImage];
 
   return (
     <section className="relative min-h-[40vh] md:min-h-[40vh] lg:min-h-[40vh] xl:min-h-[50vh] flex items-end justify-center text-white overflow-hidden">

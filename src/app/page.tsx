@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap, Users, Shield } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // Fetch events from the database
 async function getEvents() {
