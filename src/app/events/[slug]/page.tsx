@@ -426,14 +426,6 @@ export default function EventDetailPage() {
 
           {/* Event Info Overlay */}
           <div className="absolute bottom-2 sm:bottom-4 md:bottom-8 left-2 sm:left-4 right-2 sm:right-4">
-            <div className="flex flex-wrap gap-1 sm:gap-2 mb-2 sm:mb-4">
-              <Badge className={getDifficultyColor(event.difficulty)}>
-                {formatDifficulty(event.difficulty)}
-              </Badge>
-              <Badge variant="secondary" className="bg-background/90 text-foreground">
-                {event.category}
-              </Badge>
-            </div>
             <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-product-sans font-bold text-primary-foreground mb-1 sm:mb-2">
               {event.title}
             </h1>
