@@ -25,17 +25,19 @@ const DestinationCard = ({ name, image, subtitle, slug, link, order }: Destinati
       />
 
 
-      {/* Title at top like the reference card */}
-      <div className="absolute top-0 left-0 right-0 p-3 text-white pointer-events-none">
-        <h2 className="text-lg md:text-xl font-bold tracking-wide drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
-          {name}
-        </h2>
-        {subtitle && (
-          <p className="text-xs text-white/80 mt-1">
-            {subtitle}
-          </p>
-        )}
-      </div>
+      {/* Title at top like the reference card - only show if name exists */}
+      {name && (
+        <div className="absolute top-0 left-0 right-0 p-3 text-white pointer-events-none">
+          <h2 className="text-lg md:text-xl font-bold tracking-wide drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
+            {name}
+          </h2>
+          {subtitle && (
+            <p className="text-xs text-white/80 mt-1">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Bottom shine bar for nicer hover accent */}
       <div className="absolute bottom-0 left-0 right-0 h-2 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

@@ -107,7 +107,7 @@ export default async function HomePage() {
                 destinations.map((card) => (
                   <DestinationCard 
                     key={card._id} 
-                    name={card.title}
+                    name="" // Empty name so admin title doesn't show on frontend
                     image={card.photo}
                     link={card.link}
                   />
