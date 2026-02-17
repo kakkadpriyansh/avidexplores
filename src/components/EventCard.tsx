@@ -77,7 +77,7 @@ const EventCard = ({ event }: EventCardProps) => {
 
   const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null); 
 
   useEffect(() => {
     if (images.length <= 1 || isPaused) return;
