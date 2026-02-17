@@ -158,27 +158,33 @@ export default function EventsPage() {
       <section className="py-6 border-b border-border/50">
         <div className="container mx-auto px-4">
           <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 mb-6">
-            <Button
-              variant={selectedRegion === 'all' ? 'default' : 'outline'}
+            <button
               onClick={() => setSelectedRegion('all')}
-              className="flex items-center gap-2 flex-shrink-0"
+              className={`flex items-center gap-2 flex-shrink-0 border rounded-md px-4 py-2 transition-all duration-200 ${
+                selectedRegion === 'all' 
+                  ? 'bg-[#B71C1C] text-white border-[#B71C1C]' 
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gradient-to-br hover:from-[#FFE5E5] hover:via-[#FFF5F5] hover:to-[#F8F8F8] hover:text-black'
+              }`}
             >
               <Globe className="h-4 w-4" />
               All Regions
-            </Button>
+            </button>
             {sortedAllRegions.map((region) => {
               const IconComponent = getRegionIcon(region);
               const regionCount = events.filter(event => (event.region || 'Other Adventures') === region).length;
               return (
-                <Button
+                <button
                   key={region}
-                  variant={selectedRegion === region ? 'default' : 'outline'}
                   onClick={() => setSelectedRegion(region)}
-                  className="flex items-center gap-2 flex-shrink-0"
+                  className={`flex items-center gap-2 flex-shrink-0 border rounded-md px-4 py-2 transition-all duration-200 ${
+                    selectedRegion === region 
+                      ? 'bg-[#B71C1C] text-white border-[#B71C1C]' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gradient-to-br hover:from-[#FFE5E5] hover:via-[#FFF5F5] hover:to-[#F8F8F8] hover:text-black'
+                  }`}
                 >
                   <IconComponent className="h-4 w-4" />
                   {region} ({regionCount})
-                </Button>
+                </button>
               );
             })}
           </div>
