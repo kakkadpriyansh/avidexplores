@@ -95,7 +95,7 @@ export default function AdminEventsPage() {
             price: displayPrice,
             discountedPrice: displayDiscountedPrice ? Number(displayDiscountedPrice) : undefined,
             locationStr: e?.location?.name || e?.location?.state || '—',
-            durationStr: e?.duration ? `${e.duration} days` : '—',
+            durationStr: e?.duration || '—',
             maxParticipants: e.maxParticipants,
             currentBookings: e.currentBookings || 0,
             status: e.isActive ? 'PUBLISHED' : 'DRAFT',
