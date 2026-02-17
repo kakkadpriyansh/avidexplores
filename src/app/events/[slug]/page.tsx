@@ -1046,6 +1046,23 @@ export default function EventDetailPage() {
               
               {/* Help section for mobile - shown only on smaller screens */}
               <div className="lg:hidden card-adventure p-6 mt-8">
+                {event.brochure && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full mb-4"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = event.brochure!;
+                      link.download = `${event.title}-brochure.pdf`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Brochure
+                  </Button>
+                )}
                 <h3 className="font-semibold mb-4">Need Help?</h3>
                 <div className="space-y-3 text-sm">
                   <div>
