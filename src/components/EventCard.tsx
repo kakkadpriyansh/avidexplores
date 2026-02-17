@@ -79,13 +79,7 @@ const EventCard = ({ event }: EventCardProps) => {
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null); 
 
-  useEffect(() => {
-    if (images.length <= 1 || isPaused) return;
-    const id = window.setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 5000);
-    return () => window.clearInterval(id);
-  }, [images.length, isPaused]);
+
 
   const getDifficultyColor = (difficulty: string) => {
     const normalizedDifficulty = difficulty?.toLowerCase() || '';
@@ -133,27 +127,6 @@ const EventCard = ({ event }: EventCardProps) => {
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onClick={() => router.push(`/events/${event.slug}`)}
-        onTouchStart={(e) => {
-          if (e.touches && e.touches[0]) {
-            touchStartX.current = e.touches[0].clientX;
-            touchStartY.current = e.touches[0].clientY;
-          }
-        }}
-        onTouchEnd={(e) => {
-          const endX = e.changedTouches[0]?.clientX ?? 0;
-          const endY = e.changedTouches[0]?.clientY ?? 0;
-          const dx = endX - (touchStartX.current ?? 0);
-          const dy = endY - (touchStartY.current ?? 0);
-          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-            if (dx < 0) {
-              setCurrentImageIndex((prev) => (prev + 1) % images.length);
-            } else {
-              setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-            }
-          }
-          touchStartX.current = null;
-          touchStartY.current = null;
-        }}
       >
         <img
           src={images[currentImageIndex]}
