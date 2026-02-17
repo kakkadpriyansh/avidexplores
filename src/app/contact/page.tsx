@@ -145,11 +145,10 @@ export default function ContactPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Email Address *
+                    Email Address
                   </label>
                   <Input
                     type="email"
-                    required
                     placeholder="Enter your email address"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -158,10 +157,11 @@ export default function ContactPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Phone Number
+                    Phone Number *
                   </label>
                   <Input
                     type="tel"
+                    required
                     placeholder="Enter your phone number"
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
@@ -170,11 +170,11 @@ export default function ContactPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Adventure Interest
+                    Travel Destination
                   </label>
                   <Input
                     type="text"
-                    placeholder="Which adventure are you interested in?"
+                    placeholder="Which destination are you interested in?"
                     value={formData.adventureInterest}
                     onChange={(e) => setFormData({...formData, adventureInterest: e.target.value})}
                   />
