@@ -832,7 +832,7 @@ export default function EditEventPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{display: 'none'}}>
                   <div>
                     <Label htmlFor="price">Price (₹)</Label>
                     <Input
@@ -842,6 +842,7 @@ export default function EditEventPage() {
                       step="1"
                       value={event.price}
                       onChange={(e) => updateEvent('price', Number(e.target.value))}
+                      className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                       required
                     />
                   </div>
@@ -854,6 +855,7 @@ export default function EditEventPage() {
                       step="1"
                       value={event.discountedPrice || ''}
                       onChange={(e) => updateEvent('discountedPrice', e.target.value ? Number(e.target.value) : undefined)}
+                      className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                       placeholder="Optional"
                     />
                   </div>
@@ -1193,6 +1195,7 @@ export default function EditEventPage() {
                                 }
                               }
                             }}
+                            className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                             placeholder="Enter price"
                           />
                         </div>
@@ -1213,6 +1216,7 @@ export default function EditEventPage() {
                                 }
                               }
                             }}
+                            className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                             placeholder="Optional"
                           />
                         </div>
