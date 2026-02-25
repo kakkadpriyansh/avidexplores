@@ -25,14 +25,15 @@ export interface IEvent extends Document {
     discountedPrice?: number; // discounted price for this departure
     isSelected?: boolean;
     transportOptions: {
-      mode: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS';
+      mode: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS' | 'CUSTOM';
+      customMode?: string;
       price: number; // per person additional price for transport
     }[];
     availableDates: {
       month: string;
       year: number;
       dates: number[];
-      availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[];
+      availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS' | 'CUSTOM')[];
       availableSeats?: number;
       totalSeats?: number;
     }[];
@@ -201,8 +202,12 @@ const EventSchema = new Schema<IEvent>({
     transportOptions: [{
       mode: {
         type: String,
-        enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS'],
+        enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS', 'CUSTOM'],
         required: [true, 'Transport mode is required']
+      },
+      customMode: {
+        type: String,
+        required: false
       },
       price: {
         type: Number,
@@ -225,7 +230,7 @@ const EventSchema = new Schema<IEvent>({
       }],
       availableTransportModes: [{
         type: String,
-        enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS'],
+        enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS', 'CUSTOM'],
         required: false
       }],
       availableSeats: {

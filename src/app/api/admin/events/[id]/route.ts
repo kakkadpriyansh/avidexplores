@@ -136,12 +136,25 @@ export async function PUT(
           return {
             ...depObj,
             transportOptions: Array.isArray(dep.transportOptions) ? dep.transportOptions
-            .filter((opt: any) => opt && typeof opt.mode === 'string' && ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(opt.mode)
-              && opt.price !== undefined && opt.price !== null)
-            .map((opt: any) => ({
-              mode: String(opt.mode),
-              price: Number(opt.price)
-            })) : [],
+            .filter((opt: any) => {
+              console.log('Filtering transport option:', opt);
+              const isValid = opt && typeof opt.mode === 'string' && ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS','CUSTOM'].includes(opt.mode)
+                && opt.price !== undefined && opt.price !== null;
+              console.log('Transport option valid:', isValid);
+              return isValid;
+            })
+            .map((opt: any) => {
+              console.log('Mapping transport option:', opt);
+              const result: any = {
+                mode: String(opt.mode),
+                price: Number(opt.price)
+              };
+              if (opt.mode === 'CUSTOM' && opt.customMode) {
+                result.customMode = String(opt.customMode);
+              }
+              console.log('Mapped result:', result);
+              return result;
+            }) : [],
           availableDates: Array.isArray(dep.availableDates) ? dep.availableDates
             .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
               && entry.year !== undefined && entry.year !== null
@@ -158,7 +171,7 @@ export async function PUT(
                       if (Array.isArray(value) && value.length > 0) {
                         const validModes = value
                           .map((m: any) => String(m))
-                          .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m));
+                          .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS','CUSTOM'].includes(m));
                         if (validModes.length > 0) {
                           result[String(key)] = validModes;
                         }
@@ -171,7 +184,7 @@ export async function PUT(
               availableTransportModes: Array.isArray(entry.availableTransportModes)
                 ? entry.availableTransportModes
                     .map((m: any) => String(m))
-                    .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                    .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS','CUSTOM'].includes(m))
                 : undefined,
               availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
               totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
@@ -253,12 +266,11 @@ export async function PUT(
       // Try using direct MongoDB update without Mongoose casting
       const event = await (Event as any).findByIdAndUpdate(
         params.id,
-        { $set: safeUpdate },
+        safeUpdate,
         { 
           new: true, 
-          runValidators: false, // Disable validators to prevent casting
-          strict: false, // Allow fields not in schema
-          overwrite: false // Don't overwrite, just update specified fields
+          runValidators: true,
+          strict: false
         }
       );
 

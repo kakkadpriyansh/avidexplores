@@ -42,15 +42,16 @@ interface Event {
     discountedPrice?: number;
     isSelected?: boolean;
     transportOptions: {
-      mode: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS';
+      mode: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS' | 'CUSTOM';
+      customMode?: string;
       price: number;
     }[];
     availableDates: {
       month: string;
       year: number;
       dates: number[];
-      dateTransportModes?: Record<number, ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[]>;
-      availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS')[];
+      dateTransportModes?: Record<number, ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS' | 'CUSTOM')[]>;
+      availableTransportModes?: ('AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS' | 'CUSTOM')[];
       availableSeats?: number;
       totalSeats?: number;
     }[];
@@ -178,7 +179,7 @@ export default function EditEventPage() {
         price: 0,
         discountedPrice: undefined,
         isSelected: false,
-        transportOptions: [{ mode: 'BUS', price: 0 }],
+        transportOptions: [{ mode: 'BUS', price: 0, customMode: '' }],
         availableDates: []
       }]
     } : prev);
@@ -206,13 +207,13 @@ export default function EditEventPage() {
       const newDepartures = [...prev.departures];
       newDepartures[depIndex] = {
         ...newDepartures[depIndex],
-        transportOptions: [...newDepartures[depIndex].transportOptions, { mode: 'BUS', price: 0 }]
+        transportOptions: [...newDepartures[depIndex].transportOptions, { mode: 'BUS', price: 0, customMode: '' }]
       };
       return { ...prev, departures: newDepartures };
     });
   };
 
-  const updateTransportOption = (depIndex: number, optIndex: number, field: 'mode' | 'price', value: any) => {
+  const updateTransportOption = (depIndex: number, optIndex: number, field: 'mode' | 'price' | 'customMode', value: any) => {
     setEvent(prev => {
       if (!prev) return prev;
       const newDepartures = [...(prev.departures || [])];
@@ -222,12 +223,15 @@ export default function EditEventPage() {
   };
 
   const removeTransportOption = (depIndex: number, optIndex: number) => {
+    console.log('Removing transport option:', depIndex, optIndex);
     setEvent(prev => {
       if (!prev || !prev.departures || !prev.departures[depIndex]) return prev;
       const newDepartures = [...prev.departures];
+      const newTransportOptions = newDepartures[depIndex].transportOptions.filter((_, i) => i !== optIndex);
+      console.log('New transport options after removal:', newTransportOptions);
       newDepartures[depIndex] = {
         ...newDepartures[depIndex],
-        transportOptions: newDepartures[depIndex].transportOptions.filter((_, i) => i !== optIndex)
+        transportOptions: newTransportOptions
       };
       return { ...prev, departures: newDepartures };
     });
@@ -443,10 +447,16 @@ export default function EditEventPage() {
           ...depObj,
           transportOptions: Array.isArray(dep.transportOptions) 
             ? dep.transportOptions.filter((opt: any) => opt && opt.mode && opt.price !== undefined)
-                .map((opt: any) => ({
-                  mode: String(opt.mode),
-                  price: Number(opt.price)
-                }))
+                .map((opt: any) => {
+                  console.log('Processing transport option:', opt);
+                  const result = {
+                    mode: String(opt.mode),
+                    customMode: opt.mode === 'CUSTOM' ? String(opt.customMode || '') : undefined,
+                    price: Number(opt.price)
+                  };
+                  console.log('Mapped transport option:', result);
+                  return result;
+                })
             : [],
           availableDates: Array.isArray(dep.availableDates)
             ? dep.availableDates
@@ -466,14 +476,14 @@ export default function EditEventPage() {
                             String(k),
                             (v as any[])
                               .map((m: any) => String(m))
-                              .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                              .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS','CUSTOM'].includes(m))
                           ])
                       )
                     : undefined,
                   availableTransportModes: Array.isArray(entry.availableTransportModes)
                     ? entry.availableTransportModes
                         .map((m: any) => String(m))
-                        .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                        .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS','CUSTOM'].includes(m))
                     : undefined,
                   availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
                   totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,
@@ -1238,15 +1248,34 @@ export default function EditEventPage() {
                               <div className="md:w-1/3">
                                 <Label>Mode</Label>
                                 <select
-                                  value={opt.mode}
-                                  onChange={(e) => updateTransportOption(depIndex, optIndex, 'mode', e.target.value)}
+                                  value={opt.mode === 'CUSTOM' ? 'CUSTOM' : opt.mode}
+                                  onChange={(e) => {
+                                    console.log('Transport mode changed:', e.target.value);
+                                    if (e.target.value === 'CUSTOM') {
+                                      updateTransportOption(depIndex, optIndex, 'mode', 'CUSTOM');
+                                    } else {
+                                      updateTransportOption(depIndex, optIndex, 'mode', e.target.value);
+                                    }
+                                  }}
                                   className="w-full border rounded px-3 py-2"
                                 >
                                   <option value="AC_TRAIN">AC Train</option>
                                   <option value="NON_AC_TRAIN">Non-AC Train</option>
                                   <option value="FLIGHT">Flight</option>
                                   <option value="BUS">Bus</option>
+                                  <option value="CUSTOM">Custom</option>
                                 </select>
+                                {opt.mode === 'CUSTOM' && (
+                                  <Input
+                                    placeholder="Enter custom transport mode"
+                                    value={opt.customMode || ''}
+                                    onChange={(e) => {
+                                      console.log('Custom mode changed:', e.target.value);
+                                      updateTransportOption(depIndex, optIndex, 'customMode', e.target.value);
+                                    }}
+                                    className="mt-2"
+                                  />
+                                )}
                               </div>
                               <div className="md:w-1/3">
                                 <Label>Price (per person)</Label>
@@ -1398,7 +1427,7 @@ export default function EditEventPage() {
                                     return (
                                       <div key={d} className="flex flex-wrap items-center gap-3">
                                         <span className="text-sm font-medium w-16">{d}</span>
-                                        {['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].map((mode) => {
+                                        {['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS','CUSTOM'].map((mode) => {
                                           const checked = selected.includes(mode as any);
                                           return (
                                             <label key={mode} className="inline-flex items-center gap-2 border rounded px-3 py-2 cursor-pointer">

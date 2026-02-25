@@ -98,7 +98,7 @@ interface DatabaseEvent {
     price?: number;
     discountedPrice?: number;
     isSelected?: boolean;
-    transportOptions: { mode: string; price: number }[];
+    transportOptions: { mode: string; name?: string; price: number }[];
     availableDates: {
       month: string;
       year: number;
@@ -328,6 +328,28 @@ export default function EventDetailPage() {
     return difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase();
   };
 
+  const formatTransportMode = (mode: string, name?: string, customMode?: string) => {
+    // Prioritize name or customMode field for custom transports
+    if (name && name.trim() !== '') return name;
+    if (customMode && customMode.trim() !== '') return customMode;
+    
+    switch (mode) {
+      case 'AC_TRAIN':
+        return 'AC Train';
+      case 'NON_AC_TRAIN':
+        return 'Non-AC Train';
+      case 'FLIGHT':
+        return 'Flight';
+      case 'BUS':
+        return 'Bus';
+      case 'CUSTOM':
+      case 'Custom':
+        return 'Private Transport'; // Fallback when no name is provided
+      default:
+        return mode;
+    }
+  };
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -552,7 +574,7 @@ export default function EventDetailPage() {
                                       : 'bg-background text-muted-foreground hover:text-foreground border-border hover:border-primary/50'
                                   }`}
                                 >
-                                  {opt.mode} · ₹{Number(opt.price || 0).toLocaleString()}
+                                  {formatTransportMode(opt.mode, opt.name, (opt as any).customMode)} · ₹{Number(opt.price || 0).toLocaleString()}
                                 </button>
                               ))}
                             </div>
@@ -566,7 +588,7 @@ export default function EventDetailPage() {
                     <div className="space-y-4">
                       {selectedTransportIndex !== null && (
                         <p className="text-xs text-muted-foreground">
-                          Selected transport: {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.mode}
+                          Selected transport: {formatTransportMode(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.mode, event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.name, (event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] as any)?.customMode)}
                           {' '}(+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex]?.price || 0).toLocaleString()})
                         </p>
                       )}

@@ -214,12 +214,24 @@ export async function POST(request: NextRequest) {
             price: dep.price !== undefined ? Number(dep.price) : undefined,
             discountedPrice: dep.discountedPrice !== undefined ? Number(dep.discountedPrice) : undefined,
             transportOptions: Array.isArray(dep.transportOptions) ? dep.transportOptions
-              .filter((opt: any) => opt && typeof opt.mode === 'string' && ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(opt.mode)
+              .filter((opt: any) => opt && typeof opt.mode === 'string' && opt.mode.trim() !== ''
                 && opt.price !== undefined && opt.price !== null)
-              .map((opt: any) => ({
-                mode: String(opt.mode),
-                price: Number(opt.price)
-              })) : [],
+              .map((opt: any) => {
+                const transportOption: any = {
+                  mode: String(opt.mode),
+                  price: Number(opt.price)
+                };
+                
+                // Handle both name and customMode fields for backward compatibility
+                if (opt.name && String(opt.name).trim() !== '') {
+                  transportOption.name = String(opt.name).trim();
+                }
+                if (opt.customMode && String(opt.customMode).trim() !== '') {
+                  transportOption.customMode = String(opt.customMode).trim();
+                }
+                
+                return transportOption;
+              }) : [],
             availableDates: Array.isArray(dep.availableDates) ? dep.availableDates
               .filter((entry: any) => entry && typeof entry.month === 'string' && entry.month.trim() !== ''
                 && entry.year !== undefined && entry.year !== null
@@ -237,14 +249,14 @@ export async function POST(request: NextRequest) {
                           Number(k),
                           (v as any[])
                             .map((m: any) => String(m))
-                            .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                            .filter((m: string) => m.trim() !== '')
                         ])
                     )
                   : undefined,
                 availableTransportModes: Array.isArray(entry.availableTransportModes)
                   ? entry.availableTransportModes
                       .map((m: any) => String(m))
-                      .filter((m: string) => ['AC_TRAIN','NON_AC_TRAIN','FLIGHT','BUS'].includes(m))
+                      .filter((m: string) => m.trim() !== '')
                   : undefined,
                 availableSeats: entry.availableSeats !== undefined ? Number(entry.availableSeats) : undefined,
                 totalSeats: entry.totalSeats !== undefined ? Number(entry.totalSeats) : undefined,

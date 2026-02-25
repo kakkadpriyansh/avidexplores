@@ -68,7 +68,7 @@ interface Event {
     price?: number;
     discountedPrice?: number;
     isSelected?: boolean;
-    transportOptions: { mode: string; price: number }[];
+    transportOptions: { mode: string; name?: string; customMode?: string; price: number }[];
     availableDates: {
       month: string;
       year: number;
@@ -295,6 +295,28 @@ export default function BookEventPage() {
     return (basePrice + transportPrice) * participants.length;
   };
 
+  const formatTransportMode = (mode: string, name?: string, customMode?: string) => {
+    // Prioritize name or customMode field for custom transports
+    if (name && name.trim() !== '') return name;
+    if (customMode && customMode.trim() !== '') return customMode;
+    
+    switch (mode) {
+      case 'AC_TRAIN':
+        return 'AC Train';
+      case 'NON_AC_TRAIN':
+        return 'Non-AC Train';
+      case 'FLIGHT':
+        return 'Flight';
+      case 'BUS':
+        return 'Bus';
+      case 'CUSTOM':
+      case 'Custom':
+        return 'Private Transport'; // Fallback when no name is provided
+      default:
+        return mode;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!event || selectedDepartureIndex === null || !selectedDepartureDate || selectedTransportIndex === null) return;
@@ -496,7 +518,7 @@ export default function BookEventPage() {
                                           : 'bg-background text-muted-foreground hover:text-foreground border-border hover:border-primary/50'
                                       }`}
                                     >
-                                      {opt.mode} · ₹{Number(opt.price || 0).toLocaleString()}
+                                      {formatTransportMode(opt.mode, opt.name, (opt as any).customMode)} · ₹{Number(opt.price || 0).toLocaleString()}
                                     </button>
                                   ))}
                                 </div>
@@ -510,7 +532,7 @@ export default function BookEventPage() {
                         <div className="space-y-4">
                           {selectedTransportIndex !== null && event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] && (
                             <p className="text-xs text-muted-foreground">
-                              Selected transport: {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].mode.replace('_', ' ')}
+                              Selected transport: {formatTransportMode(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].mode, event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].name, (event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] as any).customMode)}
                               {' '}(+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].price || 0).toLocaleString()})
                             </p>
                           )}
@@ -797,7 +819,7 @@ export default function BookEventPage() {
                           <div className="flex justify-between">
                             <span>Transport:</span>
                             <span className="font-medium">
-                              {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].mode.replace('_', ' ')}
+                              {formatTransportMode(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].mode, event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].name, (event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] as any).customMode)}
                             </span>
                           </div>
                         )}
@@ -859,7 +881,7 @@ export default function BookEventPage() {
                         <div className="text-sm text-muted-foreground space-y-1">
                           <div>Departure: {event.departures[selectedDepartureIndex].label}</div>
                           {selectedTransportIndex !== null && event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] && (
-                            <div>Transport: {event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].mode.replace('_', ' ')} (+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].price || 0).toLocaleString()})</div>
+                            <div>Transport: {formatTransportMode(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].mode, event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].name, (event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex] as any).customMode)} (+₹{Number(event.departures[selectedDepartureIndex].transportOptions[selectedTransportIndex].price || 0).toLocaleString()})</div>
                           )}
                           {selectedDepartureDate && selectedDepartureMonth && (
                             <div>Date: {selectedDepartureDate} {selectedDepartureMonth.split('-')[0]} {selectedDepartureMonth.split('-')[1]}</div>
