@@ -179,12 +179,8 @@ export async function DELETE(
       );
     }
 
-    // Soft delete by setting isActive to false
-    const deletedEvent = await (Event as Model<IEvent>).findByIdAndUpdate(
-      id,
-      { isActive: false, updatedAt: new Date() },
-      { new: true }
-    );
+    // Hard delete the event
+    const deletedEvent = await (Event as Model<IEvent>).findByIdAndDelete(id);
 
     if (!deletedEvent) {
       return NextResponse.json(

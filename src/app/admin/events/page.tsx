@@ -18,7 +18,8 @@ import {
   MapPin,
   Calendar,
   Users,
-  CheckCircle
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
@@ -71,7 +72,7 @@ export default function AdminEventsPage() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/events?limit=50');
+      const response = await fetch('/api/events?limit=50&showDeleted=true');
       if (response.ok) {
         const data = await response.json();
         const items: EventItem[] = (data.data || []).map((e: any) => {
@@ -370,13 +371,13 @@ export default function AdminEventsPage() {
                                   <TooltipContent>Delete</TooltipContent>
                                 </Tooltip>
 
-                                {event.status === 'DRAFT' && (
+                                {event.status === 'DRAFT' ? (
                                   <Tooltip>
                                     <TooltipTrigger asChild>
                                       <Button
                                         size="icon"
                                         variant="ghost"
-                                        className="h-8 w-8 [&_svg]:size-3"
+                                        className="h-8 w-8 [&_svg]:size-3 text-green-600 hover:text-green-700 hover:bg-green-50"
                                         aria-label="Publish"
                                         onClick={() => handleStatusChange(event._id, 'PUBLISHED')}
                                       >
@@ -384,6 +385,21 @@ export default function AdminEventsPage() {
                                       </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>Publish</TooltipContent>
+                                  </Tooltip>
+                                ) : event.status === 'PUBLISHED' && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 [&_svg]:size-3 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                                        aria-label="Unpublish"
+                                        onClick={() => handleStatusChange(event._id, 'DRAFT')}
+                                      >
+                                        <XCircle />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Unpublish</TooltipContent>
                                   </Tooltip>
                                 )}
                               </div>
