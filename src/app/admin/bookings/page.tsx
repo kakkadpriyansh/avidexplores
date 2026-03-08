@@ -103,19 +103,19 @@ export default function AdminBookingsPage() {
   const exportBookings = () => {
     const csvContent = [
       ['Booking ID', 'Event', 'Departure', 'Date', 'Customer', 'Email', 'Phone', 'Participants', 'Transport', 'Amount', 'Status', 'Payment'].join(','),
-      ...bookings.map(b => [
+      ...bookings.filter(b => b && b.eventId && b.userId).map(b => [
         b.bookingId,
-        b.eventId.title,
+        b.eventId?.title || 'Unknown Event',
         b.selectedDeparture || '',
         new Date(b.date).toLocaleDateString(),
-        b.userId.name,
-        b.userId.email,
-        b.userId.phone || '',
-        b.participants.length,
+        b.userId?.name || 'Unknown User',
+        b.userId?.email || '',
+        b.userId?.phone || '',
+        b.participants?.length || 0,
         b.selectedTransportMode || '',
         b.totalAmount,
         b.status,
-        b.paymentInfo.paymentStatus
+        b.paymentInfo?.paymentStatus || 'UNKNOWN'
       ].join(','))
     ].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -129,6 +129,7 @@ export default function AdminBookingsPage() {
 
   const getBookingsForDate = (eventId: string, departure: string, month: string, year: number, date: number) => {
     return bookings.filter(b => 
+      b.eventId &&
       b.eventId._id === eventId &&
       b.selectedDeparture === departure &&
       new Date(b.date).getMonth() === new Date(`${month} 1, ${year}`).getMonth() &&
@@ -138,11 +139,13 @@ export default function AdminBookingsPage() {
   };
 
   const filteredBookings = bookings.filter(b => {
+    if (!b || !b.userId || !b.eventId) return false;
+    
     const matchesSearch = !searchQuery || 
       b.bookingId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.userId.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.userId.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.eventId.title.toLowerCase().includes(searchQuery.toLowerCase());
+      (b.userId.name && b.userId.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (b.userId.email && b.userId.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (b.eventId.title && b.eventId.title.toLowerCase().includes(searchQuery.toLowerCase()));
     
     const bookingDate = new Date(b.date);
     const matchesStartDate = !startDate || bookingDate >= new Date(startDate);
@@ -152,9 +155,10 @@ export default function AdminBookingsPage() {
   });
 
   const filteredEvents = events.filter(event => {
+    if (!event) return false;
     if (!searchQuery && !startDate && !endDate) return true;
-    const eventBookings = filteredBookings.filter(b => b.eventId._id === event._id);
-    const eventMatchesSearch = !searchQuery || event.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const eventBookings = filteredBookings.filter(b => b.eventId && b.eventId._id === event._id);
+    const eventMatchesSearch = !searchQuery || (event.title && event.title.toLowerCase().includes(searchQuery.toLowerCase()));
     return eventMatchesSearch || eventBookings.length > 0;
   });
 
