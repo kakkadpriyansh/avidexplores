@@ -1233,7 +1233,7 @@ export default function EventDetailPage() {
         </div>
 
         {/* Related Events */}
-        <section className="py-16 bg-muted/30">
+        {/* <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-product-sans font-bold text-center mb-12">
               Similar Adventures
@@ -1252,7 +1252,7 @@ export default function EventDetailPage() {
               <p className="text-center text-muted-foreground">No similar adventures found.</p>
             )}
           </div>
-        </section>
+        </section> */}
       </article>
 
       <Footer />
