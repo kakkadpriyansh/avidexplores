@@ -10,12 +10,32 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronRight, Calendar, Eye, Download, Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
+interface DateInfo {
+  month: string;
+  year: number;
+  day: number;
+  bookings: Booking[];
+}
+
 interface Booking {
   _id: string;
   bookingId: string;
   userId: { _id: string; name: string; email: string; phone?: string };
   eventId: { _id: string; title: string; location: string; price: number };
-  participants: any[];
+  participants: {
+    name: string;
+    age: number;
+    gender: 'MALE' | 'FEMALE' | 'OTHER';
+    phone: string;
+    email: string;
+    emergencyContact: {
+      name: string;
+      phone: string;
+      relationship: string;
+    };
+    medicalConditions?: string;
+    dietaryRestrictions?: string;
+  }[];
   totalAmount: number;
   status: string;
   paymentInfo: { paymentStatus: string; paymentMethod: string; transactionId?: string };
@@ -61,8 +81,8 @@ export default function AdminBookingsPage() {
     try {
       setLoading(true);
       const [bookingsRes, eventsRes] = await Promise.all([
-        fetch('/api/bookings'),
-        fetch('/api/events?admin=true')
+        fetch('/api/bookings?limit=1000'),
+        fetch('/api/events?admin=true&limit=1000')
       ]);
       if (bookingsRes.ok) {
         const data = await bookingsRes.json();
@@ -102,21 +122,31 @@ export default function AdminBookingsPage() {
 
   const exportBookings = () => {
     const csvContent = [
-      ['Booking ID', 'Event', 'Departure', 'Date', 'Customer', 'Email', 'Phone', 'Participants', 'Transport', 'Amount', 'Status', 'Payment'].join(','),
-      ...bookings.filter(b => b && b.eventId && b.userId).map(b => [
-        b.bookingId,
-        b.eventId?.title || 'Unknown Event',
-        b.selectedDeparture || '',
-        new Date(b.date).toLocaleDateString(),
-        b.userId?.name || 'Unknown User',
-        b.userId?.email || '',
-        b.userId?.phone || '',
-        b.participants?.length || 0,
-        b.selectedTransportMode || '',
-        b.totalAmount,
-        b.status,
-        b.paymentInfo?.paymentStatus || 'UNKNOWN'
-      ].join(','))
+      ['Booking ID', 'Event', 'Departure', 'Date', 'Customer', 'Email', 'Participant Name', 'Participant Age', 'Participant Gender', 'Participant Phone', 'Participant Email', 'Emergency Contact Name', 'Emergency Contact Phone', 'Emergency Contact Relationship', 'Medical Conditions', 'Dietary Restrictions', 'Transport', 'Amount', 'Status', 'Payment'].join(','),
+      ...bookings.filter(b => b && b.eventId && b.userId).flatMap(b => 
+        b.participants.map((participant, index) => [
+          index === 0 ? b.bookingId : '', // Only show booking ID for first participant
+          index === 0 ? (b.eventId?.title || 'Unknown Event') : '',
+          index === 0 ? (b.selectedDeparture || '') : '',
+          index === 0 ? new Date(b.date).toLocaleDateString() : '',
+          index === 0 ? (b.userId?.name || 'Unknown User') : '',
+          index === 0 ? (b.userId?.email || '') : '',
+          participant.name || '',
+          participant.age || '',
+          participant.gender || '',
+          participant.phone || '',
+          participant.email || '',
+          participant.emergencyContact?.name || '',
+          participant.emergencyContact?.phone || '',
+          participant.emergencyContact?.relationship || '',
+          participant.medicalConditions || '',
+          participant.dietaryRestrictions || '',
+          index === 0 ? (b.selectedTransportMode || '') : '',
+          index === 0 ? b.totalAmount : '',
+          index === 0 ? b.status : '',
+          index === 0 ? (b.paymentInfo?.paymentStatus || 'UNKNOWN') : ''
+        ].join(','))
+      )
     ].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -128,13 +158,34 @@ export default function AdminBookingsPage() {
   };
 
   const getBookingsForDate = (eventId: string, departure: string, month: string, year: number, date: number) => {
+    const dateBookings = bookings.filter(b => {
+      if (!b.eventId || b.eventId._id !== eventId || b.selectedDeparture !== departure) {
+        return false;
+      }
+      
+      const bookingDate = new Date(b.date);
+      const bookingMonth = bookingDate.toLocaleString('default', { month: 'long' });
+      const bookingYear = bookingDate.getFullYear();
+      const bookingDay = bookingDate.getDate();
+      
+      return bookingMonth === month && bookingYear === year && bookingDay === date;
+    });
+    
+    return dateBookings;
+  };
+
+  const getBookingsForDeparture = (eventId: string, departure: string) => {
     return bookings.filter(b => 
       b.eventId &&
       b.eventId._id === eventId &&
-      b.selectedDeparture === departure &&
-      new Date(b.date).getMonth() === new Date(`${month} 1, ${year}`).getMonth() &&
-      new Date(b.date).getFullYear() === year &&
-      new Date(b.date).getDate() === date
+      b.selectedDeparture === departure
+    );
+  };
+
+  const getBookingsForEvent = (eventId: string) => {
+    return bookings.filter(b => 
+      b.eventId &&
+      b.eventId._id === eventId
     );
   };
 
@@ -157,7 +208,7 @@ export default function AdminBookingsPage() {
   const filteredEvents = events.filter(event => {
     if (!event) return false;
     if (!searchQuery && !startDate && !endDate) return true;
-    const eventBookings = filteredBookings.filter(b => b.eventId && b.eventId._id === event._id);
+    const eventBookings = getBookingsForEvent(event._id).filter(b => filteredBookings.includes(b));
     const eventMatchesSearch = !searchQuery || (event.title && event.title.toLowerCase().includes(searchQuery.toLowerCase()));
     return eventMatchesSearch || eventBookings.length > 0;
   });
@@ -239,7 +290,7 @@ export default function AdminBookingsPage() {
               </Card>
             ) : null}
             {filteredEvents.map(event => {
-              const eventBookings = filteredBookings.filter(b => b.eventId._id === event._id);
+              const eventBookings = getBookingsForEvent(event._id).filter(b => filteredBookings.includes(b));
               const isEventExpanded = expandedEvents.has(event._id);
               
               return (
@@ -256,8 +307,31 @@ export default function AdminBookingsPage() {
                       <Button size="sm" variant="outline" onClick={(e) => {
                         e.stopPropagation();
                         const csv = [
-                          ['Booking ID', 'Departure', 'Date', 'Customer', 'Email', 'Participants', 'Transport', 'Amount', 'Status', 'Payment'].join(','),
-                          ...eventBookings.map(b => [b.bookingId, b.selectedDeparture || '', new Date(b.date).toLocaleDateString(), b.userId.name, b.userId.email, b.participants.length, b.selectedTransportMode || '', b.totalAmount, b.status, b.paymentInfo.paymentStatus].join(','))
+                          ['Booking ID', 'Departure', 'Date', 'Customer', 'Email', 'Phone', 'Participant Name', 'Participant Age', 'Participant Gender', 'Participant Phone', 'Participant Email', 'Emergency Contact Name', 'Emergency Contact Phone', 'Emergency Contact Relationship', 'Medical Conditions', 'Dietary Restrictions', 'Transport', 'Amount', 'Status', 'Payment'].join(','),
+                          ...eventBookings.flatMap(b => 
+                            b.participants.map((participant, index) => [
+                              index === 0 ? b.bookingId : '',
+                              index === 0 ? (b.selectedDeparture || '') : '',
+                              index === 0 ? new Date(b.date).toLocaleDateString() : '',
+                              index === 0 ? b.userId.name : '',
+                              index === 0 ? b.userId.email : '',
+                              index === 0 ? (b.userId.phone || '') : '',
+                              participant.name || '',
+                              participant.age || '',
+                              participant.gender || '',
+                              participant.phone || '',
+                              participant.email || '',
+                              participant.emergencyContact?.name || '',
+                              participant.emergencyContact?.phone || '',
+                              participant.emergencyContact?.relationship || '',
+                              participant.medicalConditions || '',
+                              participant.dietaryRestrictions || '',
+                              index === 0 ? (b.selectedTransportMode || '') : '',
+                              index === 0 ? b.totalAmount : '',
+                              index === 0 ? b.status : '',
+                              index === 0 ? b.paymentInfo.paymentStatus : ''
+                            ].join(','))
+                          )
                         ].join('\n');
                         const blob = new Blob([csv], { type: 'text/csv' });
                         const url = window.URL.createObjectURL(blob);
@@ -279,7 +353,7 @@ export default function AdminBookingsPage() {
                           event.departures.map((departure, depIdx) => {
                             const depKey = `${event._id}-${depIdx}`;
                             const isDepartureExpanded = expandedDepartures.has(depKey);
-                            const depBookings = filteredBookings.filter(b => b.eventId._id === event._id && b.selectedDeparture === departure.label);
+                            const depBookings = getBookingsForDeparture(event._id, departure.label).filter(b => filteredBookings.includes(b));
                             if (depBookings.length === 0 && (searchQuery || startDate || endDate)) return null;
 
                             return (
@@ -295,8 +369,30 @@ export default function AdminBookingsPage() {
                                   <Button size="sm" variant="outline" onClick={(e) => {
                                     e.stopPropagation();
                                     const csv = [
-                                      ['Booking ID', 'Date', 'Customer', 'Email', 'Participants', 'Transport', 'Amount', 'Status', 'Payment'].join(','),
-                                      ...depBookings.map(b => [b.bookingId, new Date(b.date).toLocaleDateString(), b.userId.name, b.userId.email, b.participants.length, b.selectedTransportMode || '', b.totalAmount, b.status, b.paymentInfo.paymentStatus].join(','))
+                                      ['Booking ID', 'Date', 'Customer', 'Email', 'Phone', 'Participant Name', 'Participant Age', 'Participant Gender', 'Participant Phone', 'Participant Email', 'Emergency Contact Name', 'Emergency Contact Phone', 'Emergency Contact Relationship', 'Medical Conditions', 'Dietary Restrictions', 'Transport', 'Amount', 'Status', 'Payment'].join(','),
+                                      ...depBookings.flatMap(b => 
+                                        b.participants.map((participant, index) => [
+                                          index === 0 ? b.bookingId : '',
+                                          index === 0 ? new Date(b.date).toLocaleDateString() : '',
+                                          index === 0 ? b.userId.name : '',
+                                          index === 0 ? b.userId.email : '',
+                                          index === 0 ? (b.userId.phone || '') : '',
+                                          participant.name || '',
+                                          participant.age || '',
+                                          participant.gender || '',
+                                          participant.phone || '',
+                                          participant.email || '',
+                                          participant.emergencyContact?.name || '',
+                                          participant.emergencyContact?.phone || '',
+                                          participant.emergencyContact?.relationship || '',
+                                          participant.medicalConditions || '',
+                                          participant.dietaryRestrictions || '',
+                                          index === 0 ? (b.selectedTransportMode || '') : '',
+                                          index === 0 ? b.totalAmount : '',
+                                          index === 0 ? b.status : '',
+                                          index === 0 ? b.paymentInfo.paymentStatus : ''
+                                        ].join(','))
+                                      )
                                     ].join('\n');
                                     const blob = new Blob([csv], { type: 'text/csv' });
                                     const url = window.URL.createObjectURL(blob);
@@ -312,88 +408,132 @@ export default function AdminBookingsPage() {
 
                                 {isDepartureExpanded && (
                                   <div className="bg-muted/5">
-                                    {!departure.availableDates || departure.availableDates.length === 0 ? (
-                                      <div className="p-4 pl-20 text-sm text-muted-foreground">No dates configured</div>
-                                    ) : (
-                                      <div>
-                                        {departure.availableDates.map((dateEntry, dateEntryIdx) => (
-                                          <div key={dateEntryIdx} className="border-b border-border/20 last:border-0">
-                                            {dateEntry.dates.map(date => {
-                                              const dateKey = `${depKey}-${dateEntry.month}-${dateEntry.year}-${date}`;
-                                              const isDateExpanded = expandedDates.has(dateKey);
-                                              const dateBookings = getBookingsForDate(event._id, departure.label, dateEntry.month, dateEntry.year, date).filter(b => filteredBookings.includes(b));
-                                              if (dateBookings.length === 0 && (searchQuery || startDate || endDate)) return null;
-
-                                              return (
-                                                <div key={dateKey}>
-                                                  <div className="flex items-center justify-between p-3 pl-20 hover:bg-muted/20">
-                                                    <div className="flex items-center gap-3 flex-1 cursor-pointer" onClick={() => toggleDate(dateKey)}>
-                                                      {isDateExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                                                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                                                      <div>
-                                                        <span className="font-medium">{dateEntry.month} {date}, {dateEntry.year}</span>
-                                                        <span className="ml-2 text-xs text-muted-foreground">
-                                                          {dateBookings.length} {dateBookings.length === 1 ? 'booking' : 'bookings'}
-                                                        </span>
-                                                      </div>
+                                    {(() => {
+                                      // Get all unique dates from bookings for this departure
+                                      const allBookingDates = depBookings.reduce((dates, booking) => {
+                                        const bookingDate = new Date(booking.date);
+                                        const month = bookingDate.toLocaleString('default', { month: 'long' });
+                                        const year = bookingDate.getFullYear();
+                                        const day = bookingDate.getDate();
+                                        const dateKey = `${month}-${year}-${day}`;
+                                        
+                                        if (!dates[dateKey]) {
+                                          dates[dateKey] = {
+                                            month,
+                                            year,
+                                            day,
+                                            bookings: []
+                                          };
+                                        }
+                                        dates[dateKey].bookings.push(booking);
+                                        return dates;
+                                      }, {} as Record<string, DateInfo>);
+                                      
+                                      const sortedDates = Object.entries(allBookingDates).sort(([, a], [, b]) => {
+                                        const dateA = new Date(a.year, new Date(`${a.month} 1`).getMonth(), a.day);
+                                        const dateB = new Date(b.year, new Date(`${b.month} 1`).getMonth(), b.day);
+                                        return dateA.getTime() - dateB.getTime();
+                                      });
+                                      
+                                      if (sortedDates.length === 0) {
+                                        return <div className="p-4 pl-20 text-sm text-muted-foreground">No bookings for this departure</div>;
+                                      }
+                                      
+                                      return (
+                                        <div>
+                                          {sortedDates.map(([dateKey, dateInfo]: [string, DateInfo]) => {
+                                            const expandKey = `${depKey}-${dateKey}`;
+                                            const isDateExpanded = expandedDates.has(expandKey);
+                                            const dateBookings = dateInfo.bookings.filter((b: any) => filteredBookings.includes(b));
+                                            
+                                            if (dateBookings.length === 0 && (searchQuery || startDate || endDate)) return null;
+                                            
+                                            return (
+                                              <div key={expandKey} className="border-b border-border/20 last:border-0">
+                                                <div className="flex items-center justify-between p-3 pl-20 hover:bg-muted/20">
+                                                  <div className="flex items-center gap-3 flex-1 cursor-pointer" onClick={() => toggleDate(expandKey)}>
+                                                    {isDateExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                                                    <div>
+                                                      <span className="font-medium">{dateInfo.month} {dateInfo.day}, {dateInfo.year}</span>
+                                                      <span className="ml-2 text-xs text-muted-foreground">
+                                                        {dateBookings.length} {dateBookings.length === 1 ? 'booking' : 'bookings'}
+                                                      </span>
                                                     </div>
-                                                    {dateBookings.length > 0 && (
-                                                      <Button size="sm" variant="outline" onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        const csv = [
-                                                          ['Booking ID', 'Customer', 'Email', 'Phone', 'Participants', 'Transport', 'Amount', 'Status', 'Payment'].join(','),
-                                                          ...dateBookings.map(b => [b.bookingId, b.userId.name, b.userId.email, b.userId.phone || '', b.participants.length, b.selectedTransportMode || '', b.totalAmount, b.status, b.paymentInfo.paymentStatus].join(','))
-                                                        ].join('\n');
-                                                        const blob = new Blob([csv], { type: 'text/csv' });
-                                                        const url = window.URL.createObjectURL(blob);
-                                                        const a = document.createElement('a');
-                                                        a.href = url;
-                                                        a.download = `${event.title.replace(/\s+/g, '-')}-${departure.label.replace(/\s+/g, '-')}-${dateEntry.month}-${date}-bookings.csv`;
-                                                        a.click();
-                                                        window.URL.revokeObjectURL(url);
-                                                      }}>
-                                                        <Download className="h-3 w-3" />
-                                                      </Button>
-                                                    )}
                                                   </div>
-
-                                                  {isDateExpanded && (
-                                                    <div className="bg-background/50 p-4 pl-28">
-                                                      {dateBookings.length === 0 ? (
-                                                        <p className="text-sm text-muted-foreground">No bookings for this date</p>
-                                                      ) : (
-                                                        <div className="space-y-2">
-                                                          {dateBookings.map(booking => (
-                                                            <div key={booking._id} className="flex items-center justify-between p-3 bg-card border border-border rounded-lg">
-                                                              <div className="flex-1">
-                                                                <div className="font-medium">{booking.bookingId}</div>
-                                                                <div className="text-sm text-muted-foreground">{booking.userId.name} • {booking.participants.length} participants</div>
-                                                                <div className="text-xs text-muted-foreground">{booking.selectedTransportMode?.replace('_', ' ')}</div>
-                                                              </div>
-                                                              <div className="flex items-center gap-3">
-                                                                <div className="text-right">
-                                                                  <div className="font-semibold text-primary">₹{booking.totalAmount.toLocaleString()}</div>
-                                                                  <Badge className={booking.paymentInfo.paymentStatus === 'SUCCESS' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                                                                    {booking.paymentInfo.paymentStatus}
-                                                                  </Badge>
-                                                                </div>
-                                                                <Button size="sm" variant="outline" onClick={() => router.push(`/admin/bookings/${booking._id}`)}>
-                                                                  <Eye className="h-3 w-3" />
-                                                                </Button>
-                                                              </div>
-                                                            </div>
-                                                          ))}
-                                                        </div>
-                                                      )}
-                                                    </div>
+                                                  {dateBookings.length > 0 && (
+                                                    <Button size="sm" variant="outline" onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      const csv = [
+                                                        ['Booking ID', 'Customer', 'Email', 'Phone', 'Participant Name', 'Participant Age', 'Participant Gender', 'Participant Phone', 'Participant Email', 'Emergency Contact Name', 'Emergency Contact Phone', 'Emergency Contact Relationship', 'Medical Conditions', 'Dietary Restrictions', 'Transport', 'Amount', 'Status', 'Payment'].join(','),
+                                                        ...dateBookings.flatMap((b: Booking) => 
+                                                          b.participants.map((participant, index) => [
+                                                            index === 0 ? b.bookingId : '',
+                                                            index === 0 ? b.userId.name : '',
+                                                            index === 0 ? b.userId.email : '',
+                                                            index === 0 ? (b.userId.phone || '') : '',
+                                                            participant.name || '',
+                                                            participant.age || '',
+                                                            participant.gender || '',
+                                                            participant.phone || '',
+                                                            participant.email || '',
+                                                            participant.emergencyContact?.name || '',
+                                                            participant.emergencyContact?.phone || '',
+                                                            participant.emergencyContact?.relationship || '',
+                                                            participant.medicalConditions || '',
+                                                            participant.dietaryRestrictions || '',
+                                                            index === 0 ? (b.selectedTransportMode || '') : '',
+                                                            index === 0 ? b.totalAmount : '',
+                                                            index === 0 ? b.status : '',
+                                                            index === 0 ? b.paymentInfo.paymentStatus : ''
+                                                          ].join(','))
+                                                        )
+                                                      ].join('\n');
+                                                      const blob = new Blob([csv], { type: 'text/csv' });
+                                                      const url = window.URL.createObjectURL(blob);
+                                                      const a = document.createElement('a');
+                                                      a.href = url;
+                                                      a.download = `${event.title.replace(/\s+/g, '-')}-${departure.label.replace(/\s+/g, '-')}-${dateInfo.month}-${dateInfo.day}-bookings.csv`;
+                                                      a.click();
+                                                      window.URL.revokeObjectURL(url);
+                                                    }}>
+                                                      <Download className="h-3 w-3" />
+                                                    </Button>
                                                   )}
                                                 </div>
-                                              );
-                                            })}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
+                                                
+                                                {isDateExpanded && (
+                                                  <div className="bg-background/50 p-4 pl-28">
+                                                    <div className="space-y-2">
+                                                      {dateBookings.map((booking: Booking) => (
+                                                        <div key={booking._id} className="flex items-center justify-between p-3 bg-card border border-border rounded-lg">
+                                                          <div className="flex-1">
+                                                            <div className="font-medium">{booking.bookingId}</div>
+                                                            <div className="text-sm text-muted-foreground">{booking.userId.name} • {booking.participants.length} participants</div>
+                                                            <div className="text-xs text-muted-foreground">{booking.selectedTransportMode?.replace('_', ' ')}</div>
+                                                          </div>
+                                                          <div className="flex items-center gap-3">
+                                                            <div className="text-right">
+                                                              <div className="font-semibold text-primary">₹{booking.totalAmount.toLocaleString()}</div>
+                                                              <Badge className={booking.paymentInfo.paymentStatus === 'SUCCESS' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                                                                {booking.paymentInfo.paymentStatus}
+                                                              </Badge>
+                                                            </div>
+                                                            <Button size="sm" variant="outline" onClick={() => router.push(`/admin/bookings/${booking._id}`)}>
+                                                              <Eye className="h-3 w-3" />
+                                                            </Button>
+                                                          </div>
+                                                        </div>
+                                                      ))}
+                                                    </div>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      );
+                                    })()}
                                   </div>
                                 )}
                               </div>
