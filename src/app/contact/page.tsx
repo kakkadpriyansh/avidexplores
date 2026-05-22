@@ -67,10 +67,10 @@ export default function ContactPage() {
       icon: MapPin,
       title: 'Address',
       details: [
-        'Nakshatra -8, 704, Sadhu Vasvani Rd',
-        'Indian Park, Rajkot, Gujarat 360005',
+        ' C-702,Titanium City Center - Corporate Offices,',
+        ' Prahlad Nagar, Ahmedabad, Gujarat - 380015',
         'India',
-        <a href="https://maps.app.goo.gl/dnu32o4nsHkHrWXr7" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">View on Map</a>
+        <a href="https://maps.app.goo.gl/rbVHh7tVXPvZAhNg6" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">View on Map</a>
       ]
     },
     {
@@ -249,14 +249,14 @@ export default function ContactPage() {
             <p className="text-muted-foreground mb-4">
               Drop by our office to discuss your next adventure in person
             </p>
-            <a href="https://maps.app.goo.gl/dnu32o4nsHkHrWXr7" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+            <a href="https://maps.app.goo.gl/rbVHh7tVXPvZAhNg6" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
               View on Google Maps
             </a>
           </div>
           
           <div className="bg-card rounded-2xl overflow-hidden shadow-card">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3691.5008724056406!2d70.75889609999999!3d22.29688939999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3959cb780cbc7991%3A0x4d30206cf885f8b!2sAvid%20Explorers!5e0!3m2!1sen!2sin!4v1758803858396!5m2!1sen!2sin"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3672.3231076822676!2d72.52065851089236!3d23.01190577909441!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e9b577365c97b%3A0x6f169c3344693cfd!2sAvid%20Explorers%20Pvt%20Ltd!5e0!3m2!1sen!2sin!4v1779433778576!5m2!1sen!2sin"
               width="100%"
               height="400"
               style={{ border: 0 }}
