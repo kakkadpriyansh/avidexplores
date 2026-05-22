@@ -2,8 +2,8 @@
 
 const WhatsAppButton = () => {
   const handleWhatsAppClick = () => {
-    const phoneNumber = '+91 88665 52400';
-    const message = encodeURIComponent('Hi! I\'m interested in your adventure tours. Can you help me?');
+    const phoneNumber = '918866552400';
+    const message = encodeURIComponent('Hi Avid Explorers! I'm interested in your travel packages. Please help me with trip details, pricing, available dates, and booking process.');
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
