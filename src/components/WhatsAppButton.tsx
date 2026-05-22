@@ -3,7 +3,7 @@
 const WhatsAppButton = () => {
   const handleWhatsAppClick = () => {
     const phoneNumber = '918866552400';
-    const message = encodeURIComponent('Hi Avid Explorers! I'm interested in your travel packages. Please help me with trip details, pricing, available dates, and booking process.');
+    const message = encodeURIComponent('Hi Avid Explorers! I\'m interested in your travel packages. Please help me with trip details, pricing, available dates, and booking process.');
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
