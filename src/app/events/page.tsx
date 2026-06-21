@@ -150,7 +150,7 @@ export default function EventsPage() {
         </h2>
         <div className="relative z-10 w-16 h-1 bg-[#B71C1C] rounded-full mb-2" />
         <p className="relative z-10 text-base md:text-lg text-[#333] text-center max-w-2xl">
-          Discover amazing adventures tailored to your interests and skill level
+          Discover amazing experiences tailored to your interests.
         </p>
       </section>
 
@@ -195,7 +195,7 @@ export default function EventsPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search adventures..."
+                placeholder="Search experiences..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -211,7 +211,7 @@ export default function EventsPage() {
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="ml-2 text-muted-foreground">Loading adventures...</span>
+              <span className="ml-2 text-muted-foreground">Loading experiences...</span>
             </div>
           ) : error ? (
             <div className="text-center py-16">
@@ -234,7 +234,7 @@ export default function EventsPage() {
           ) : (
             <div className="text-center py-16">
               <p className="text-lg text-muted-foreground mb-4">
-                {searchTerm ? 'No adventures found matching your search' : 'No adventures available at the moment'}
+                {searchTerm ? 'No experiences found matching your search' : 'No experiences available at the moment'}
               </p>
               {searchTerm && (
                 <button
