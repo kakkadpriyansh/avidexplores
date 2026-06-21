@@ -28,22 +28,22 @@ export default async function AboutPage() {
     {
       icon: Shield,
       title: 'Safety First',
-      description: 'Every adventure is planned with comprehensive safety protocols and emergency procedures.'
+      description: 'Every Trip is planned with comprehensive safety protocols and emergency procedures.'
     },
     {
       icon: Users,
       title: 'Community',
-      description: 'We believe in building a community of like-minded adventurers who support each other.'
+      description: 'We believe in building a community of like-minded Explorers who support each other.'
     },
     {
       icon: Award,
       title: 'Excellence',
-      description: 'We strive for excellence in every aspect of our adventures, from planning to execution.'
+      description: 'We strive for excellence in every aspect of our Trip, from planning to execution.'
     },
     {
       icon: Heart,
       title: 'Passion',
-      description: 'Our passion for adventure drives us to create unforgettable experiences for every traveler.'
+      description: 'Our passion for Travel drives us to create unforgettable experiences for every traveler.'
     }
   ];
 
@@ -58,7 +58,7 @@ export default async function AboutPage() {
         </h2>
         <div className="relative z-10 w-16 h-1 bg-[#B71C1C] rounded-full mb-2" />
         <p className="relative z-10 text-base md:text-lg text-[#333] text-center max-w-2xl">
-          Creating unforgettable adventures and connecting people with nature
+           Travel & Stories — Community-driven group travel for Explorers who want more from every journey.
         </p>
       </section>
 
@@ -125,9 +125,9 @@ export default async function AboutPage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">Meet Our Team</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-4">The People Behind Avid Explorers</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Our experienced guides and coordinators are passionate about adventure and committed to your safety
+              Passionate travel experts crafting unforgettable experience, safely and seamlessly.
             </p>
           </div>
           {teamMembers.length === 0 ? (
@@ -158,21 +158,21 @@ export default async function AboutPage() {
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-foreground mb-6">Our Mission</h2>
             <p className="text-lg text-muted-foreground mb-8">
-              To inspire and enable people to explore the world's most beautiful places while fostering 
-              a deep respect for nature and local communities. We believe that adventure travel should be 
-              accessible, safe, and transformative for everyone.
+              To make travel in India feel personal, connected, and unforgettable — 
+              by building communities of like-minded travellers, curating honest itineraries,
+              and turning every trip into a story worth telling.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">500+</div>
-                <p className="text-muted-foreground">Adventures Completed</p>
+                <div className="text-3xl font-bold text-primary mb-2">50+</div>
+                <p className="text-muted-foreground">Trips Completed</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">5000+</div>
-                <p className="text-muted-foreground">Happy Adventurers</p>
+                <div className="text-3xl font-bold text-primary mb-2">250+</div>
+                <p className="text-muted-foreground">Happy Explorers</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">12+</div>
+                <div className="text-3xl font-bold text-primary mb-2">1+</div>
                 <p className="text-muted-foreground">Years of Experience</p>
               </div>
             </div>
@@ -183,8 +183,8 @@ export default async function AboutPage() {
       {/* CTA Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-foreground">Ready to Start Your Adventure?</h2>
-          <p className="text-xl mb-8 text-muted-foreground">Join our community of adventurers and discover what you're capable of.</p>
+          <h2 className="text-3xl font-bold mb-4 text-foreground">Ready to Plan Your Next Trip?</h2>
+          <p className="text-xl mb-8 text-muted-foreground">Be part of something. Travel differently.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/events">
               <Button size="lg" variant="default" className="group">
