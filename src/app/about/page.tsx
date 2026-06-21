@@ -188,7 +188,7 @@ export default async function AboutPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/events">
               <Button size="lg" variant="default" className="group">
-                Browse Adventures
+                Explore Experiences. 
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
