@@ -8,7 +8,8 @@ export interface IBooking extends Document {
   selectedMonth?: string; // Selected month for seat tracking
   selectedYear?: number; // Selected year for seat tracking
   selectedDeparture?: string; // Selected departure label (e.g., "Rajkot to Rajkot")
-  selectedTransportMode?: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS'; // Selected transport mode
+  //selectedTransportMode?: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS'; // Selected transport mode
+  selectedTransportMode?: 'AC_TRAIN' | 'NON_AC_TRAIN' | 'FLIGHT' | 'BUS' | 'CUSTOM'; // Selected transport mode
   participants: {
     name: string;
     age: number;
@@ -92,7 +93,8 @@ const BookingSchema = new Schema<IBooking>({
   },
   selectedTransportMode: {
     type: String,
-    enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS']
+    enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS', 'CUSTOM']
+   // enum: ['AC_TRAIN', 'NON_AC_TRAIN', 'FLIGHT', 'BUS']
   },
   participants: [{
     name: {
